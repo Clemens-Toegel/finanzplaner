@@ -1,0 +1,106 @@
+{
+  "@@locale": "en",
+  "appTitle": "Tax refund expenses",
+  "taxRefundPurchasesTitle": "Tax refund expenses",
+  "exportPdfTooltip": "Export PDF",
+  "expenseAccountLabel": "Expense account",
+  "accountLabelPersonal": "Personal expenses",
+  "accountLabelBusiness": "Business expenses",
+  "accountLabelInSentencePersonal": "personal expenses",
+  "accountLabelInSentenceBusiness": "business expenses",
+  "addPurchase": "Add expense",
+  "addPurchaseTitle": "Add expense",
+  "editPurchaseTitle": "Edit expense",
+  "editPurchaseAction": "Edit",
+  "savePurchaseAction": "Save",
+  "deletePurchaseAction": "Delete",
+  "deletePurchaseTitle": "Delete expense?",
+  "deletePurchaseMessage": "Do you really want to delete this expense?",
+  "cancelAction": "Cancel",
+  "confirmDeleteAction": "Delete",
+  "purchaseDetailsTitle": "Expense details",
+  "descriptionLabel": "Description",
+  "descriptionValidation": "Please enter a description.",
+  "vendorLabel": "Vendor",
+  "amountLabel": "Amount (€)",
+  "amountValidation": "Please enter an amount.",
+  "amountInvalidValidation": "Please enter a valid amount.",
+  "categoryLabel": "Category",
+  "dateOfPurchaseLabel": "Purchase date",
+  "pickDate": "Select",
+  "vatDeductibleLabel": "VAT deductible in Austria",
+  "notesLabel": "Notes for tax advisor",
+  "addBeforeExport": "Please add expenses before exporting.",
+  "emptyStateTitle": "Track tax-deductible expenses in Austria",
+  "emptyStateSubtitle": "Add each receipt for {account} so your tax advisor can review it.",
+  "@emptyStateSubtitle": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "dashboardTabLabel": "Analytics",
+  "expensesTabLabel": "Expenses",
+  "totalAmountLabel": "Total amount",
+  "averageExpenseLabel": "Average expense",
+  "nonDeductibleTotalLabel": "Not deductible",
+  "topCategoriesLabel": "Top categories",
+  "deductibleTotalLabel": "Deductible total",
+  "itemsTracked": "{count, plural, one{# item tracked} other{# items tracked}}",
+  "@itemsTracked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknownVendor": "Unknown vendor",
+  "deductibleLabel": "Deductible",
+  "notDeductibleLabel": "Not deductible",
+  "pdfTitle": "{account} – deductible expenses",
+  "@pdfTitle": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "pdfGeneratedAt": "Generated on {date}",
+  "@pdfGeneratedAt": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "pdfHeaderDate": "Date",
+  "pdfHeaderDescription": "Description",
+  "pdfHeaderVendor": "Vendor",
+  "pdfHeaderCategory": "Category",
+  "pdfHeaderAmount": "Amount",
+  "pdfHeaderDeductible": "Deductible",
+  "pdfHeaderNotes": "Notes",
+  "yesLabel": "Yes",
+  "noLabel": "No",
+  "totalLabel": "Total: {amount}",
+  "@totalLabel": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "deductibleTotalText": "Deductible total: {amount}",
+  "@deductibleTotalText": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "categoryPersonalGroceries": "Groceries",
+  "categoryPersonalHousehold": "Household",
+  "categoryPersonalHealth": "Health",
+  "categoryPersonalMobility": "Mobility",
+  "categoryPersonalEducation": "Education",
+  "categoryPersonalLeisure": "Leisure",
+  "categoryPersonalOther": "Other",
+  "categoryBusinessOfficeSupplies": "Office supplies",
+  "categoryBusinessHardware": "Hardware",
+  "categoryBusinessSoftware": "Software",
+  "categoryBusinessTravel": "Travel",
+  "categoryBusinessTraining": "Training",
+  "categoryBusinessServices": "Services",
+  "categoryBusinessOther": "Other"
+}

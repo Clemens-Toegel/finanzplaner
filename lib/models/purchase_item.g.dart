@@ -1,0 +1,41 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'purchase_item.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+_PurchaseItem _$PurchaseItemFromJson(Map<String, dynamic> json) =>
+    _PurchaseItem(
+      id: (json['id'] as num?)?.toInt(),
+      accountType: $enumDecode(
+        _$ExpenseAccountTypeEnumMap,
+        json['accountType'],
+      ),
+      description: json['description'] as String,
+      vendor: json['vendor'] as String,
+      category: json['category'] as String,
+      amount: (json['amount'] as num).toDouble(),
+      date: DateTime.parse(json['date'] as String),
+      isDeductible: json['isDeductible'] as bool,
+      notes: json['notes'] as String,
+    );
+
+Map<String, dynamic> _$PurchaseItemToJson(_PurchaseItem instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'accountType': _$ExpenseAccountTypeEnumMap[instance.accountType]!,
+      'description': instance.description,
+      'vendor': instance.vendor,
+      'category': instance.category,
+      'amount': instance.amount,
+      'date': instance.date.toIso8601String(),
+      'isDeductible': instance.isDeductible,
+      'notes': instance.notes,
+    };
+
+const _$ExpenseAccountTypeEnumMap = {
+  ExpenseAccountType.personal: 'personal',
+  ExpenseAccountType.business: 'business',
+};

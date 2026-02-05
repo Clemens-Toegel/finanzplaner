@@ -1,0 +1,106 @@
+{
+  "@@locale": "de",
+  "appTitle": "Steuererstattungs-Ausgaben",
+  "taxRefundPurchasesTitle": "Steuererstattungs-Ausgaben",
+  "exportPdfTooltip": "PDF exportieren",
+  "expenseAccountLabel": "Ausgabenkonto",
+  "accountLabelPersonal": "Private Ausgaben",
+  "accountLabelBusiness": "Betriebliche Ausgaben",
+  "accountLabelInSentencePersonal": "private Ausgaben",
+  "accountLabelInSentenceBusiness": "betriebliche Ausgaben",
+  "addPurchase": "Ausgabe hinzufügen",
+  "addPurchaseTitle": "Ausgabe hinzufügen",
+  "editPurchaseTitle": "Ausgabe bearbeiten",
+  "editPurchaseAction": "Bearbeiten",
+  "savePurchaseAction": "Speichern",
+  "deletePurchaseAction": "Löschen",
+  "deletePurchaseTitle": "Ausgabe löschen?",
+  "deletePurchaseMessage": "Möchtest du diese Ausgabe wirklich löschen?",
+  "cancelAction": "Abbrechen",
+  "confirmDeleteAction": "Löschen",
+  "purchaseDetailsTitle": "Ausgabedetails",
+  "descriptionLabel": "Beschreibung",
+  "descriptionValidation": "Bitte eine Beschreibung eingeben.",
+  "vendorLabel": "Anbieter",
+  "amountLabel": "Betrag (€)",
+  "amountValidation": "Bitte einen Betrag eingeben.",
+  "amountInvalidValidation": "Bitte einen gültigen Betrag eingeben.",
+  "categoryLabel": "Kategorie",
+  "dateOfPurchaseLabel": "Kaufdatum",
+  "pickDate": "Auswählen",
+  "vatDeductibleLabel": "In Österreich vorsteuerabzugsfähig",
+  "notesLabel": "Notizen für die Steuerberatung",
+  "addBeforeExport": "Bitte zuerst Ausgaben hinzufügen, bevor exportiert wird.",
+  "emptyStateTitle": "Steuerlich absetzbare Ausgaben in Österreich erfassen",
+  "emptyStateSubtitle": "Füge jeden Beleg für {account} hinzu, damit deine Steuerberatung ihn prüfen kann.",
+  "@emptyStateSubtitle": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "dashboardTabLabel": "Analyse",
+  "expensesTabLabel": "Ausgaben",
+  "totalAmountLabel": "Gesamtsumme",
+  "averageExpenseLabel": "Durchschnitt pro Ausgabe",
+  "nonDeductibleTotalLabel": "Nicht absetzbar",
+  "topCategoriesLabel": "Top-Kategorien",
+  "deductibleTotalLabel": "Absetzbare Summe",
+  "itemsTracked": "{count, plural, one{# Eintrag erfasst} other{# Einträge erfasst}}",
+  "@itemsTracked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unknownVendor": "Unbekannter Anbieter",
+  "deductibleLabel": "Absetzbar",
+  "notDeductibleLabel": "Nicht absetzbar",
+  "pdfTitle": "{account} – absetzbare Ausgaben",
+  "@pdfTitle": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "pdfGeneratedAt": "Erstellt am {date}",
+  "@pdfGeneratedAt": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "pdfHeaderDate": "Datum",
+  "pdfHeaderDescription": "Beschreibung",
+  "pdfHeaderVendor": "Anbieter",
+  "pdfHeaderCategory": "Kategorie",
+  "pdfHeaderAmount": "Betrag",
+  "pdfHeaderDeductible": "Absetzbar",
+  "pdfHeaderNotes": "Notizen",
+  "yesLabel": "Ja",
+  "noLabel": "Nein",
+  "totalLabel": "Summe: {amount}",
+  "@totalLabel": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "deductibleTotalText": "Absetzbare Summe: {amount}",
+  "@deductibleTotalText": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "categoryPersonalGroceries": "Lebensmittel",
+  "categoryPersonalHousehold": "Haushalt",
+  "categoryPersonalHealth": "Gesundheit",
+  "categoryPersonalMobility": "Mobilität",
+  "categoryPersonalEducation": "Bildung",
+  "categoryPersonalLeisure": "Freizeit",
+  "categoryPersonalOther": "Sonstiges",
+  "categoryBusinessOfficeSupplies": "Bürobedarf",
+  "categoryBusinessHardware": "Hardware",
+  "categoryBusinessSoftware": "Software",
+  "categoryBusinessTravel": "Reisen",
+  "categoryBusinessTraining": "Fortbildung",
+  "categoryBusinessServices": "Dienstleistungen",
+  "categoryBusinessOther": "Sonstiges"
+}
