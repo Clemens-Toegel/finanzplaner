@@ -829,7 +829,7 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
                   child: Form(
                     key: formKey,
                     child: SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.82,
+                      height: MediaQuery.of(context).size.height * 0.9,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -1252,93 +1252,112 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: currentStep == 0
-                                      ? null
-                                      : () {
-                                          pageController.previousPage(
-                                            duration: const Duration(
-                                              milliseconds: 220,
-                                            ),
-                                            curve: Curves.easeOut,
-                                          );
-                                        },
-                                  icon: const Icon(Icons.arrow_back_rounded),
-                                  label: Text(l10n.stepBackAction),
+                          SafeArea(
+                            top: false,
+                            minimum: const EdgeInsets.only(top: 10, bottom: 4),
+                            child: Column(
+                              spacing: 10,
+                              children: [
+                                Row(
+                                  spacing: 10,
+                                  children: [
+                                    Expanded(
+                                      child: OutlinedButton.icon(
+                                        onPressed: currentStep == 0
+                                            ? null
+                                            : () {
+                                                pageController.previousPage(
+                                                  duration: const Duration(
+                                                    milliseconds: 220,
+                                                  ),
+                                                  curve: Curves.easeOut,
+                                                );
+                                              },
+                                        icon: const Icon(
+                                          Icons.arrow_back_rounded,
+                                        ),
+                                        label: Text(l10n.stepBackAction),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: FilledButton.icon(
+                                        onPressed: currentStep == 2
+                                            ? null
+                                            : () {
+                                                pageController.nextPage(
+                                                  duration: const Duration(
+                                                    milliseconds: 220,
+                                                  ),
+                                                  curve: Curves.easeOut,
+                                                );
+                                              },
+                                        icon: const Icon(
+                                          Icons.arrow_forward_rounded,
+                                        ),
+                                        label: Text(l10n.stepNextAction),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: FilledButton.icon(
-                                  onPressed: currentStep == 2
-                                      ? null
-                                      : () {
-                                          pageController.nextPage(
-                                            duration: const Duration(
-                                              milliseconds: 220,
-                                            ),
-                                            curve: Curves.easeOut,
-                                          );
-                                        },
-                                  icon: const Icon(Icons.arrow_forward_rounded),
-                                  label: Text(l10n.stepNextAction),
+                                Row(
+                                  spacing: 10,
+                                  children: [
+                                    Expanded(
+                                      child: OutlinedButton(
+                                        onPressed: requestClose,
+                                        child: Text(l10n.cancelAction),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: ValueListenableBuilder<TextEditingValue>(
+                                        valueListenable: descriptionController,
+                                        builder:
+                                            (context, descriptionValue, child) {
+                                              return ValueListenableBuilder<
+                                                TextEditingValue
+                                              >(
+                                                valueListenable:
+                                                    amountController,
+                                                builder:
+                                                    (
+                                                      context,
+                                                      amountValue,
+                                                      child,
+                                                    ) {
+                                                      final hasMinimumDetails =
+                                                          descriptionController
+                                                              .text
+                                                              .trim()
+                                                              .isNotEmpty &&
+                                                          amountController.text
+                                                              .trim()
+                                                              .isNotEmpty;
+                                                      return FilledButton.icon(
+                                                        onPressed:
+                                                            hasMinimumDetails
+                                                            ? submitForm
+                                                            : null,
+                                                        icon: Icon(
+                                                          item == null
+                                                              ? Icons.add
+                                                              : Icons.save,
+                                                        ),
+                                                        label: Text(
+                                                          item == null
+                                                              ? l10n.addPurchase
+                                                              : l10n.savePurchaseAction,
+                                                        ),
+                                                      );
+                                                    },
+                                              );
+                                            },
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: requestClose,
-                                  child: Text(l10n.cancelAction),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: ValueListenableBuilder<TextEditingValue>(
-                                  valueListenable: descriptionController,
-                                  builder: (context, descriptionValue, child) {
-                                    return ValueListenableBuilder<
-                                      TextEditingValue
-                                    >(
-                                      valueListenable: amountController,
-                                      builder: (context, amountValue, child) {
-                                        final hasMinimumDetails =
-                                            descriptionController.text
-                                                .trim()
-                                                .isNotEmpty &&
-                                            amountController.text
-                                                .trim()
-                                                .isNotEmpty;
-                                        return FilledButton.icon(
-                                          onPressed: hasMinimumDetails
-                                              ? submitForm
-                                              : null,
-                                          icon: Icon(
-                                            item == null
-                                                ? Icons.add
-                                                : Icons.save,
-                                          ),
-                                          label: Text(
-                                            item == null
-                                                ? l10n.addPurchase
-                                                : l10n.savePurchaseAction,
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
                         ],
                       ),
                     ),
