@@ -158,6 +158,24 @@ abstract class AppLocalizations {
   /// **'Kontoeinstellungen gespeichert.'**
   String get accountSettingsSavedMessage;
 
+  /// No description provided for @dataExportTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Datenexport'**
+  String get dataExportTitle;
+
+  /// No description provided for @exportExcelForTaxConsultantAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Excel für die Steuerberatung exportieren'**
+  String get exportExcelForTaxConsultantAction;
+
+  /// No description provided for @exportExcelSuccessMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Excel-Datei ist zum Teilen bereit.'**
+  String get exportExcelSuccessMessage;
+
   /// No description provided for @discardChangesTitle.
   ///
   /// In de, this message translates to:

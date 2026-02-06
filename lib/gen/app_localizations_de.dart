@@ -40,6 +40,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get accountSettingsSavedMessage => 'Kontoeinstellungen gespeichert.';
 
   @override
+  String get dataExportTitle => 'Datenexport';
+
+  @override
+  String get exportExcelForTaxConsultantAction =>
+      'Excel für die Steuerberatung exportieren';
+
+  @override
+  String get exportExcelSuccessMessage => 'Excel-Datei ist zum Teilen bereit.';
+
+  @override
   String get discardChangesTitle => 'Änderungen verwerfen?';
 
   @override
