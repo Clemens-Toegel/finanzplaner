@@ -16,7 +16,6 @@ class ExcelExporter {
     required List<PurchaseItem> items,
     required AccountSettings? accountSettings,
     required AppLocalizations localizations,
-    required Rect sharePositionOrigin,
   }) async {
     if (items.isEmpty) {
       return;
@@ -134,7 +133,7 @@ class ExcelExporter {
         ),
       ],
       subject: filename,
-      sharePositionOrigin: sharePositionOrigin,
+      sharePositionOrigin: Rect.fromLTWH(0, 0, 1, 1),
     );
   }
 }

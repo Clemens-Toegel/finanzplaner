@@ -20,7 +20,7 @@ class AccountSettingsSheet extends StatelessWidget {
   final ExpenseAccountType selectedAccount;
   final Future<void> Function(Map<ExpenseAccountType, AccountSettings> settings)
   onSave;
-  final Future<void> Function(Rect sharePositionOrigin) onExportExcel;
+  final Future<void> Function() onExportExcel;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class _AccountSettingsSheetContent extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final Future<void> Function(Map<ExpenseAccountType, AccountSettings> settings)
   onSave;
-  final Future<void> Function(Rect sharePositionOrigin) onExportExcel;
+  final Future<void> Function() onExportExcel;
 
   @override
   Widget build(BuildContext context) {
@@ -121,40 +121,27 @@ class _AccountSettingsSheetContent extends StatelessWidget {
                     l10n.dataExportTitle,
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
-                  Builder(
-                    builder: (buttonContext) {
-                      return OutlinedButton.icon(
-                        onPressed: controller.isExporting
-                            ? null
-                            : () async {
-                                final box =
-                                    buttonContext.findRenderObject()
-                                        as RenderBox?;
-                                final sharePositionOrigin =
-                                    box == null || !box.hasSize
-                                    ? const Rect.fromLTWH(1, 1, 1, 1)
-                                    : box.localToGlobal(Offset.zero) & box.size;
-                                controller.setExporting(true);
-                                try {
-                                  await onExportExcel(sharePositionOrigin);
-                                } finally {
-                                  if (buttonContext.mounted) {
-                                    controller.setExporting(false);
-                                  }
-                                }
-                              },
-                        icon: controller.isExporting
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.table_view_outlined),
-                        label: Text(l10n.exportExcelForTaxConsultantAction),
-                      );
-                    },
+                  OutlinedButton.icon(
+                    onPressed: controller.isExporting
+                        ? null
+                        : () async {
+                            controller.setExporting(true);
+                            try {
+                              await onExportExcel();
+                            } finally {
+                              if (context.mounted) {
+                                controller.setExporting(false);
+                              }
+                            }
+                          },
+                    icon: controller.isExporting
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.table_view_outlined),
+                    label: Text(l10n.exportExcelForTaxConsultantAction),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,

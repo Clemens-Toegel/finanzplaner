@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:finanzplaner/gen/app_localizations.dart';
 import 'package:finanzplaner/gen/app_localizations_en.dart';
@@ -188,7 +186,6 @@ void main() {
 
         final result = await controller.exportExcelForTaxConsultant(
           AppLocalizationsEn(),
-          sharePositionOrigin: const Rect.fromLTWH(1, 1, 10, 10),
         );
 
         expect(result, isFalse);
