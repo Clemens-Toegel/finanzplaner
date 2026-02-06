@@ -19,7 +19,6 @@ class AddEditPurchaseController extends ChangeNotifier {
       text: item != null ? item!.amount.toStringAsFixed(2) : '',
     );
     notesController = TextEditingController(text: item?.notes ?? '');
-    pageController = PageController();
 
     selectedDate = item?.date ?? DateTime.now();
     selectedCategory = item?.category ?? categories.first;
@@ -47,13 +46,11 @@ class AddEditPurchaseController extends ChangeNotifier {
   late final TextEditingController vendorController;
   late final TextEditingController amountController;
   late final TextEditingController notesController;
-  late final PageController pageController;
 
   late DateTime selectedDate;
   late String selectedCategory;
   late bool isDeductible;
   bool isScanning = false;
-  int currentStep = 0;
   late List<ExpenseSubItem> subItems;
 
   late final String initialDescription;
@@ -83,14 +80,6 @@ class AddEditPurchaseController extends ChangeNotifier {
   bool get hasMinimumDetails =>
       descriptionController.text.trim().isNotEmpty &&
       amountController.text.trim().isNotEmpty;
-
-  void setCurrentStep(int value) {
-    if (currentStep == value) {
-      return;
-    }
-    currentStep = value;
-    notifyListeners();
-  }
 
   void setSelectedCategory(String value) {
     if (selectedCategory == value) {
@@ -246,7 +235,6 @@ class AddEditPurchaseController extends ChangeNotifier {
     vendorController.dispose();
     amountController.dispose();
     notesController.dispose();
-    pageController.dispose();
     super.dispose();
   }
 }

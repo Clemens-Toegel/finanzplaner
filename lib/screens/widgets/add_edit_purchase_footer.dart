@@ -10,19 +10,18 @@ class AddEditPurchaseFooter extends StatelessWidget {
     required this.isEdit,
     required this.onCancel,
     required this.onSubmit,
+    required this.onOpenExtraDetails,
   });
 
   final bool isEdit;
   final VoidCallback onCancel;
   final VoidCallback onSubmit;
+  final VoidCallback onOpenExtraDetails;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final controller = context.read<AddEditPurchaseController>();
-    final currentStep = context.select<AddEditPurchaseController, int>(
-      (c) => c.currentStep,
-    );
 
     return SafeArea(
       top: false,
@@ -30,44 +29,16 @@ class AddEditPurchaseFooter extends StatelessWidget {
       child: Column(
         spacing: 10,
         children: [
-          Row(
-            spacing: 10,
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: currentStep == 0
-                      ? null
-                      : () {
-                          controller.pageController.previousPage(
-                            duration: const Duration(milliseconds: 220),
-                            curve: Curves.easeOut,
-                          );
-                        },
-                  icon: const Icon(Icons.arrow_back_rounded),
-                  label: Text(l10n.stepBackAction),
-                ),
-              ),
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: currentStep == 2
-                      ? null
-                      : () {
-                          controller.pageController.nextPage(
-                            duration: const Duration(milliseconds: 220),
-                            curve: Curves.easeOut,
-                          );
-                        },
-                  icon: const Icon(Icons.arrow_forward_rounded),
-                  label: Text(l10n.stepNextAction),
-                ),
-              ),
-            ],
+          OutlinedButton.icon(
+            onPressed: onOpenExtraDetails,
+            icon: const Icon(Icons.playlist_add_outlined),
+            label: Text('${l10n.stepSubItemsTitle} / ${l10n.notesLabel}'),
           ),
           Row(
             spacing: 10,
             children: [
               Expanded(
-                child: OutlinedButton(
+                child: TextButton(
                   onPressed: onCancel,
                   child: Text(l10n.cancelAction),
                 ),

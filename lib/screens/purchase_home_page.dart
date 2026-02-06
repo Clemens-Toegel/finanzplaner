@@ -296,21 +296,41 @@ class _PurchaseHomeView extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: selectedTabIndex,
-        onDestinationSelected: controller.changeTab,
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.receipt_long_outlined),
-            selectedIcon: const Icon(Icons.receipt_long),
-            label: l10n.expensesTabLabel,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.analytics_outlined),
-            selectedIcon: const Icon(Icons.analytics),
-            label: l10n.dashboardTabLabel,
-          ),
-        ],
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          indicatorColor: accountColor.withValues(alpha: 0.2),
+          iconTheme: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return IconThemeData(color: accountColor);
+            }
+            return null;
+          }),
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return TextStyle(
+                color: accountColor,
+                fontWeight: FontWeight.w600,
+              );
+            }
+            return null;
+          }),
+        ),
+        child: NavigationBar(
+          selectedIndex: selectedTabIndex,
+          onDestinationSelected: controller.changeTab,
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.receipt_long_outlined),
+              selectedIcon: const Icon(Icons.receipt_long),
+              label: l10n.expensesTabLabel,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.analytics_outlined),
+              selectedIcon: const Icon(Icons.analytics),
+              label: l10n.dashboardTabLabel,
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: isExporting

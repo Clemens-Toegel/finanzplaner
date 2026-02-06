@@ -13,11 +13,11 @@ class AddEditPurchaseNotesStep extends StatelessWidget {
     final controller = context.read<AddEditPurchaseController>();
 
     return ListView(
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.only(top: 4),
       children: [
         Text(l10n.notesLabel, style: Theme.of(context).textTheme.titleSmall),
         Padding(
-          padding: const EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.only(top: 12),
           child: TextFormField(
             controller: controller.notesController,
             decoration: InputDecoration(labelText: l10n.notesLabel),
