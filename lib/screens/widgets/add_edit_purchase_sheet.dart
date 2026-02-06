@@ -84,25 +84,11 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
     controller.ensureAmountFromSubItemsIfMissing();
 
     if (!controller.hasMinimumDetails) {
-      if (controller.currentStep != 0) {
-        await controller.pageController.animateToPage(
-          0,
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOut,
-        );
-      }
       _formKey.currentState!.validate();
       return;
     }
 
     if (!_formKey.currentState!.validate()) {
-      if (controller.currentStep != 0) {
-        await controller.pageController.animateToPage(
-          0,
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOut,
-        );
-      }
       return;
     }
 
@@ -114,19 +100,13 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
     );
 
     if (hasSubItemAboveTotal || controller.subItemsTotal > parsedAmount) {
-      if (controller.currentStep != 1) {
-        await controller.pageController.animateToPage(
-          1,
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOut,
-        );
-      }
       if (!context.mounted) {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.subItemsExceedTotalValidation)),
       );
+      await _openExtraDetailsSheet(context, controller);
       return;
     }
 
@@ -362,6 +342,77 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
     controller.upsertSubItem(added, index: index);
   }
 
+  Future<void> _openExtraDetailsSheet(
+    BuildContext context,
+    AddEditPurchaseController controller,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return ChangeNotifierProvider.value(
+          value: controller,
+          child: DefaultTabController(
+            length: 2,
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 12,
+                bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 16,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: TabBar(
+                      isScrollable: true,
+                      tabAlignment: TabAlignment.start,
+                      tabs: [
+                        Tab(text: l10n.stepSubItemsTitle),
+                        Tab(text: l10n.notesLabel),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: TabBarView(
+                        children: [
+                          AddEditPurchaseSubItemsStep(
+                            currencyFormat: currencyFormat,
+                            onAddOrEditSubItem: ({index}) => _addOrEditSubItem(
+                              sheetContext,
+                              controller,
+                              index: index,
+                            ),
+                          ),
+                          const AddEditPurchaseNotesStep(),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton(
+                      onPressed: () => Navigator.pop(sheetContext),
+                      child: Text(l10n.savePurchaseAction),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _requestClose(
     BuildContext context,
     AddEditPurchaseController controller,
@@ -399,72 +450,49 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = context.read<AddEditPurchaseController>();
 
-    return SafeArea(
-      child: AnimatedPadding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-          left: 16,
-          right: 16,
-          top: 16,
-        ),
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        child: PopScope(
-          canPop: false,
-          onPopInvokedWithResult: (didPop, result) {
-            if (!didPop) {
-              _requestClose(context, controller);
-            }
-          },
-          child: Form(
-            key: _formKey,
-            child: FractionallySizedBox(
-              heightFactor: 0.9,
-              alignment: Alignment.topCenter,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  AddEditPurchaseHeader(
-                    selectedAccount: selectedAccount,
-                    isEdit: item != null,
-                    accountColor: _accountColor(),
-                  ),
-                  Expanded(
-                    child: PageView(
-                      controller: controller.pageController,
-                      onPageChanged: controller.setCurrentStep,
-                      children: [
-                        AddEditPurchaseDetailsStep(
-                          dateFormat: dateFormat,
-                          currencyFormat: currencyFormat,
-                          onScanReceipt: () => _scanBill(
-                            context,
-                            controller,
-                            BillScanMode.shopReceipt,
-                          ),
-                          onScanDocument: () =>
-                              _scanA4Bill(context, controller),
-                        ),
-                        AddEditPurchaseSubItemsStep(
-                          currencyFormat: currencyFormat,
-                          onAddOrEditSubItem: ({index}) => _addOrEditSubItem(
-                            context,
-                            controller,
-                            index: index,
-                          ),
-                        ),
-                        const AddEditPurchaseNotesStep(),
-                      ],
-                    ),
-                  ),
-                  AddEditPurchaseFooter(
-                    isEdit: item != null,
-                    onCancel: () => _requestClose(context, controller),
-                    onSubmit: () => _submitForm(context, controller),
-                  ),
-                ],
+    return AnimatedPadding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+        left: 16,
+        right: 16,
+        top: 8,
+      ),
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) {
+            _requestClose(context, controller);
+          }
+        },
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AddEditPurchaseHeader(
+                selectedAccount: selectedAccount,
+                isEdit: item != null,
+                accountColor: _accountColor(),
               ),
-            ),
+              Expanded(
+                child: AddEditPurchaseDetailsStep(
+                  dateFormat: dateFormat,
+                  currencyFormat: currencyFormat,
+                  onScanReceipt: () =>
+                      _scanBill(context, controller, BillScanMode.shopReceipt),
+                  onScanDocument: () => _scanA4Bill(context, controller),
+                ),
+              ),
+              AddEditPurchaseFooter(
+                isEdit: item != null,
+                onCancel: () => _requestClose(context, controller),
+                onSubmit: () => _submitForm(context, controller),
+                onOpenExtraDetails: () =>
+                    _openExtraDetailsSheet(context, controller),
+              ),
+            ],
           ),
         ),
       ),

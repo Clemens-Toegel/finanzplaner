@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../gen/app_localizations.dart';
 import '../../localization/app_localizations_ext.dart';
 import '../../models/expense_account_type.dart';
-import '../../state/add_edit_purchase_controller.dart';
 
 class AddEditPurchaseHeader extends StatelessWidget {
   const AddEditPurchaseHeader({
@@ -21,9 +19,6 @@ class AddEditPurchaseHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final currentStep = context.select<AddEditPurchaseController, int>(
-      (c) => c.currentStep,
-    );
 
     return Padding(
       padding: const EdgeInsets.only(top: 4, bottom: 10),
@@ -65,33 +60,8 @@ class AddEditPurchaseHeader extends StatelessWidget {
             ),
           ),
           Text(
-            currentStep == 0
-                ? l10n.stepExpenseDetailsTitle
-                : currentStep == 1
-                ? l10n.stepSubItemsTitle
-                : l10n.notesLabel,
+            l10n.stepExpenseDetailsTitle,
             style: Theme.of(context).textTheme.titleMedium,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(3, (index) {
-                final isActive = index == currentStep;
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  height: 8,
-                  width: isActive ? 22 : 8,
-                  decoration: BoxDecoration(
-                    color: isActive
-                        ? accountColor
-                        : Theme.of(context).colorScheme.outlineVariant,
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                );
-              }),
-            ),
           ),
         ],
       ),

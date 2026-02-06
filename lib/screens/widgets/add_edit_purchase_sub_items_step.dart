@@ -41,7 +41,7 @@ class AddEditPurchaseSubItemsStep extends StatelessWidget {
         );
 
     return ListView(
-      padding: EdgeInsets.zero,
+      padding: const EdgeInsets.only(top: 4),
       children: [
         Text(
           l10n.subItemsHelpText,
@@ -103,9 +103,12 @@ class AddEditPurchaseSubItemsStep extends StatelessWidget {
             ),
           ),
         if (vm.subItems.isEmpty)
-          Text(
-            l10n.noSubItemsYet,
-            style: Theme.of(context).textTheme.bodySmall,
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Text(
+              l10n.noSubItemsYet,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           ),
         ...vm.subItems.asMap().entries.map((entry) {
           final index = entry.key;
