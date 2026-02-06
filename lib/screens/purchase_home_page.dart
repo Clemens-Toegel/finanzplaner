@@ -67,6 +67,9 @@ class _PurchaseHomeView extends StatelessWidget {
               ),
             );
           },
+          onExportPdf: () async {
+            await _exportPdf(context, l10n, controller, controller.items);
+          },
         );
       },
     );
@@ -261,15 +264,6 @@ class _PurchaseHomeView extends StatelessWidget {
                       ? null
                       : () => _openAccountSettingsSheet(context, controller),
                   icon: const Icon(Icons.settings_outlined),
-                ),
-                IconButton(
-                  tooltip: l10n.exportPdfTooltip,
-                  onPressed: isExporting
-                      ? null
-                      : () => _exportPdf(context, l10n, controller, items),
-                  icon: isExporting
-                      ? const CircularProgressIndicator(strokeWidth: 2)
-                      : const Icon(Icons.picture_as_pdf),
                 ),
               ],
         bottom: isSelectionMode
