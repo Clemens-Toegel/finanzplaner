@@ -101,13 +101,13 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In de, this message translates to:
-  /// **'Steuererstattungs-Ausgaben'**
+  /// **'BelegPilot'**
   String get appTitle;
 
   /// No description provided for @taxRefundPurchasesTitle.
   ///
   /// In de, this message translates to:
-  /// **'Steuererstattungs-Ausgaben'**
+  /// **'BelegPilot'**
   String get taxRefundPurchasesTitle;
 
   /// No description provided for @exportPdfTooltip.
@@ -383,13 +383,13 @@ abstract class AppLocalizations {
   /// No description provided for @emptyStateTitle.
   ///
   /// In de, this message translates to:
-  /// **'Steuerlich absetzbare Ausgaben in Österreich erfassen'**
+  /// **'Ausgaben einfach erfassen und organisieren'**
   String get emptyStateTitle;
 
   /// No description provided for @emptyStateSubtitle.
   ///
   /// In de, this message translates to:
-  /// **'Füge jeden Beleg für {account} hinzu, damit deine Steuerberatung ihn prüfen kann.'**
+  /// **'Füge jeden Beleg für {account} hinzu, damit du alles übersichtlich an einem Ort hast.'**
   String emptyStateSubtitle(Object account);
 
   /// No description provided for @dashboardTabLabel.

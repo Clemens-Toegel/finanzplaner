@@ -6,6 +6,7 @@ import '../../localization/app_localizations_ext.dart';
 import '../../models/account_settings.dart';
 import '../../models/expense_account_type.dart';
 import '../../state/account_settings_sheet_controller.dart';
+import '../../widgets/pilo_logo.dart';
 
 class AccountSettingsSheet extends StatelessWidget {
   const AccountSettingsSheet({
@@ -73,9 +74,19 @@ class _AccountSettingsSheetContent extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 spacing: 12,
                 children: [
-                  Text(
-                    l10n.accountSettingsTitle,
-                    style: Theme.of(context).textTheme.headlineSmall,
+                  Row(
+                    children: [
+                      const PiloLogo(size: 24, showWordmark: false),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: Text(
+                            l10n.accountSettingsTitle,
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   DropdownButtonFormField<ExpenseAccountType>(
                     initialValue: controller.editingAccount,

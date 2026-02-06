@@ -1,7 +1,7 @@
 {
   "@@locale": "en",
-  "appTitle": "Tax refund expenses",
-  "taxRefundPurchasesTitle": "Tax refund expenses",
+  "appTitle": "BelegPilot",
+  "taxRefundPurchasesTitle": "BelegPilot",
   "exportPdfTooltip": "Export PDF",
   "expenseAccountLabel": "Expense account",
   "accountSettingsTitle": "Account settings",
@@ -47,8 +47,8 @@
   "vatDeductibleLabel": "VAT deductible in Austria",
   "notesLabel": "Notes for tax advisor",
   "addBeforeExport": "Please add expenses before exporting.",
-  "emptyStateTitle": "Track tax-deductible expenses in Austria",
-  "emptyStateSubtitle": "Add each receipt for {account} so your tax advisor can review it.",
+  "emptyStateTitle": "Capture and organize expenses with ease",
+  "emptyStateSubtitle": "Add each receipt for {account} to keep everything clearly organized in one place.",
   "@emptyStateSubtitle": {
     "placeholders": {
       "account": {}

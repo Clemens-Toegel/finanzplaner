@@ -9,10 +9,10 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
-  String get appTitle => 'Steuererstattungs-Ausgaben';
+  String get appTitle => 'BelegPilot';
 
   @override
-  String get taxRefundPurchasesTitle => 'Steuererstattungs-Ausgaben';
+  String get taxRefundPurchasesTitle => 'BelegPilot';
 
   @override
   String get exportPdfTooltip => 'PDF exportieren';
@@ -157,12 +157,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bitte zuerst Ausgaben hinzufügen, bevor exportiert wird.';
 
   @override
-  String get emptyStateTitle =>
-      'Steuerlich absetzbare Ausgaben in Österreich erfassen';
+  String get emptyStateTitle => 'Ausgaben einfach erfassen und organisieren';
 
   @override
   String emptyStateSubtitle(Object account) {
-    return 'Füge jeden Beleg für $account hinzu, damit deine Steuerberatung ihn prüfen kann.';
+    return 'Füge jeden Beleg für $account hinzu, damit du alles übersichtlich an einem Ort hast.';
   }
 
   @override

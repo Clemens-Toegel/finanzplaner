@@ -6,6 +6,7 @@ import '../localization/app_localizations_ext.dart';
 import '../models/expense_account_type.dart';
 import '../models/purchase_item.dart';
 import '../state/purchase_home_controller.dart';
+import '../widgets/pilo_logo.dart';
 import 'purchase_detail_page.dart';
 import 'widgets/account_settings_sheet.dart';
 import 'widgets/add_edit_purchase_sheet.dart';
@@ -237,11 +238,22 @@ class _PurchaseHomeView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          isSelectionMode
-              ? '$selectedCount ausgewählt'
-              : l10n.taxRefundPurchasesTitle,
-        ),
+        title: isSelectionMode
+            ? Text('$selectedCount ausgewählt')
+            : Row(
+                children: [
+                  const PiloLogo(size: 24, showWordmark: false),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Text(
+                        l10n.taxRefundPurchasesTitle,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
         actions: isSelectionMode
             ? [
                 IconButton(
