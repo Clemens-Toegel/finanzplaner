@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../gen/app_localizations.dart';
 import '../../localization/app_localizations_ext.dart';
 import '../../models/expense_account_type.dart';
 import '../../models/expense_sub_item.dart';
-import '../../models/ocr_bill_data.dart';
 import '../../models/purchase_item.dart';
 import '../../services/offline_bill_ocr_service.dart';
+import '../../state/add_edit_purchase_controller.dart';
+import 'add_edit_purchase_details_step.dart';
+import 'add_edit_purchase_footer.dart';
+import 'add_edit_purchase_header.dart';
+import 'add_edit_purchase_notes_step.dart';
+import 'add_edit_purchase_sub_items_step.dart';
 
-class AddEditPurchaseSheet extends StatefulWidget {
+class AddEditPurchaseSheet extends StatelessWidget {
   const AddEditPurchaseSheet({
     super.key,
     required this.selectedAccount,
@@ -26,107 +32,60 @@ class AddEditPurchaseSheet extends StatefulWidget {
   final NumberFormat currencyFormat;
 
   @override
-  State<AddEditPurchaseSheet> createState() => _AddEditPurchaseSheetState();
+  Widget build(BuildContext context) {
+    final categories = AppLocalizations.of(
+      context,
+    )!.categoriesForAccount(selectedAccount);
+
+    return ChangeNotifierProvider(
+      create: (_) => AddEditPurchaseController(
+        selectedAccount: selectedAccount,
+        categories: categories,
+        item: item,
+      ),
+      child: _AddEditPurchaseSheetContent(
+        selectedAccount: selectedAccount,
+        item: item,
+        ocrService: ocrService,
+        dateFormat: dateFormat,
+        currencyFormat: currencyFormat,
+      ),
+    );
+  }
 }
 
-class _AddEditPurchaseSheetState extends State<AddEditPurchaseSheet> {
+class _AddEditPurchaseSheetContent extends StatelessWidget {
+  _AddEditPurchaseSheetContent({
+    required this.selectedAccount,
+    required this.item,
+    required this.ocrService,
+    required this.dateFormat,
+    required this.currencyFormat,
+  });
+
   final _formKey = GlobalKey<FormState>();
-
-  late final TextEditingController _descriptionController;
-  late final TextEditingController _vendorController;
-  late final TextEditingController _amountController;
-  late final TextEditingController _notesController;
-  late final PageController _pageController;
-
-  late DateTime _selectedDate;
-  late String _selectedCategory;
-  late bool _isDeductible;
-  bool _isScanning = false;
-  int _currentStep = 0;
-  late List<ExpenseSubItem> _subItems;
-
-  late final String _initialDescription;
-  late final String _initialVendor;
-  late final String _initialAmount;
-  late final String _initialNotes;
-  late final String _initialCategory;
-  late final DateTime _initialDate;
-  late final bool _initialIsDeductible;
-  late final List<ExpenseSubItem> _initialSubItems;
+  final ExpenseAccountType selectedAccount;
+  final PurchaseItem? item;
+  final OfflineBillOcrService ocrService;
+  final DateFormat dateFormat;
+  final NumberFormat currencyFormat;
 
   Color _accountColor() {
-    return widget.selectedAccount == ExpenseAccountType.business
+    return selectedAccount == ExpenseAccountType.business
         ? Colors.blue
         : Colors.orange;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    final item = widget.item;
+  Future<void> _submitForm(
+    BuildContext context,
+    AddEditPurchaseController controller,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    controller.ensureAmountFromSubItemsIfMissing();
 
-    _descriptionController = TextEditingController(
-      text: item?.description ?? '',
-    );
-    _vendorController = TextEditingController(text: item?.vendor ?? '');
-    _amountController = TextEditingController(
-      text: item != null ? item.amount.toStringAsFixed(2) : '',
-    );
-    _notesController = TextEditingController(text: item?.notes ?? '');
-    _pageController = PageController(initialPage: 0);
-    _subItems = List<ExpenseSubItem>.from(item?.subItems ?? const []);
-
-    _selectedDate = item?.date ?? DateTime.now();
-    _selectedCategory = item?.category ?? '';
-    _isDeductible = item?.isDeductible ?? true;
-
-    _initialDescription = _descriptionController.text.trim();
-    _initialVendor = _vendorController.text.trim();
-    _initialAmount = _amountController.text.trim();
-    _initialNotes = _notesController.text.trim();
-    _initialCategory = _selectedCategory;
-    _initialDate = _selectedDate;
-    _initialIsDeductible = _isDeductible;
-    _initialSubItems = List<ExpenseSubItem>.from(_subItems);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final categories = AppLocalizations.of(
-      context,
-    )!.categoriesForAccount(widget.selectedAccount);
-    if (!categories.contains(_selectedCategory)) {
-      _selectedCategory = categories.first;
-    }
-  }
-
-  @override
-  void dispose() {
-    _descriptionController.dispose();
-    _vendorController.dispose();
-    _amountController.dispose();
-    _notesController.dispose();
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submitForm() async {
-    if (_amountController.text.trim().isEmpty && _subItems.isNotEmpty) {
-      final sum = _subItems.fold<double>(
-        0,
-        (total, subItem) => total + subItem.amount,
-      );
-      _amountController.text = sum.toStringAsFixed(2);
-    }
-
-    final hasMinimumDetails =
-        _descriptionController.text.trim().isNotEmpty &&
-        _amountController.text.trim().isNotEmpty;
-
-    if (!hasMinimumDetails) {
-      if (_currentStep != 0) {
-        await _pageController.animateToPage(
+    if (!controller.hasMinimumDetails) {
+      if (controller.currentStep != 0) {
+        await controller.pageController.animateToPage(
           0,
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOut,
@@ -137,8 +96,8 @@ class _AddEditPurchaseSheetState extends State<AddEditPurchaseSheet> {
     }
 
     if (!_formKey.currentState!.validate()) {
-      if (_currentStep != 0) {
-        await _pageController.animateToPage(
+      if (controller.currentStep != 0) {
+        await controller.pageController.animateToPage(
           0,
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOut,
@@ -148,70 +107,53 @@ class _AddEditPurchaseSheetState extends State<AddEditPurchaseSheet> {
     }
 
     final parsedAmount = double.parse(
-      _amountController.text.replaceAll(',', '.'),
+      controller.amountController.text.replaceAll(',', '.'),
     );
-    final subItemsSum = _subItems.fold<double>(
-      0,
-      (total, subItem) => total + subItem.amount,
-    );
-    final hasSubItemAboveTotal = _subItems.any(
+    final hasSubItemAboveTotal = controller.subItems.any(
       (subItem) => subItem.amount > parsedAmount,
     );
 
-    if (hasSubItemAboveTotal || subItemsSum > parsedAmount) {
-      if (_currentStep != 1) {
-        await _pageController.animateToPage(
+    if (hasSubItemAboveTotal || controller.subItemsTotal > parsedAmount) {
+      if (controller.currentStep != 1) {
+        await controller.pageController.animateToPage(
           1,
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOut,
         );
       }
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
-      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.subItemsExceedTotalValidation)),
       );
       return;
     }
 
-    final item = PurchaseItem(
-      id: widget.item?.id,
-      accountType: widget.selectedAccount,
-      description: _descriptionController.text.trim(),
-      vendor: _vendorController.text.trim(),
-      category: _selectedCategory,
-      amount: parsedAmount,
-      date: _selectedDate,
-      isDeductible: _isDeductible,
-      notes: _notesController.text.trim(),
-      subItems: _subItems,
-    );
-
-    if (!mounted) {
+    final draft = controller.tryBuildDraft();
+    if (draft == null || !context.mounted) {
       return;
     }
-    Navigator.of(context).pop(item);
+
+    Navigator.of(context).pop(draft);
   }
 
   Future<void> _scanBill(
+    BuildContext context,
+    AddEditPurchaseController controller,
     BillScanMode mode, {
     BillImageSource source = BillImageSource.camera,
   }) async {
-    if (_isScanning) {
+    if (controller.isScanning) {
       return;
     }
 
-    setState(() {
-      _isScanning = true;
-    });
-
     final l10n = AppLocalizations.of(context)!;
+    controller.setScanning(true);
 
     try {
-      final data = await widget.ocrService.scanBill(mode: mode, source: source);
-      if (!mounted || data == null) {
+      final data = await ocrService.scanBill(mode: mode, source: source);
+      if (!context.mounted || data == null) {
         return;
       }
 
@@ -222,30 +164,28 @@ class _AddEditPurchaseSheetState extends State<AddEditPurchaseSheet> {
         return;
       }
 
-      setState(() {
-        _applyOcrDataToForm(data);
-      });
-
+      controller.applyOcrDataToForm(data);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.ocrAppliedMessage)));
     } catch (_) {
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.ocrErrorMessage)));
     } finally {
-      if (mounted) {
-        setState(() {
-          _isScanning = false;
-        });
+      if (context.mounted) {
+        controller.setScanning(false);
       }
     }
   }
 
-  Future<void> _scanA4Bill() async {
+  Future<void> _scanA4Bill(
+    BuildContext context,
+    AddEditPurchaseController controller,
+  ) async {
     final l10n = AppLocalizations.of(context)!;
     final source = await showModalBottomSheet<BillImageSource>(
       context: context,
@@ -270,21 +210,26 @@ class _AddEditPurchaseSheetState extends State<AddEditPurchaseSheet> {
       },
     );
 
-    if (source == null) {
+    if (source == null || !context.mounted) {
       return;
     }
 
-    await _scanBill(BillScanMode.a4Bill, source: source);
+    await _scanBill(context, controller, BillScanMode.a4Bill, source: source);
   }
 
-  Future<void> _addOrEditSubItem({int? index}) async {
+  Future<void> _addOrEditSubItem(
+    BuildContext context,
+    AddEditPurchaseController controller, {
+    int? index,
+  }) async {
     final l10n = AppLocalizations.of(context)!;
-    final existing = index != null ? _subItems[index] : null;
-    final totalAmount = double.tryParse(
-      _amountController.text.replaceAll(',', '.'),
-    );
+    final existing = index != null ? controller.subItems[index] : null;
+    final totalAmount = controller.totalAmountValue;
     final allocatedWithoutCurrent =
-        _subItems.fold<double>(0, (total, subItem) => total + subItem.amount) -
+        controller.subItems.fold<double>(
+          0,
+          (total, subItem) => total + subItem.amount,
+        ) -
         (existing?.amount ?? 0);
 
     if (index == null &&
@@ -386,11 +331,11 @@ class _AddEditPurchaseSheetState extends State<AddEditPurchaseSheet> {
       },
     );
 
-    if (added == null || !mounted) {
+    if (added == null || !context.mounted) {
       return;
     }
 
-    final candidateSubItems = List<ExpenseSubItem>.from(_subItems);
+    final candidateSubItems = List<ExpenseSubItem>.from(controller.subItems);
     if (index == null) {
       candidateSubItems.add(added);
     } else {
@@ -414,53 +359,14 @@ class _AddEditPurchaseSheetState extends State<AddEditPurchaseSheet> {
       }
     }
 
-    setState(() {
-      if (index == null) {
-        _subItems.add(added);
-      } else {
-        _subItems[index] = added;
-      }
-    });
+    controller.upsertSubItem(added, index: index);
   }
 
-  bool _hasUnsavedChanges() {
-    if (_descriptionController.text.trim() != _initialDescription) {
-      return true;
-    }
-    if (_vendorController.text.trim() != _initialVendor) {
-      return true;
-    }
-    if (_amountController.text.trim() != _initialAmount) {
-      return true;
-    }
-    if (_notesController.text.trim() != _initialNotes) {
-      return true;
-    }
-    if (_selectedCategory != _initialCategory) {
-      return true;
-    }
-    if (_selectedDate != _initialDate) {
-      return true;
-    }
-    if (_isDeductible != _initialIsDeductible) {
-      return true;
-    }
-    if (_subItems.length != _initialSubItems.length) {
-      return true;
-    }
-    for (var i = 0; i < _subItems.length; i++) {
-      final current = _subItems[i];
-      final initial = _initialSubItems[i];
-      if (current.description != initial.description ||
-          current.amount != initial.amount) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  Future<void> _requestClose() async {
-    if (!_hasUnsavedChanges()) {
+  Future<void> _requestClose(
+    BuildContext context,
+    AddEditPurchaseController controller,
+  ) async {
+    if (!controller.hasUnsavedChanges()) {
       Navigator.of(context).pop();
       return;
     }
@@ -484,57 +390,14 @@ class _AddEditPurchaseSheetState extends State<AddEditPurchaseSheet> {
       ),
     );
 
-    if (shouldDiscard == true && mounted) {
+    if (shouldDiscard == true && context.mounted) {
       Navigator.of(context).pop();
-    }
-  }
-
-  void _applyOcrDataToForm(OcrBillData data) {
-    if (data.description != null && data.description!.trim().isNotEmpty) {
-      _descriptionController.text = data.description!.trim();
-    }
-    if (data.vendor != null && data.vendor!.trim().isNotEmpty) {
-      _vendorController.text = data.vendor!.trim();
-    }
-    if (data.amount != null && data.amount! > 0) {
-      _amountController.text = data.amount!.toStringAsFixed(2);
-    }
-    if (data.date != null) {
-      _selectedDate = data.date!;
-    }
-    if (data.subItems.isNotEmpty) {
-      _subItems = List<ExpenseSubItem>.from(data.subItems);
-      if (data.amount == null || data.amount! <= 0) {
-        final sum = data.subItems.fold<double>(
-          0,
-          (total, subItem) => total + subItem.amount,
-        );
-        if (sum > 0) {
-          _amountController.text = sum.toStringAsFixed(2);
-        }
-      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final categories = l10n.categoriesForAccount(widget.selectedAccount);
-
-    final subItemsTotal = _subItems.fold<double>(
-      0,
-      (total, entry) => total + entry.amount,
-    );
-    final totalAmountValue = double.tryParse(
-      _amountController.text.replaceAll(',', '.'),
-    );
-    final remainingForSubItems = totalAmountValue != null
-        ? (totalAmountValue - subItemsTotal)
-        : null;
-    final canAddSubItem =
-        remainingForSubItems == null || remainingForSubItems > 0;
-    final subItemsOverAllocated =
-        remainingForSubItems != null && remainingForSubItems < 0;
+    final controller = context.read<AddEditPurchaseController>();
 
     return SafeArea(
       child: AnimatedPadding(
@@ -550,7 +413,7 @@ class _AddEditPurchaseSheetState extends State<AddEditPurchaseSheet> {
           canPop: false,
           onPopInvokedWithResult: (didPop, result) {
             if (!didPop) {
-              _requestClose();
+              _requestClose(context, controller);
             }
           },
           child: Form(
@@ -560,474 +423,43 @@ class _AddEditPurchaseSheetState extends State<AddEditPurchaseSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _accountColor().withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: _accountColor().withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: 8,
-                      children: [
-                        Icon(
-                          widget.selectedAccount == ExpenseAccountType.business
-                              ? Icons.business
-                              : Icons.person,
-                          color: _accountColor(),
-                        ),
-                        Text(
-                          l10n.accountLabel(widget.selectedAccount),
-                          style: Theme.of(context).textTheme.titleSmall
-                              ?.copyWith(
-                                color: _accountColor(),
-                                fontWeight: FontWeight.w600,
-                              ),
-                        ),
-                      ],
-                    ),
+                  AddEditPurchaseHeader(
+                    selectedAccount: selectedAccount,
+                    isEdit: item != null,
+                    accountColor: _accountColor(),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8, bottom: 4),
-                    child: Text(
-                      widget.item == null
-                          ? l10n.addPurchaseTitle
-                          : l10n.editPurchaseTitle,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                  ),
-                  Text(
-                    _currentStep == 0
-                        ? l10n.stepExpenseDetailsTitle
-                        : _currentStep == 1
-                        ? l10n.stepSubItemsTitle
-                        : l10n.notesLabel,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(3, (index) {
-                      final isActive = index == _currentStep;
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        height: 8,
-                        width: isActive ? 22 : 8,
-                        decoration: BoxDecoration(
-                          color: isActive
-                              ? _accountColor()
-                              : Theme.of(context).colorScheme.outlineVariant,
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(height: 10),
                   Expanded(
                     child: PageView(
-                      controller: _pageController,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentStep = index;
-                        });
-                      },
+                      controller: controller.pageController,
+                      onPageChanged: controller.setCurrentStep,
                       children: [
-                        ListView(
-                          padding: EdgeInsets.zero,
-                          children: [
-                            Text(
-                              l10n.offlineOcrPrivacyNote,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: _isScanning
-                                        ? null
-                                        : () => _scanBill(
-                                            BillScanMode.shopReceipt,
-                                          ),
-                                    icon: const Icon(Icons.receipt_long),
-                                    label: Text(l10n.scanReceiptAction),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: _isScanning ? null : _scanA4Bill,
-                                    icon: const Icon(
-                                      Icons.document_scanner_outlined,
-                                    ),
-                                    label: Text(l10n.scanDocumentAction),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (_isScanning) ...[
-                              const SizedBox(height: 12),
-                              const LinearProgressIndicator(),
-                            ],
-                            const SizedBox(height: 12),
-                            TextFormField(
-                              controller: _descriptionController,
-                              decoration: InputDecoration(
-                                labelText: l10n.descriptionLabel,
-                              ),
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return l10n.descriptionValidation;
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 12),
-                            TextFormField(
-                              controller: _vendorController,
-                              decoration: InputDecoration(
-                                labelText: l10n.vendorLabel,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            TextFormField(
-                              controller: _amountController,
-                              decoration: InputDecoration(
-                                labelText: l10n.amountLabel,
-                                helperText: _subItems.isNotEmpty
-                                    ? l10n.subItemsSumHint(
-                                        widget.currencyFormat.format(
-                                          subItemsTotal,
-                                        ),
-                                      )
-                                    : null,
-                              ),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                  ),
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return l10n.amountValidation;
-                                }
-                                final parsed = double.tryParse(
-                                  value.replaceAll(',', '.'),
-                                );
-                                if (parsed == null || parsed <= 0) {
-                                  return l10n.amountInvalidValidation;
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 12),
-                            DropdownButtonFormField<String>(
-                              initialValue: _selectedCategory,
-                              decoration: InputDecoration(
-                                labelText: l10n.categoryLabel,
-                              ),
-                              items: categories
-                                  .map(
-                                    (category) => DropdownMenuItem(
-                                      value: category,
-                                      child: Text(category),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (value) {
-                                if (value == null) {
-                                  return;
-                                }
-                                setState(() {
-                                  _selectedCategory = value;
-                                });
-                              },
-                            ),
-                            const SizedBox(height: 4),
-                            ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              title: Text(l10n.dateOfPurchaseLabel),
-                              subtitle: Text(
-                                widget.dateFormat.format(_selectedDate),
-                              ),
-                              trailing: TextButton.icon(
-                                onPressed: () async {
-                                  final picked = await showDatePicker(
-                                    context: context,
-                                    initialDate: _selectedDate,
-                                    firstDate: DateTime(2015),
-                                    lastDate: DateTime.now(),
-                                  );
-                                  if (picked != null) {
-                                    setState(() {
-                                      _selectedDate = picked;
-                                    });
-                                  }
-                                },
-                                icon: const Icon(Icons.calendar_today),
-                                label: Text(l10n.pickDate),
-                              ),
-                            ),
-                            SwitchListTile(
-                              contentPadding: EdgeInsets.zero,
-                              title: Text(l10n.vatDeductibleLabel),
-                              value: _isDeductible,
-                              onChanged: (value) {
-                                setState(() {
-                                  _isDeductible = value;
-                                });
-                              },
-                            ),
-                          ],
+                        AddEditPurchaseDetailsStep(
+                          dateFormat: dateFormat,
+                          currencyFormat: currencyFormat,
+                          onScanReceipt: () => _scanBill(
+                            context,
+                            controller,
+                            BillScanMode.shopReceipt,
+                          ),
+                          onScanDocument: () =>
+                              _scanA4Bill(context, controller),
                         ),
-                        ListView(
-                          padding: EdgeInsets.zero,
-                          children: [
-                            Text(
-                              l10n.subItemsHelpText,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            const SizedBox(height: 10),
-                            Card(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHighest,
-                              child: Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  spacing: 4,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(l10n.subItemsTotalLabel),
-                                        Text(
-                                          widget.currencyFormat.format(
-                                            subItemsTotal,
-                                          ),
-                                          style: Theme.of(
-                                            context,
-                                          ).textTheme.titleSmall,
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(l10n.remainingForSubItemsLabel),
-                                        Text(
-                                          remainingForSubItems == null
-                                              ? '—'
-                                              : widget.currencyFormat.format(
-                                                  remainingForSubItems,
-                                                ),
-                                          style: Theme.of(
-                                            context,
-                                          ).textTheme.titleSmall,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            OutlinedButton.icon(
-                              onPressed: canAddSubItem
-                                  ? () => _addOrEditSubItem()
-                                  : null,
-                              icon: const Icon(Icons.add),
-                              label: Text(l10n.addSubItemAction),
-                            ),
-                            const SizedBox(height: 10),
-                            if (subItemsOverAllocated)
-                              Text(
-                                l10n.subItemsExceedTotalValidation,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.error,
-                                    ),
-                              ),
-                            if (_subItems.isEmpty)
-                              Text(
-                                l10n.noSubItemsYet,
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                            ..._subItems.asMap().entries.map((entry) {
-                              final index = entry.key;
-                              final subItem = entry.value;
-                              return Card(
-                                child: ListTile(
-                                  title: Text(subItem.description),
-                                  subtitle: Text(
-                                    widget.currencyFormat.format(
-                                      subItem.amount,
-                                    ),
-                                  ),
-                                  trailing: Wrap(
-                                    spacing: 4,
-                                    children: [
-                                      IconButton(
-                                        tooltip: l10n.editSubItemAction,
-                                        onPressed: () =>
-                                            _addOrEditSubItem(index: index),
-                                        icon: const Icon(Icons.edit_outlined),
-                                      ),
-                                      IconButton(
-                                        tooltip: l10n.deletePurchaseAction,
-                                        onPressed: () {
-                                          setState(() {
-                                            _subItems.removeAt(index);
-                                          });
-                                        },
-                                        icon: const Icon(Icons.delete_outline),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }),
-                            if (_subItems.isNotEmpty)
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _amountController.text = subItemsTotal
-                                          .toStringAsFixed(2);
-                                    });
-                                  },
-                                  child: Text(l10n.applySubItemsTotalAction),
-                                ),
-                              ),
-                          ],
+                        AddEditPurchaseSubItemsStep(
+                          currencyFormat: currencyFormat,
+                          onAddOrEditSubItem: ({index}) => _addOrEditSubItem(
+                            context,
+                            controller,
+                            index: index,
+                          ),
                         ),
-                        ListView(
-                          padding: EdgeInsets.zero,
-                          children: [
-                            Text(
-                              l10n.notesLabel,
-                              style: Theme.of(context).textTheme.titleSmall,
-                            ),
-                            const SizedBox(height: 8),
-                            TextFormField(
-                              controller: _notesController,
-                              decoration: InputDecoration(
-                                labelText: l10n.notesLabel,
-                              ),
-                              minLines: 6,
-                              maxLines: 10,
-                              textInputAction: TextInputAction.done,
-                            ),
-                          ],
-                        ),
+                        const AddEditPurchaseNotesStep(),
                       ],
                     ),
                   ),
-                  SafeArea(
-                    top: false,
-                    minimum: const EdgeInsets.only(top: 10, bottom: 4),
-                    child: Column(
-                      spacing: 10,
-                      children: [
-                        Row(
-                          spacing: 10,
-                          children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _currentStep == 0
-                                    ? null
-                                    : () {
-                                        _pageController.previousPage(
-                                          duration: const Duration(
-                                            milliseconds: 220,
-                                          ),
-                                          curve: Curves.easeOut,
-                                        );
-                                      },
-                                icon: const Icon(Icons.arrow_back_rounded),
-                                label: Text(l10n.stepBackAction),
-                              ),
-                            ),
-                            Expanded(
-                              child: FilledButton.icon(
-                                onPressed: _currentStep == 2
-                                    ? null
-                                    : () {
-                                        _pageController.nextPage(
-                                          duration: const Duration(
-                                            milliseconds: 220,
-                                          ),
-                                          curve: Curves.easeOut,
-                                        );
-                                      },
-                                icon: const Icon(Icons.arrow_forward_rounded),
-                                label: Text(l10n.stepNextAction),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          spacing: 10,
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: _requestClose,
-                                child: Text(l10n.cancelAction),
-                              ),
-                            ),
-                            Expanded(
-                              child: ValueListenableBuilder<TextEditingValue>(
-                                valueListenable: _descriptionController,
-                                builder: (context, descriptionValue, child) {
-                                  return ValueListenableBuilder<
-                                    TextEditingValue
-                                  >(
-                                    valueListenable: _amountController,
-                                    builder: (context, amountValue, child) {
-                                      final hasMinimumDetails =
-                                          _descriptionController.text
-                                              .trim()
-                                              .isNotEmpty &&
-                                          _amountController.text
-                                              .trim()
-                                              .isNotEmpty;
-                                      return FilledButton.icon(
-                                        onPressed: hasMinimumDetails
-                                            ? _submitForm
-                                            : null,
-                                        icon: Icon(
-                                          widget.item == null
-                                              ? Icons.add
-                                              : Icons.save,
-                                        ),
-                                        label: Text(
-                                          widget.item == null
-                                              ? l10n.addPurchase
-                                              : l10n.savePurchaseAction,
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                  AddEditPurchaseFooter(
+                    isEdit: item != null,
+                    onCancel: () => _requestClose(context, controller),
+                    onSubmit: () => _submitForm(context, controller),
                   ),
                 ],
               ),
