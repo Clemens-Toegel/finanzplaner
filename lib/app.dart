@@ -14,7 +14,6 @@ class PurchaseTrackerApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: AppTheme.buildLightTheme(),
       darkTheme: AppTheme.buildDarkTheme(),
-      locale: const Locale('de'),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       home: const PurchaseHomePage(),
