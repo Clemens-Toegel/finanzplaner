@@ -61,6 +61,8 @@ PODS:
   - printing (1.0.0):
     - Flutter
   - PromisesObjC (2.4.0)
+  - share_plus (0.0.1):
+    - Flutter
   - sqflite_darwin (0.0.4):
     - Flutter
     - FlutterMacOS
@@ -71,6 +73,7 @@ DEPENDENCIES:
   - google_mlkit_text_recognition (from `.symlinks/plugins/google_mlkit_text_recognition/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - printing (from `.symlinks/plugins/printing/ios`)
+  - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
 
 SPEC REPOS:
@@ -99,6 +102,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   printing:
     :path: ".symlinks/plugins/printing/ios"
+  share_plus:
+    :path: ".symlinks/plugins/share_plus/ios"
   sqflite_darwin:
     :path: ".symlinks/plugins/sqflite_darwin/darwin"
 
@@ -120,6 +125,7 @@ SPEC CHECKSUMS:
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   printing: 54ff03f28fe9ba3aa93358afb80a8595a071dd07
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   sqflite_darwin: 20b2a3a3b70e43edae938624ce550a3cbf66a3d0
 
 PODFILE CHECKSUM: 515e556a1f762fa9ef54e3503a00df88f263c77c
