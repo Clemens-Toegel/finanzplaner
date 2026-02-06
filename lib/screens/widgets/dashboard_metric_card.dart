@@ -14,8 +14,8 @@ class DashboardMetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 170,
+    return ConstrainedBox(
+      constraints: const BoxConstraints.tightFor(width: 170),
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(14),

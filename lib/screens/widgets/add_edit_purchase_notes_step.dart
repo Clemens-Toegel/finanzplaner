@@ -16,13 +16,15 @@ class AddEditPurchaseNotesStep extends StatelessWidget {
       padding: EdgeInsets.zero,
       children: [
         Text(l10n.notesLabel, style: Theme.of(context).textTheme.titleSmall),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller.notesController,
-          decoration: InputDecoration(labelText: l10n.notesLabel),
-          minLines: 6,
-          maxLines: 10,
-          textInputAction: TextInputAction.done,
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: TextFormField(
+            controller: controller.notesController,
+            decoration: InputDecoration(labelText: l10n.notesLabel),
+            minLines: 6,
+            maxLines: 10,
+            textInputAction: TextInputAction.done,
+          ),
         ),
       ],
     );

@@ -52,85 +52,97 @@ class AddEditPurchaseDetailsStep extends StatelessWidget {
           l10n.offlineOcrPrivacyNote,
           style: Theme.of(context).textTheme.bodySmall,
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: vm.isScanning ? null : onScanReceipt,
-                icon: const Icon(Icons.receipt_long),
-                label: Text(l10n.scanReceiptAction),
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: Row(
+            spacing: 8,
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: vm.isScanning ? null : onScanReceipt,
+                  icon: const Icon(Icons.receipt_long),
+                  label: Text(l10n.scanReceiptAction),
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: vm.isScanning ? null : onScanDocument,
-                icon: const Icon(Icons.document_scanner_outlined),
-                label: Text(l10n.scanDocumentAction),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: vm.isScanning ? null : onScanDocument,
+                  icon: const Icon(Icons.document_scanner_outlined),
+                  label: Text(l10n.scanDocumentAction),
+                ),
               ),
-            ),
-          ],
-        ),
-        if (vm.isScanning) ...[
-          const SizedBox(height: 12),
-          const LinearProgressIndicator(),
-        ],
-        const SizedBox(height: 12),
-        TextFormField(
-          controller: controller.descriptionController,
-          decoration: InputDecoration(labelText: l10n.descriptionLabel),
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return l10n.descriptionValidation;
-            }
-            return null;
-          },
-        ),
-        const SizedBox(height: 12),
-        TextFormField(
-          controller: controller.vendorController,
-          decoration: InputDecoration(labelText: l10n.vendorLabel),
-        ),
-        const SizedBox(height: 12),
-        TextFormField(
-          controller: controller.amountController,
-          decoration: InputDecoration(
-            labelText: l10n.amountLabel,
-            helperText: vm.hasSubItems
-                ? l10n.subItemsSumHint(currencyFormat.format(vm.subItemsTotal))
-                : null,
+            ],
           ),
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return l10n.amountValidation;
-            }
-            final parsed = double.tryParse(value.replaceAll(',', '.'));
-            if (parsed == null || parsed <= 0) {
-              return l10n.amountInvalidValidation;
-            }
-            return null;
-          },
         ),
-        const SizedBox(height: 12),
-        DropdownButtonFormField<String>(
-          key: ValueKey(vm.selectedCategory),
-          initialValue: vm.selectedCategory,
-          decoration: InputDecoration(labelText: l10n.categoryLabel),
-          items: controller.categories
-              .map(
-                (category) =>
-                    DropdownMenuItem(value: category, child: Text(category)),
-              )
-              .toList(),
-          onChanged: (value) {
-            if (value != null) {
-              controller.setSelectedCategory(value);
-            }
-          },
+        if (vm.isScanning)
+          const Padding(
+            padding: EdgeInsets.only(top: 12),
+            child: LinearProgressIndicator(),
+          ),
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: TextFormField(
+            controller: controller.descriptionController,
+            decoration: InputDecoration(labelText: l10n.descriptionLabel),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return l10n.descriptionValidation;
+              }
+              return null;
+            },
+          ),
         ),
-        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: TextFormField(
+            controller: controller.vendorController,
+            decoration: InputDecoration(labelText: l10n.vendorLabel),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: TextFormField(
+            controller: controller.amountController,
+            decoration: InputDecoration(
+              labelText: l10n.amountLabel,
+              helperText: vm.hasSubItems
+                  ? l10n.subItemsSumHint(
+                      currencyFormat.format(vm.subItemsTotal),
+                    )
+                  : null,
+            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return l10n.amountValidation;
+              }
+              final parsed = double.tryParse(value.replaceAll(',', '.'));
+              if (parsed == null || parsed <= 0) {
+                return l10n.amountInvalidValidation;
+              }
+              return null;
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: DropdownButtonFormField<String>(
+            key: ValueKey(vm.selectedCategory),
+            initialValue: vm.selectedCategory,
+            decoration: InputDecoration(labelText: l10n.categoryLabel),
+            items: controller.categories
+                .map(
+                  (category) =>
+                      DropdownMenuItem(value: category, child: Text(category)),
+                )
+                .toList(),
+            onChanged: (value) {
+              if (value != null) {
+                controller.setSelectedCategory(value);
+              }
+            },
+          ),
+        ),
         ListTile(
           contentPadding: EdgeInsets.zero,
           title: Text(l10n.dateOfPurchaseLabel),

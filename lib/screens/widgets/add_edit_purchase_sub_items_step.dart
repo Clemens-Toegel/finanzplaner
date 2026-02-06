@@ -47,53 +47,59 @@ class AddEditPurchaseSubItemsStep extends StatelessWidget {
           l10n.subItemsHelpText,
           style: Theme.of(context).textTheme.bodySmall,
         ),
-        const SizedBox(height: 10),
-        Card(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 4,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(l10n.subItemsTotalLabel),
-                    Text(
-                      currencyFormat.format(vm.subItemsTotal),
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(l10n.remainingForSubItemsLabel),
-                    Text(
-                      vm.remainingForSubItems == null
-                          ? '—'
-                          : currencyFormat.format(vm.remainingForSubItems),
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                  ],
-                ),
-              ],
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Card(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 4,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(l10n.subItemsTotalLabel),
+                      Text(
+                        currencyFormat.format(vm.subItemsTotal),
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(l10n.remainingForSubItemsLabel),
+                      Text(
+                        vm.remainingForSubItems == null
+                            ? '—'
+                            : currencyFormat.format(vm.remainingForSubItems),
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-        const SizedBox(height: 10),
-        OutlinedButton.icon(
-          onPressed: vm.canAddSubItem ? () => onAddOrEditSubItem() : null,
-          icon: const Icon(Icons.add),
-          label: Text(l10n.addSubItemAction),
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: OutlinedButton.icon(
+            onPressed: vm.canAddSubItem ? () => onAddOrEditSubItem() : null,
+            icon: const Icon(Icons.add),
+            label: Text(l10n.addSubItemAction),
+          ),
         ),
-        const SizedBox(height: 10),
         if (vm.subItemsOverAllocated)
-          Text(
-            l10n.subItemsExceedTotalValidation,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.error,
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Text(
+              l10n.subItemsExceedTotalValidation,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.error,
+              ),
             ),
           ),
         if (vm.subItems.isEmpty)
