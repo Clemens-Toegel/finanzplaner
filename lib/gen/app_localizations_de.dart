@@ -21,6 +21,46 @@ class AppLocalizationsDe extends AppLocalizations {
   String get expenseAccountLabel => 'Ausgabenkonto';
 
   @override
+  String get accountSettingsTitle => 'Kontoeinstellungen';
+
+  @override
+  String get accountDisplayNameLabel => 'Kontobezeichnung';
+
+  @override
+  String get firmenbuchnummerLabel => 'Firmenbuchnummer';
+
+  @override
+  String get firmenbuchnummerValidation =>
+      'Nur Buchstaben, Zahlen, Leerzeichen, / und - sind erlaubt.';
+
+  @override
+  String get saveSettingsAction => 'Einstellungen speichern';
+
+  @override
+  String get accountSettingsSavedMessage => 'Kontoeinstellungen gespeichert.';
+
+  @override
+  String get discardChangesTitle => 'Änderungen verwerfen?';
+
+  @override
+  String get discardChangesMessage =>
+      'Du hast ungespeicherte Änderungen in diesem Formular.';
+
+  @override
+  String get discardChangesAction => 'Verwerfen';
+
+  @override
+  String get subItemsExceedTotalValidation =>
+      'Unterpositionen dürfen nicht höher als der Ausgabenbetrag sein.';
+
+  @override
+  String get subItemAmountExceedsTotalValidation =>
+      'Diese Unterposition ist höher als der Ausgabenbetrag.';
+
+  @override
+  String get remainingForSubItemsLabel => 'Verbleibend für Unterpositionen';
+
+  @override
   String get accountLabelPersonal => 'Private Ausgaben';
 
   @override
@@ -152,6 +192,81 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get notDeductibleLabel => 'Nicht absetzbar';
+
+  @override
+  String get offlineOcrPrivacyNote =>
+      'Belege werden offline auf dem Gerät gescannt. Keine Bild- oder Textdaten verlassen dein Gerät.';
+
+  @override
+  String get scanReceiptAction => 'Kassenbon scannen';
+
+  @override
+  String get scanDocumentAction => 'A4-Rechnung scannen';
+
+  @override
+  String get ocrNoTextFound => 'Kein lesbarer Text auf dem Beleg gefunden.';
+
+  @override
+  String get ocrAppliedMessage =>
+      'Belegdaten wurden in das Formular übernommen.';
+
+  @override
+  String get ocrErrorMessage =>
+      'Belegscan fehlgeschlagen. Bitte erneut versuchen.';
+
+  @override
+  String get scanFromCameraAction => 'Foto aufnehmen';
+
+  @override
+  String get scanFromGalleryAction => 'Aus Fotos auswählen';
+
+  @override
+  String get stepExpenseDetailsTitle => 'Ausgabendetails';
+
+  @override
+  String get stepSubItemsTitle => 'Unterpositionen';
+
+  @override
+  String get stepNextAction => 'Weiter';
+
+  @override
+  String get stepBackAction => 'Zurück';
+
+  @override
+  String get subItemsHelpText =>
+      'Füge Positionen vom Beleg hinzu. Eine Ausgabe kann aus mehreren Unterpositionen bestehen.';
+
+  @override
+  String get addSubItemAction => 'Unterposition hinzufügen';
+
+  @override
+  String get editSubItemAction => 'Unterposition bearbeiten';
+
+  @override
+  String get noSubItemsYet => 'Noch keine Unterpositionen hinzugefügt.';
+
+  @override
+  String get subItemsTotalLabel => 'Summe Unterpositionen';
+
+  @override
+  String subItemsCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# Unterpositionen',
+      one: '# Unterposition',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get applySubItemsTotalAction =>
+      'Summe der Unterpositionen als Ausgabenbetrag verwenden';
+
+  @override
+  String subItemsSumHint(Object amount) {
+    return 'Summe Unterpositionen: $amount';
+  }
 
   @override
   String pdfTitle(Object account) {

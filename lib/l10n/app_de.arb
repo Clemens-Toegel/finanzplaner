@@ -4,6 +4,18 @@
   "taxRefundPurchasesTitle": "Steuererstattungs-Ausgaben",
   "exportPdfTooltip": "PDF exportieren",
   "expenseAccountLabel": "Ausgabenkonto",
+  "accountSettingsTitle": "Kontoeinstellungen",
+  "accountDisplayNameLabel": "Kontobezeichnung",
+  "firmenbuchnummerLabel": "Firmenbuchnummer",
+  "firmenbuchnummerValidation": "Nur Buchstaben, Zahlen, Leerzeichen, / und - sind erlaubt.",
+  "saveSettingsAction": "Einstellungen speichern",
+  "accountSettingsSavedMessage": "Kontoeinstellungen gespeichert.",
+  "discardChangesTitle": "Änderungen verwerfen?",
+  "discardChangesMessage": "Du hast ungespeicherte Änderungen in diesem Formular.",
+  "discardChangesAction": "Verwerfen",
+  "subItemsExceedTotalValidation": "Unterpositionen dürfen nicht höher als der Ausgabenbetrag sein.",
+  "subItemAmountExceedsTotalValidation": "Diese Unterposition ist höher als der Ausgabenbetrag.",
+  "remainingForSubItemsLabel": "Verbleibend für Unterpositionen",
   "accountLabelPersonal": "Private Ausgaben",
   "accountLabelBusiness": "Betriebliche Ausgaben",
   "accountLabelInSentencePersonal": "private Ausgaben",
@@ -56,6 +68,38 @@
   "unknownVendor": "Unbekannter Anbieter",
   "deductibleLabel": "Absetzbar",
   "notDeductibleLabel": "Nicht absetzbar",
+  "offlineOcrPrivacyNote": "Belege werden offline auf dem Gerät gescannt. Keine Bild- oder Textdaten verlassen dein Gerät.",
+  "scanReceiptAction": "Kassenbon scannen",
+  "scanDocumentAction": "A4-Rechnung scannen",
+  "ocrNoTextFound": "Kein lesbarer Text auf dem Beleg gefunden.",
+  "ocrAppliedMessage": "Belegdaten wurden in das Formular übernommen.",
+  "ocrErrorMessage": "Belegscan fehlgeschlagen. Bitte erneut versuchen.",
+  "scanFromCameraAction": "Foto aufnehmen",
+  "scanFromGalleryAction": "Aus Fotos auswählen",
+  "stepExpenseDetailsTitle": "Ausgabendetails",
+  "stepSubItemsTitle": "Unterpositionen",
+  "stepNextAction": "Weiter",
+  "stepBackAction": "Zurück",
+  "subItemsHelpText": "Füge Positionen vom Beleg hinzu. Eine Ausgabe kann aus mehreren Unterpositionen bestehen.",
+  "addSubItemAction": "Unterposition hinzufügen",
+  "editSubItemAction": "Unterposition bearbeiten",
+  "noSubItemsYet": "Noch keine Unterpositionen hinzugefügt.",
+  "subItemsTotalLabel": "Summe Unterpositionen",
+  "subItemsCountLabel": "{count, plural, one{# Unterposition} other{# Unterpositionen}}",
+  "@subItemsCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "applySubItemsTotalAction": "Summe der Unterpositionen als Ausgabenbetrag verwenden",
+  "subItemsSumHint": "Summe Unterpositionen: {amount}",
+  "@subItemsSumHint": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
   "pdfTitle": "{account} – absetzbare Ausgaben",
   "@pdfTitle": {
     "placeholders": {
