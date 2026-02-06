@@ -8,6 +8,7 @@ class OcrBillData {
     this.amount,
     this.date,
     this.notes,
+    this.sourceFilePath,
     this.subItems = const [],
   });
 
@@ -17,5 +18,6 @@ class OcrBillData {
   final double? amount;
   final DateTime? date;
   final String? notes;
+  final String? sourceFilePath;
   final List<ExpenseSubItem> subItems;
 }

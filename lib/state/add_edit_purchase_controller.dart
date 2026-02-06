@@ -20,6 +20,8 @@ class AddEditPurchaseController extends ChangeNotifier {
     );
     notesController = TextEditingController(text: item?.notes ?? '');
 
+    attachmentPath = item?.attachmentPath;
+
     selectedDate = item?.date ?? DateTime.now();
     selectedCategory = item?.category ?? categories.first;
     if (!categories.contains(selectedCategory)) {
@@ -32,6 +34,7 @@ class AddEditPurchaseController extends ChangeNotifier {
     initialVendor = vendorController.text.trim();
     initialAmount = amountController.text.trim();
     initialNotes = notesController.text.trim();
+    initialAttachmentPath = (attachmentPath ?? '').trim();
     initialCategory = selectedCategory;
     initialDate = selectedDate;
     initialIsDeductible = isDeductible;
@@ -51,12 +54,15 @@ class AddEditPurchaseController extends ChangeNotifier {
   late String selectedCategory;
   late bool isDeductible;
   bool isScanning = false;
+  String? attachmentPath;
+  String? pendingAttachmentSourcePath;
   late List<ExpenseSubItem> subItems;
 
   late final String initialDescription;
   late final String initialVendor;
   late final String initialAmount;
   late final String initialNotes;
+  late final String initialAttachmentPath;
   late final String initialCategory;
   late final DateTime initialDate;
   late final bool initialIsDeductible;
@@ -80,6 +86,26 @@ class AddEditPurchaseController extends ChangeNotifier {
   bool get hasMinimumDetails =>
       descriptionController.text.trim().isNotEmpty &&
       amountController.text.trim().isNotEmpty;
+
+  bool get hasAttachment =>
+      (attachmentPath != null && attachmentPath!.trim().isNotEmpty) ||
+      (pendingAttachmentSourcePath != null &&
+          pendingAttachmentSourcePath!.trim().isNotEmpty);
+
+  void setPendingAttachmentSourcePath(String? sourcePath) {
+    pendingAttachmentSourcePath = sourcePath?.trim();
+    notifyListeners();
+  }
+
+  void setAttachmentPath(String? path) {
+    attachmentPath = path?.trim();
+    notifyListeners();
+  }
+
+  void clearPendingAttachmentSourcePath() {
+    pendingAttachmentSourcePath = null;
+    notifyListeners();
+  }
 
   void setSelectedCategory(String value) {
     if (selectedCategory == value) {
@@ -162,6 +188,9 @@ class AddEditPurchaseController extends ChangeNotifier {
         }
       }
     }
+    if (data.sourceFilePath != null && data.sourceFilePath!.trim().isNotEmpty) {
+      pendingAttachmentSourcePath = data.sourceFilePath!.trim();
+    }
     notifyListeners();
   }
 
@@ -182,6 +211,12 @@ class AddEditPurchaseController extends ChangeNotifier {
       return true;
     }
     if (notesController.text.trim() != initialNotes) {
+      return true;
+    }
+    if ((attachmentPath ?? '').trim() != initialAttachmentPath) {
+      return true;
+    }
+    if ((pendingAttachmentSourcePath ?? '').trim().isNotEmpty) {
       return true;
     }
     if (selectedCategory != initialCategory) {
@@ -225,6 +260,7 @@ class AddEditPurchaseController extends ChangeNotifier {
       date: selectedDate,
       isDeductible: isDeductible,
       notes: notesController.text.trim(),
+      attachmentPath: attachmentPath,
       subItems: subItems,
     );
   }

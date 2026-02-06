@@ -13,7 +13,7 @@ abstract class PurchaseHomeService {
   );
   Future<PurchaseItem> insertPurchase(PurchaseItem item);
   Future<PurchaseItem> updatePurchase(PurchaseItem item);
-  Future<void> deletePurchase(int id);
+  Future<void> deletePurchase(PurchaseItem item);
   Future<void> exportPdf({
     required ExpenseAccountType account,
     required List<PurchaseItem> items,
@@ -65,7 +65,11 @@ class DefaultPurchaseHomeService implements PurchaseHomeService {
   }
 
   @override
-  Future<void> deletePurchase(int id) {
+  Future<void> deletePurchase(PurchaseItem item) {
+    final id = item.id;
+    if (id == null) {
+      return Future.value();
+    }
     return _repository.deletePurchase(id);
   }
 

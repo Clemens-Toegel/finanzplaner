@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart' as p;
+import 'package:share_plus/share_plus.dart';
 
 import '../gen/app_localizations.dart';
 import '../models/purchase_item.dart';
@@ -11,6 +15,26 @@ class PurchaseDetailPage extends StatelessWidget {
   const PurchaseDetailPage({super.key, required this.item});
 
   final PurchaseItem item;
+
+  Future<void> _downloadAttachment(
+    BuildContext context,
+    String filePath,
+  ) async {
+    final file = File(filePath);
+    if (!await file.exists()) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Die Belegdatei wurde nicht gefunden.')),
+      );
+      return;
+    }
+
+    await Share.shareXFiles([
+      XFile(file.path, name: p.basename(file.path)),
+    ], sharePositionOrigin: Rect.fromLTWH(0, 0, 1, 1));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +156,24 @@ class PurchaseDetailPage extends StatelessWidget {
                       Text(currencyFormat.format(subItem.amount)),
                     ],
                   ),
+                ),
+              ),
+            ],
+            if ((item.attachmentPath ?? '').trim().isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(
+                  'Beleg',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: FilledButton.icon(
+                  onPressed: () =>
+                      _downloadAttachment(context, item.attachmentPath!.trim()),
+                  icon: const Icon(Icons.download_rounded),
+                  label: const Text('Beleg herunterladen'),
                 ),
               ),
             ],

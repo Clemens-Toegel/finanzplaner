@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 import '../models/expense_sub_item.dart';
 import '../models/ocr_bill_data.dart';
@@ -39,13 +42,17 @@ class OfflineBillOcrService {
 
     final rawText = recognizedText.text.trim();
     if (rawText.isEmpty) {
-      return const OcrBillData(rawText: '');
+      return OcrBillData(rawText: '', sourceFilePath: image.path);
     }
 
-    return _extractData(rawText, mode: mode);
+    return _extractData(rawText, mode: mode, sourceFilePath: image.path);
   }
 
-  OcrBillData _extractData(String rawText, {required BillScanMode mode}) {
+  OcrBillData _extractData(
+    String rawText, {
+    required BillScanMode mode,
+    required String sourceFilePath,
+  }) {
     final lines = rawText
         .split('\n')
         .map((line) => line.trim())
@@ -66,6 +73,7 @@ class OfflineBillOcrService {
       date: date,
       amount: amount,
       notes: null,
+      sourceFilePath: sourceFilePath,
       subItems: subItems,
     );
   }
@@ -312,6 +320,50 @@ class OfflineBillOcrService {
     }
 
     return values;
+  }
+
+  Future<String?> persistAttachment(String sourcePath) async {
+    try {
+      final source = File(sourcePath);
+      if (!await source.exists()) {
+        return null;
+      }
+
+      final appDir = await getApplicationDocumentsDirectory();
+      final attachmentsDir = Directory(
+        p.join(appDir.path, 'expense_attachments'),
+      );
+      if (!await attachmentsDir.exists()) {
+        await attachmentsDir.create(recursive: true);
+      }
+
+      final extension = p.extension(source.path).toLowerCase();
+      final safeExtension = extension.isEmpty ? '.jpg' : extension;
+      final fileName =
+          'expense_${DateTime.now().millisecondsSinceEpoch}$safeExtension';
+      final targetPath = p.join(attachmentsDir.path, fileName);
+
+      final stored = await source.copy(targetPath);
+      return stored.path;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> deleteStoredAttachment(String? filePath) async {
+    final path = filePath?.trim();
+    if (path == null || path.isEmpty) {
+      return;
+    }
+
+    try {
+      final file = File(path);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (_) {
+      // Best effort cleanup.
+    }
   }
 
   Future<void> dispose() async {

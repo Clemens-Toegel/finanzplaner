@@ -20,6 +20,7 @@ _PurchaseItem _$PurchaseItemFromJson(Map<String, dynamic> json) =>
       date: DateTime.parse(json['date'] as String),
       isDeductible: json['isDeductible'] as bool,
       notes: json['notes'] as String,
+      attachmentPath: json['attachmentPath'] as String?,
       subItems:
           (json['subItems'] as List<dynamic>?)
               ?.map((e) => ExpenseSubItem.fromJson(e as Map<String, dynamic>))
@@ -38,6 +39,7 @@ Map<String, dynamic> _$PurchaseItemToJson(_PurchaseItem instance) =>
       'date': instance.date.toIso8601String(),
       'isDeductible': instance.isDeductible,
       'notes': instance.notes,
+      'attachmentPath': instance.attachmentPath,
       'subItems': instance.subItems,
     };
 
