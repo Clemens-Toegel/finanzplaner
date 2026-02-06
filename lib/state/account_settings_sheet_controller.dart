@@ -22,6 +22,7 @@ class AccountSettingsSheetController extends ChangeNotifier {
        );
 
   ExpenseAccountType editingAccount;
+  bool isExporting = false;
   final TextEditingController personalNameController;
   final TextEditingController businessNameController;
   final TextEditingController registerNumberController;
@@ -36,6 +37,14 @@ class AccountSettingsSheetController extends ChangeNotifier {
       return;
     }
     editingAccount = account;
+    notifyListeners();
+  }
+
+  void setExporting(bool value) {
+    if (isExporting == value) {
+      return;
+    }
+    isExporting = value;
     notifyListeners();
   }
 

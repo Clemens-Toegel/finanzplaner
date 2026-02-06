@@ -35,6 +35,7 @@ class PurchaseHomeController extends ChangeNotifier {
   ExpenseAccountType selectedAccount = ExpenseAccountType.business;
   List<PurchaseItem> items = [];
   bool isLoading = true;
+  bool isExporting = false;
   int selectedTabIndex = 0;
   Map<ExpenseAccountType, AccountSettings> accountSettings = {
     ExpenseAccountType.personal: const AccountSettings(
@@ -103,32 +104,54 @@ class PurchaseHomeController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> exportPdf(AppLocalizations localizations) {
-    return _service.exportPdf(
-      account: selectedAccount,
-      items: items,
-      localizations: localizations,
-      accountSettings: accountSettings[selectedAccount],
-    );
+  Future<void> exportPdf(AppLocalizations localizations) async {
+    if (isExporting) {
+      return;
+    }
+
+    isExporting = true;
+    notifyListeners();
+    try {
+      await _service.exportPdf(
+        account: selectedAccount,
+        items: items,
+        localizations: localizations,
+        accountSettings: accountSettings[selectedAccount],
+      );
+    } finally {
+      isExporting = false;
+      notifyListeners();
+    }
   }
 
   Future<bool> exportExcelForTaxConsultant(
     AppLocalizations localizations, {
     required Rect sharePositionOrigin,
   }) async {
-    final accountItems = await _service.fetchPurchases(selectedAccount);
-    if (accountItems.isEmpty) {
+    if (isExporting) {
       return false;
     }
 
-    await _excelExporter.exportForTaxConsultant(
-      account: selectedAccount,
-      items: accountItems,
-      accountSettings: accountSettings[selectedAccount],
-      localizations: localizations,
-      sharePositionOrigin: sharePositionOrigin,
-    );
-    return true;
+    isExporting = true;
+    notifyListeners();
+    try {
+      final accountItems = await _service.fetchPurchases(selectedAccount);
+      if (accountItems.isEmpty) {
+        return false;
+      }
+
+      await _excelExporter.exportForTaxConsultant(
+        account: selectedAccount,
+        items: accountItems,
+        accountSettings: accountSettings[selectedAccount],
+        localizations: localizations,
+        sharePositionOrigin: sharePositionOrigin,
+      );
+      return true;
+    } finally {
+      isExporting = false;
+      notifyListeners();
+    }
   }
 
   Future<void> saveAccountSettings(

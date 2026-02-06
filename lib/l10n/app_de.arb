@@ -13,6 +13,7 @@
   "dataExportTitle": "Datenexport",
   "exportExcelForTaxConsultantAction": "Excel für die Steuerberatung exportieren",
   "exportExcelSuccessMessage": "Excel-Datei ist zum Teilen bereit.",
+  "exportInProgressMessage": "Export läuft…",
   "discardChangesTitle": "Änderungen verwerfen?",
   "discardChangesMessage": "Du hast ungespeicherte Änderungen in diesem Formular.",
   "discardChangesAction": "Verwerfen",

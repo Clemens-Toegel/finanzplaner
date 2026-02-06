@@ -177,6 +177,9 @@ class _PurchaseHomeView extends StatelessWidget {
     final isLoading = context.select<PurchaseHomeController, bool>(
       (c) => c.isLoading,
     );
+    final isExporting = context.select<PurchaseHomeController, bool>(
+      (c) => c.isExporting,
+    );
     final items = context.select<PurchaseHomeController, List<PurchaseItem>>(
       (c) => c.items,
     );
@@ -189,13 +192,23 @@ class _PurchaseHomeView extends StatelessWidget {
         actions: [
           IconButton(
             tooltip: l10n.accountSettingsTitle,
-            onPressed: () => _openAccountSettingsSheet(context, controller),
+            onPressed: isExporting
+                ? null
+                : () => _openAccountSettingsSheet(context, controller),
             icon: const Icon(Icons.settings_outlined),
           ),
           IconButton(
             tooltip: l10n.exportPdfTooltip,
-            onPressed: () => _exportPdf(context, l10n, controller, items),
-            icon: const Icon(Icons.picture_as_pdf),
+            onPressed: isExporting
+                ? null
+                : () => _exportPdf(context, l10n, controller, items),
+            icon: isExporting
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.picture_as_pdf),
           ),
         ],
         bottom: PreferredSize(
@@ -210,55 +223,82 @@ class _PurchaseHomeView extends StatelessWidget {
       ),
       body: SafeArea(
         top: false,
-        child: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          behavior: HitTestBehavior.translucent,
-          child: isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : items.isEmpty
-              ? PurchaseEmptyState(
-                  localizations: l10n,
-                  accountLabelInSentence: l10n.accountLabelInSentence(
-                    selectedAccount,
+        child: Stack(
+          children: [
+            GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              behavior: HitTestBehavior.translucent,
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : items.isEmpty
+                  ? PurchaseEmptyState(
+                      localizations: l10n,
+                      accountLabelInSentence: l10n.accountLabelInSentence(
+                        selectedAccount,
+                      ),
+                    )
+                  : selectedTabIndex == 0
+                  ? PurchaseExpensesTab(
+                      localizations: l10n,
+                      items: items,
+                      summaryDeductibleAmount: controller.currencyFormat.format(
+                        controller.deductibleAmount,
+                      ),
+                      onBuildItem: (item) =>
+                          _buildExpenseCard(context, controller, item, l10n),
+                    )
+                  : PurchaseDashboardTab(
+                      localizations: l10n,
+                      formattedTotalAmount: controller.currencyFormat.format(
+                        controller.totalAmount,
+                      ),
+                      formattedDeductibleAmount: controller.currencyFormat
+                          .format(controller.deductibleAmount),
+                      formattedNonDeductibleAmount: controller.currencyFormat
+                          .format(controller.nonDeductibleAmount),
+                      formattedAverageAmount: controller.currencyFormat.format(
+                        controller.totalAmount / items.length,
+                      ),
+                      formattedTopCategories:
+                          (controller.categoryTotals.entries.toList()
+                                ..sort((a, b) => b.value.compareTo(a.value)))
+                              .take(5)
+                              .map(
+                                (entry) => (
+                                  category: entry.key,
+                                  amount: controller.currencyFormat.format(
+                                    entry.value,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                    ),
+            ),
+            if (isExporting)
+              Positioned.fill(
+                child: ColoredBox(
+                  color: Colors.black26,
+                  child: Center(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const CircularProgressIndicator(),
+                            const SizedBox(height: 12),
+                            Text(l10n.exportInProgressMessage),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                )
-              : selectedTabIndex == 0
-              ? PurchaseExpensesTab(
-                  localizations: l10n,
-                  items: items,
-                  summaryDeductibleAmount: controller.currencyFormat.format(
-                    controller.deductibleAmount,
-                  ),
-                  onBuildItem: (item) =>
-                      _buildExpenseCard(context, controller, item, l10n),
-                )
-              : PurchaseDashboardTab(
-                  localizations: l10n,
-                  formattedTotalAmount: controller.currencyFormat.format(
-                    controller.totalAmount,
-                  ),
-                  formattedDeductibleAmount: controller.currencyFormat.format(
-                    controller.deductibleAmount,
-                  ),
-                  formattedNonDeductibleAmount: controller.currencyFormat
-                      .format(controller.nonDeductibleAmount),
-                  formattedAverageAmount: controller.currencyFormat.format(
-                    controller.totalAmount / items.length,
-                  ),
-                  formattedTopCategories:
-                      (controller.categoryTotals.entries.toList()
-                            ..sort((a, b) => b.value.compareTo(a.value)))
-                          .take(5)
-                          .map(
-                            (entry) => (
-                              category: entry.key,
-                              amount: controller.currencyFormat.format(
-                                entry.value,
-                              ),
-                            ),
-                          )
-                          .toList(),
                 ),
+              ),
+          ],
         ),
       ),
       bottomNavigationBar: NavigationBar(
@@ -278,7 +318,9 @@ class _PurchaseHomeView extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openAddItemSheet(context, controller),
+        onPressed: isExporting
+            ? null
+            : () => _openAddItemSheet(context, controller),
         backgroundColor: accountColor,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),

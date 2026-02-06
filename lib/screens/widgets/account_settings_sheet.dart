@@ -124,16 +124,34 @@ class _AccountSettingsSheetContent extends StatelessWidget {
                   Builder(
                     builder: (buttonContext) {
                       return OutlinedButton.icon(
-                        onPressed: () async {
-                          final box =
-                              buttonContext.findRenderObject() as RenderBox?;
-                          final sharePositionOrigin =
-                              box == null || !box.hasSize
-                              ? const Rect.fromLTWH(1, 1, 1, 1)
-                              : box.localToGlobal(Offset.zero) & box.size;
-                          await onExportExcel(sharePositionOrigin);
-                        },
-                        icon: const Icon(Icons.table_view_outlined),
+                        onPressed: controller.isExporting
+                            ? null
+                            : () async {
+                                final box =
+                                    buttonContext.findRenderObject()
+                                        as RenderBox?;
+                                final sharePositionOrigin =
+                                    box == null || !box.hasSize
+                                    ? const Rect.fromLTWH(1, 1, 1, 1)
+                                    : box.localToGlobal(Offset.zero) & box.size;
+                                controller.setExporting(true);
+                                try {
+                                  await onExportExcel(sharePositionOrigin);
+                                } finally {
+                                  if (buttonContext.mounted) {
+                                    controller.setExporting(false);
+                                  }
+                                }
+                              },
+                        icon: controller.isExporting
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.table_view_outlined),
                         label: Text(l10n.exportExcelForTaxConsultantAction),
                       );
                     },
