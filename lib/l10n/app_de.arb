@@ -1,7 +1,7 @@
 {
   "@@locale": "de",
-  "appTitle": "Steuererstattungs-Ausgaben",
-  "taxRefundPurchasesTitle": "Steuererstattungs-Ausgaben",
+  "appTitle": "BelegPilot",
+  "taxRefundPurchasesTitle": "BelegPilot",
   "exportPdfTooltip": "PDF exportieren",
   "expenseAccountLabel": "Ausgabenkonto",
   "accountSettingsTitle": "Kontoeinstellungen",
@@ -47,8 +47,8 @@
   "vatDeductibleLabel": "In Österreich vorsteuerabzugsfähig",
   "notesLabel": "Notizen für die Steuerberatung",
   "addBeforeExport": "Bitte zuerst Ausgaben hinzufügen, bevor exportiert wird.",
-  "emptyStateTitle": "Steuerlich absetzbare Ausgaben in Österreich erfassen",
-  "emptyStateSubtitle": "Füge jeden Beleg für {account} hinzu, damit deine Steuerberatung ihn prüfen kann.",
+  "emptyStateTitle": "Ausgaben einfach erfassen und organisieren",
+  "emptyStateSubtitle": "Füge jeden Beleg für {account} hinzu, damit du alles übersichtlich an einem Ort hast.",
   "@emptyStateSubtitle": {
     "placeholders": {
       "account": {}

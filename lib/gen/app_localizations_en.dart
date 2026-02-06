@@ -9,10 +9,10 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Tax refund expenses';
+  String get appTitle => 'BelegPilot';
 
   @override
-  String get taxRefundPurchasesTitle => 'Tax refund expenses';
+  String get taxRefundPurchasesTitle => 'BelegPilot';
 
   @override
   String get exportPdfTooltip => 'Export PDF';
@@ -155,11 +155,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addBeforeExport => 'Please add expenses before exporting.';
 
   @override
-  String get emptyStateTitle => 'Track tax-deductible expenses in Austria';
+  String get emptyStateTitle => 'Capture and organize expenses with ease';
 
   @override
   String emptyStateSubtitle(Object account) {
-    return 'Add each receipt for $account so your tax advisor can review it.';
+    return 'Add each receipt for $account to keep everything clearly organized in one place.';
   }
 
   @override

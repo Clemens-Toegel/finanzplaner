@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../gen/app_localizations.dart';
 import '../../state/add_edit_purchase_controller.dart';
+import '../../widgets/pilo_scanning_logo.dart';
 
 class AddEditPurchaseDetailsStep extends StatelessWidget {
   const AddEditPurchaseDetailsStep({
@@ -78,8 +79,8 @@ class AddEditPurchaseDetailsStep extends StatelessWidget {
         ),
         if (vm.isScanning)
           const Padding(
-            padding: EdgeInsets.only(top: 12),
-            child: LinearProgressIndicator(),
+            padding: EdgeInsets.only(top: 14),
+            child: Center(child: _PiloScanningStatus()),
           ),
         if (vm.hasAttachment)
           Padding(
@@ -192,6 +193,59 @@ class AddEditPurchaseDetailsStep extends StatelessWidget {
           onChanged: controller.setIsDeductible,
         ),
       ],
+    );
+  }
+}
+
+class _PiloScanningStatus extends StatefulWidget {
+  const _PiloScanningStatus();
+
+  @override
+  State<_PiloScanningStatus> createState() => _PiloScanningStatusState();
+}
+
+class _PiloScanningStatusState extends State<_PiloScanningStatus>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final dots = (_controller.value * 3).floor() + 1;
+        final label = 'Pilo scannt deinen Beleg${'.' * dots}';
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const PiloScanningLogo(size: 64),
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

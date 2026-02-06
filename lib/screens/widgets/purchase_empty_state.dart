@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../gen/app_localizations.dart';
+import '../../widgets/pilo_logo.dart';
 
 class PurchaseEmptyState extends StatelessWidget {
   const PurchaseEmptyState({
@@ -21,13 +22,9 @@ class PurchaseEmptyState extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: 8,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Icon(
-                Icons.receipt_long,
-                size: 64,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 10),
+              child: PiloLogo(size: 68, showWordmark: false),
             ),
             Text(
               localizations.emptyStateTitle,

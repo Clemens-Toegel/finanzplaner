@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="160" viewBox="0 0 512 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="piloBg" x1="20" y1="20" x2="140" y2="140" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2A9AFF"/>
+      <stop offset="1" stop-color="#0F62C3"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mark -->
+  <g transform="translate(20,20)">
+    <!-- coin -->
+    <circle cx="60" cy="60" r="60" fill="url(#piloBg)"/>
+
+    <!-- owl body -->
+    <rect x="19" y="29" width="82" height="77" rx="34" fill="#071225" fill-opacity="0.93"/>
+
+    <!-- eyes -->
+    <circle cx="45" cy="50" r="13" fill="#F8FBFF"/>
+    <circle cx="75" cy="50" r="13" fill="#F8FBFF"/>
+    <circle cx="45" cy="50" r="5" fill="#071225"/>
+    <circle cx="75" cy="50" r="5" fill="#071225"/>
+
+    <!-- scan visor -->
+    <rect x="59" y="34" width="32" height="32" rx="7" stroke="#3DDC97" stroke-width="4" fill="none"/>
+
+    <!-- beak -->
+    <path d="M60 60 L53 68 L67 68 Z" fill="#FFB020"/>
+
+    <!-- receipt tab -->
+    <rect x="74" y="74" width="22" height="26" rx="3" fill="#F8FBFF" fill-opacity="0.95"/>
+    <line x1="78" y1="81" x2="92" y2="81" stroke="#071225" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round"/>
+    <line x1="78" y1="87" x2="90" y2="87" stroke="#071225" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round"/>
+    <line x1="78" y1="93" x2="91" y2="93" stroke="#071225" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="170" y="96" fill="#F8FBFF" font-size="54" font-weight="700" font-family="Inter, SF Pro Display, Roboto, Arial, sans-serif" letter-spacing="0.2">BelegPilot</text>
+</svg>
