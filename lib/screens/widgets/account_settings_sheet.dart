@@ -14,6 +14,7 @@ class AccountSettingsSheet extends StatelessWidget {
     required this.selectedAccount,
     required this.onSave,
     required this.onExportExcel,
+    required this.onExportPdf,
   });
 
   final Map<ExpenseAccountType, AccountSettings> initialSettings;
@@ -21,6 +22,7 @@ class AccountSettingsSheet extends StatelessWidget {
   final Future<void> Function(Map<ExpenseAccountType, AccountSettings> settings)
   onSave;
   final Future<void> Function() onExportExcel;
+  final Future<void> Function() onExportPdf;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,7 @@ class AccountSettingsSheet extends StatelessWidget {
       child: _AccountSettingsSheetContent(
         onSave: onSave,
         onExportExcel: onExportExcel,
+        onExportPdf: onExportPdf,
       ),
     );
   }
@@ -41,12 +44,14 @@ class _AccountSettingsSheetContent extends StatelessWidget {
   _AccountSettingsSheetContent({
     required this.onSave,
     required this.onExportExcel,
+    required this.onExportPdf,
   });
 
   final _formKey = GlobalKey<FormState>();
   final Future<void> Function(Map<ExpenseAccountType, AccountSettings> settings)
   onSave;
   final Future<void> Function() onExportExcel;
+  final Future<void> Function() onExportPdf;
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +143,24 @@ class _AccountSettingsSheetContent extends StatelessWidget {
                         ? const CircularProgressIndicator(strokeWidth: 2)
                         : const Icon(Icons.table_view_outlined),
                     label: Text(l10n.exportExcelForTaxConsultantAction),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: controller.isExporting
+                        ? null
+                        : () async {
+                            controller.setExporting(true);
+                            try {
+                              await onExportPdf();
+                            } finally {
+                              if (context.mounted) {
+                                controller.setExporting(false);
+                              }
+                            }
+                          },
+                    icon: controller.isExporting
+                        ? const CircularProgressIndicator(strokeWidth: 2)
+                        : const Icon(Icons.picture_as_pdf_outlined),
+                    label: Text(l10n.exportPdfTooltip),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
