@@ -20,6 +20,7 @@ abstract class PurchaseItem with _$PurchaseItem {
     required DateTime date,
     required bool isDeductible,
     required String notes,
+    String? attachmentPath,
     @Default(<ExpenseSubItem>[]) List<ExpenseSubItem> subItems,
   }) = _PurchaseItem;
 
@@ -39,6 +40,7 @@ abstract class PurchaseItem with _$PurchaseItem {
       'date': date.toIso8601String(),
       'deductible': isDeductible ? 1 : 0,
       'notes': notes,
+      'attachment_path': attachmentPath,
       'sub_items': jsonEncode(subItems.map((item) => item.toJson()).toList()),
     };
   }
@@ -58,6 +60,7 @@ abstract class PurchaseItem with _$PurchaseItem {
       date: DateTime.tryParse(map['date'] as String? ?? '') ?? DateTime.now(),
       isDeductible: (map['deductible'] as int? ?? 0) == 1,
       notes: map['notes'] as String? ?? '',
+      attachmentPath: (map['attachment_path'] as String?)?.trim(),
       subItems: _decodeSubItems(rawSubItems),
     );
   }

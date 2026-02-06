@@ -13,6 +13,9 @@ class PurchaseExpenseCard extends StatelessWidget {
     required this.dateFormat,
     required this.currencyFormat,
     required this.onTap,
+    this.onLongPress,
+    this.isSelectionMode = false,
+    this.isSelected = false,
   });
 
   final PurchaseItem item;
@@ -20,22 +23,49 @@ class PurchaseExpenseCard extends StatelessWidget {
   final DateFormat dateFormat;
   final NumberFormat currencyFormat;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final bool isSelectionMode;
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
+    final selectedColor = Theme.of(context).colorScheme.primary;
+
     return Card(
       clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: isSelected
+            ? BorderSide(color: selectedColor, width: 1.5)
+            : BorderSide.none,
+      ),
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             spacing: 4,
             children: [
-              Text(
-                item.description,
-                style: Theme.of(context).textTheme.titleMedium,
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      item.description,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  if (isSelectionMode)
+                    Icon(
+                      isSelected
+                          ? Icons.check_circle
+                          : Icons.radio_button_unchecked,
+                      color: isSelected
+                          ? selectedColor
+                          : Theme.of(context).colorScheme.outline,
+                    ),
+                ],
               ),
               Text(
                 '${item.vendor.isEmpty ? localizations.unknownVendor : item.vendor} • ${item.category}',

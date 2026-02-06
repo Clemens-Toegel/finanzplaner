@@ -33,6 +33,7 @@ class AddEditPurchaseDetailsStep extends StatelessWidget {
             bool isDeductible,
             double subItemsTotal,
             bool hasSubItems,
+            bool hasAttachment,
           })
         >(
           (c) => (
@@ -42,6 +43,7 @@ class AddEditPurchaseDetailsStep extends StatelessWidget {
             isDeductible: c.isDeductible,
             subItemsTotal: c.subItemsTotal,
             hasSubItems: c.subItems.isNotEmpty,
+            hasAttachment: c.hasAttachment,
           ),
         );
 
@@ -78,6 +80,26 @@ class AddEditPurchaseDetailsStep extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.only(top: 12),
             child: LinearProgressIndicator(),
+          ),
+        if (vm.hasAttachment)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.attach_file,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 6),
+                  child: Text(
+                    'Beleg angehängt',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+              ],
+            ),
           ),
         Padding(
           padding: const EdgeInsets.only(top: 12),

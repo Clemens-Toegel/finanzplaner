@@ -24,7 +24,7 @@ class PurchaseRepository {
 
     _database = await openDatabase(
       filePath,
-      version: 4,
+      version: 1,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE purchases(
@@ -37,6 +37,7 @@ class PurchaseRepository {
             date TEXT NOT NULL,
             deductible INTEGER NOT NULL,
             notes TEXT,
+            attachment_path TEXT,
             sub_items TEXT NOT NULL DEFAULT '[]'
           )
           ''');
@@ -57,61 +58,6 @@ class PurchaseRepository {
           'display_name': '',
           'company_register_number': '',
         });
-      },
-      onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 2) {
-          await db.execute(
-            "ALTER TABLE purchases ADD COLUMN sub_items TEXT NOT NULL DEFAULT '[]'",
-          );
-        }
-        if (oldVersion < 3) {
-          await db.execute('''
-            CREATE TABLE IF NOT EXISTS account_settings(
-              account TEXT PRIMARY KEY,
-              display_name TEXT NOT NULL DEFAULT '',
-              company_register_number TEXT NOT NULL DEFAULT ''
-            )
-            ''');
-          await db.insert('account_settings', {
-            'account': ExpenseAccountType.personal.storageValue,
-            'display_name': '',
-            'company_register_number': '',
-          }, conflictAlgorithm: ConflictAlgorithm.ignore);
-          await db.insert('account_settings', {
-            'account': ExpenseAccountType.business.storageValue,
-            'display_name': '',
-            'company_register_number': '',
-          }, conflictAlgorithm: ConflictAlgorithm.ignore);
-        }
-        if (oldVersion < 4) {
-          await db.execute('''
-            CREATE TABLE IF NOT EXISTS account_settings_new(
-              account TEXT PRIMARY KEY,
-              display_name TEXT NOT NULL DEFAULT '',
-              company_register_number TEXT NOT NULL DEFAULT ''
-            )
-            ''');
-
-          final columns = await db.rawQuery(
-            'PRAGMA table_info(account_settings)',
-          );
-          final hasEnglishColumn = columns.any(
-            (row) => row['name'] == 'company_register_number',
-          );
-          final sourceColumn = hasEnglishColumn
-              ? 'company_register_number'
-              : 'firmenbuchnummer';
-
-          await db.execute('''
-            INSERT OR REPLACE INTO account_settings_new(account, display_name, company_register_number)
-            SELECT account, display_name, $sourceColumn FROM account_settings
-          ''');
-
-          await db.execute('DROP TABLE account_settings');
-          await db.execute(
-            'ALTER TABLE account_settings_new RENAME TO account_settings',
-          );
-        }
       },
     );
 

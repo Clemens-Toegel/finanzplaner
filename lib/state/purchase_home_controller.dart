@@ -36,6 +36,7 @@ class PurchaseHomeController extends ChangeNotifier {
   bool isLoading = true;
   bool isExporting = false;
   int selectedTabIndex = 0;
+  Set<int> selectedPurchaseIds = <int>{};
   Map<ExpenseAccountType, AccountSettings> accountSettings = {
     ExpenseAccountType.personal: const AccountSettings(
       accountType: ExpenseAccountType.personal,
@@ -67,6 +68,8 @@ class PurchaseHomeController extends ChangeNotifier {
 
   OfflineBillOcrService get offlineBillOcrService => _offlineBillOcrService;
 
+  bool get isSelectionMode => selectedPurchaseIds.isNotEmpty;
+
   Future<void> initialize() async {
     await loadAccountSettings();
     await loadItems();
@@ -74,6 +77,7 @@ class PurchaseHomeController extends ChangeNotifier {
 
   Future<void> loadItems() async {
     isLoading = true;
+    selectedPurchaseIds.clear();
     notifyListeners();
     final loadedItems = await _service.fetchPurchases(selectedAccount);
     items = _sortItemsByDate(loadedItems);
@@ -100,6 +104,62 @@ class PurchaseHomeController extends ChangeNotifier {
       return;
     }
     selectedTabIndex = index;
+    if (index != 0) {
+      selectedPurchaseIds.clear();
+    }
+    notifyListeners();
+  }
+
+  void togglePurchaseSelection(PurchaseItem item) {
+    final id = item.id;
+    if (id == null) {
+      return;
+    }
+    if (selectedPurchaseIds.contains(id)) {
+      selectedPurchaseIds.remove(id);
+    } else {
+      selectedPurchaseIds.add(id);
+    }
+    notifyListeners();
+  }
+
+  bool isPurchaseSelected(PurchaseItem item) {
+    final id = item.id;
+    if (id == null) {
+      return false;
+    }
+    return selectedPurchaseIds.contains(id);
+  }
+
+  void clearSelection() {
+    if (selectedPurchaseIds.isEmpty) {
+      return;
+    }
+    selectedPurchaseIds.clear();
+    notifyListeners();
+  }
+
+  Future<void> deleteSelectedPurchases() async {
+    final ids = Set<int>.from(selectedPurchaseIds);
+    if (ids.isEmpty) {
+      return;
+    }
+
+    final selectedItems = items.where((item) {
+      final id = item.id;
+      return id != null && ids.contains(id);
+    }).toList();
+
+    for (final item in selectedItems) {
+      await _service.deletePurchase(item);
+      await _offlineBillOcrService.deleteStoredAttachment(item.attachmentPath);
+    }
+
+    items = items.where((item) {
+      final id = item.id;
+      return id == null || !ids.contains(id);
+    }).toList();
+    selectedPurchaseIds.clear();
     notifyListeners();
   }
 
@@ -167,16 +227,31 @@ class PurchaseHomeController extends ChangeNotifier {
       return;
     }
 
-    await _service.updatePurchase(draft);
     final index = items.indexWhere((existing) => existing.id == draft.id);
+    final previous = index != -1 ? items[index] : null;
+
+    await _service.updatePurchase(draft);
+
+    final previousAttachment = previous?.attachmentPath?.trim() ?? '';
+    final nextAttachment = draft.attachmentPath?.trim() ?? '';
+    if (previousAttachment.isNotEmpty && previousAttachment != nextAttachment) {
+      await _offlineBillOcrService.deleteStoredAttachment(previousAttachment);
+    }
+
     if (index != -1) {
       items = _sortItemsByDate(List.from(items)..[index] = draft);
       notifyListeners();
     }
   }
 
-  Future<void> deletePurchase(int id) async {
-    await _service.deletePurchase(id);
+  Future<void> deletePurchase(PurchaseItem item) async {
+    await _service.deletePurchase(item);
+    await _offlineBillOcrService.deleteStoredAttachment(item.attachmentPath);
+    final id = item.id;
+    if (id == null) {
+      return;
+    }
+    selectedPurchaseIds.remove(id);
     items = items.where((existing) => existing.id != id).toList();
     notifyListeners();
   }

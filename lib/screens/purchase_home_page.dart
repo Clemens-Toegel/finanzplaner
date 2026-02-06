@@ -128,18 +128,61 @@ class _PurchaseHomeView extends StatelessWidget {
     await controller.exportPdf(l10n);
   }
 
+  Future<void> _confirmDeleteSelected(
+    BuildContext context,
+    PurchaseHomeController controller,
+  ) async {
+    final selectedCount = controller.selectedPurchaseIds.length;
+    if (selectedCount == 0) {
+      return;
+    }
+
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Ausgewählte Ausgaben löschen?'),
+        content: Text('$selectedCount Einträge werden gelöscht.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Abbrechen'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete == true && context.mounted) {
+      await controller.deleteSelectedPurchases();
+    }
+  }
+
   Widget _buildExpenseCard(
     BuildContext context,
     PurchaseHomeController controller,
     PurchaseItem item,
     AppLocalizations l10n,
+    bool isSelectionMode,
   ) {
+    final isSelected = controller.isPurchaseSelected(item);
+
     return PurchaseExpenseCard(
       item: item,
       localizations: l10n,
       dateFormat: controller.dateFormat,
       currencyFormat: controller.currencyFormat,
+      isSelectionMode: isSelectionMode,
+      isSelected: isSelected,
+      onLongPress: () => controller.togglePurchaseSelection(item),
       onTap: () async {
+        if (isSelectionMode) {
+          controller.togglePurchaseSelection(item);
+          return;
+        }
+
         final action = await Navigator.push<PurchaseDetailAction>(
           context,
           MaterialPageRoute(
@@ -153,7 +196,7 @@ class _PurchaseHomeView extends StatelessWidget {
           await _openAddItemSheet(context, controller, item: item);
         }
         if (action == PurchaseDetailAction.delete && item.id != null) {
-          await controller.deletePurchase(item.id!);
+          await controller.deletePurchase(item);
         }
       },
     );
@@ -180,39 +223,66 @@ class _PurchaseHomeView extends StatelessWidget {
     final items = context.select<PurchaseHomeController, List<PurchaseItem>>(
       (c) => c.items,
     );
+    final isSelectionMode = context.select<PurchaseHomeController, bool>(
+      (c) => c.isSelectionMode,
+    );
+    final selectedCount = context.select<PurchaseHomeController, int>(
+      (c) => c.selectedPurchaseIds.length,
+    );
 
     final accountColor = _accountColor(selectedAccount);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.taxRefundPurchasesTitle),
-        actions: [
-          IconButton(
-            tooltip: l10n.accountSettingsTitle,
-            onPressed: isExporting
-                ? null
-                : () => _openAccountSettingsSheet(context, controller),
-            icon: const Icon(Icons.settings_outlined),
-          ),
-          IconButton(
-            tooltip: l10n.exportPdfTooltip,
-            onPressed: isExporting
-                ? null
-                : () => _exportPdf(context, l10n, controller, items),
-            icon: isExporting
-                ? const CircularProgressIndicator(strokeWidth: 2)
-                : const Icon(Icons.picture_as_pdf),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(88),
-          child: PurchaseAccountSwitcher(
-            localizations: l10n,
-            selectedAccount: selectedAccount,
-            accountColor: accountColor,
-            onChanged: controller.changeAccount,
-          ),
+        title: Text(
+          isSelectionMode
+              ? '$selectedCount ausgewählt'
+              : l10n.taxRefundPurchasesTitle,
         ),
+        actions: isSelectionMode
+            ? [
+                IconButton(
+                  tooltip: 'Auswahl löschen',
+                  onPressed: selectedCount == 0
+                      ? null
+                      : () => _confirmDeleteSelected(context, controller),
+                  icon: const Icon(Icons.delete_outline),
+                ),
+                IconButton(
+                  tooltip: 'Auswahl beenden',
+                  onPressed: controller.clearSelection,
+                  icon: const Icon(Icons.close),
+                ),
+              ]
+            : [
+                IconButton(
+                  tooltip: l10n.accountSettingsTitle,
+                  onPressed: isExporting
+                      ? null
+                      : () => _openAccountSettingsSheet(context, controller),
+                  icon: const Icon(Icons.settings_outlined),
+                ),
+                IconButton(
+                  tooltip: l10n.exportPdfTooltip,
+                  onPressed: isExporting
+                      ? null
+                      : () => _exportPdf(context, l10n, controller, items),
+                  icon: isExporting
+                      ? const CircularProgressIndicator(strokeWidth: 2)
+                      : const Icon(Icons.picture_as_pdf),
+                ),
+              ],
+        bottom: isSelectionMode
+            ? null
+            : PreferredSize(
+                preferredSize: const Size.fromHeight(88),
+                child: PurchaseAccountSwitcher(
+                  localizations: l10n,
+                  selectedAccount: selectedAccount,
+                  accountColor: accountColor,
+                  onChanged: controller.changeAccount,
+                ),
+              ),
       ),
       body: SafeArea(
         top: false,
@@ -237,8 +307,13 @@ class _PurchaseHomeView extends StatelessWidget {
                       summaryDeductibleAmount: controller.currencyFormat.format(
                         controller.deductibleAmount,
                       ),
-                      onBuildItem: (item) =>
-                          _buildExpenseCard(context, controller, item, l10n),
+                      onBuildItem: (item) => _buildExpenseCard(
+                        context,
+                        controller,
+                        item,
+                        l10n,
+                        isSelectionMode,
+                      ),
                     )
                   : PurchaseDashboardTab(
                       localizations: l10n,
@@ -332,15 +407,17 @@ class _PurchaseHomeView extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: isExporting
-            ? null
-            : () => _openAddItemSheet(context, controller),
-        backgroundColor: accountColor,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add),
-        label: Text(l10n.addPurchase),
-      ),
+      floatingActionButton: isSelectionMode
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: isExporting
+                  ? null
+                  : () => _openAddItemSheet(context, controller),
+              backgroundColor: accountColor,
+              foregroundColor: Colors.white,
+              icon: const Icon(Icons.add),
+              label: Text(l10n.addPurchase),
+            ),
     );
   }
 }

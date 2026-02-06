@@ -92,6 +92,16 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
       return;
     }
 
+    if ((controller.pendingAttachmentSourcePath ?? '').trim().isNotEmpty) {
+      final storedAttachmentPath = await ocrService.persistAttachment(
+        controller.pendingAttachmentSourcePath!,
+      );
+      if (storedAttachmentPath != null) {
+        controller.setAttachmentPath(storedAttachmentPath);
+      }
+      controller.clearPendingAttachmentSourcePath();
+    }
+
     final parsedAmount = double.parse(
       controller.amountController.text.replaceAll(',', '.'),
     );
@@ -137,14 +147,15 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
         return;
       }
 
+      controller.applyOcrDataToForm(data);
+
       if (data.rawText.isEmpty) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l10n.ocrNoTextFound)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.ocrNoTextFound} – Beleg angehängt.')),
+        );
         return;
       }
 
-      controller.applyOcrDataToForm(data);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.ocrAppliedMessage)));
@@ -442,6 +453,15 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
     );
 
     if (shouldDiscard == true && context.mounted) {
+      final initialAttachment = item?.attachmentPath?.trim() ?? '';
+      final currentAttachment = controller.attachmentPath?.trim() ?? '';
+      if (currentAttachment.isNotEmpty &&
+          currentAttachment != initialAttachment) {
+        await ocrService.deleteStoredAttachment(currentAttachment);
+        if (!context.mounted) {
+          return;
+        }
+      }
       Navigator.of(context).pop();
     }
   }

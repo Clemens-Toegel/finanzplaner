@@ -27,7 +27,11 @@ class _FakePurchaseHomeService implements PurchaseHomeService {
   int _id = 1;
 
   @override
-  Future<void> deletePurchase(int id) async {
+  Future<void> deletePurchase(PurchaseItem item) async {
+    final id = item.id;
+    if (id == null) {
+      return;
+    }
     for (final key in store.keys) {
       store[key] = store[key]!.where((e) => e.id != id).toList();
     }
