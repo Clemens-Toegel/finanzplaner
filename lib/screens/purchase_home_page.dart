@@ -52,11 +52,8 @@ class _PurchaseHomeView extends StatelessWidget {
           initialSettings: controller.accountSettings,
           selectedAccount: controller.selectedAccount,
           onSave: controller.saveAccountSettings,
-          onExportExcel: (sharePositionOrigin) async {
-            final success = await controller.exportExcelForTaxConsultant(
-              l10n,
-              sharePositionOrigin: sharePositionOrigin,
-            );
+          onExportExcel: () async {
+            final success = await controller.exportExcelForTaxConsultant(l10n);
             if (!context.mounted) {
               return;
             }

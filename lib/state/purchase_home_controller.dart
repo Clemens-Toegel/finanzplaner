@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
@@ -125,9 +124,8 @@ class PurchaseHomeController extends ChangeNotifier {
   }
 
   Future<bool> exportExcelForTaxConsultant(
-    AppLocalizations localizations, {
-    required Rect sharePositionOrigin,
-  }) async {
+    AppLocalizations localizations,
+  ) async {
     if (isExporting) {
       return false;
     }
@@ -145,7 +143,6 @@ class PurchaseHomeController extends ChangeNotifier {
         items: accountItems,
         accountSettings: accountSettings[selectedAccount],
         localizations: localizations,
-        sharePositionOrigin: sharePositionOrigin,
       );
       return true;
     } finally {
