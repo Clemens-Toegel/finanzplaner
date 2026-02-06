@@ -111,6 +111,25 @@ class PurchaseDetailPage extends StatelessWidget {
               label: l10n.vatDeductibleLabel,
               value: item.isDeductible ? l10n.yesLabel : l10n.noLabel,
             ),
+            if (item.subItems.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(
+                l10n.stepSubItemsTitle,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 8),
+              ...item.subItems.map(
+                (subItem) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Expanded(child: Text(subItem.description)),
+                      Text(currencyFormat.format(subItem.amount)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
             if (item.notes.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text(

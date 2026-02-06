@@ -4,6 +4,18 @@
   "taxRefundPurchasesTitle": "Tax refund expenses",
   "exportPdfTooltip": "Export PDF",
   "expenseAccountLabel": "Expense account",
+  "accountSettingsTitle": "Account settings",
+  "accountDisplayNameLabel": "Account display name",
+  "firmenbuchnummerLabel": "Firmenbuchnummer",
+  "firmenbuchnummerValidation": "Only letters, numbers, spaces, / and - are allowed.",
+  "saveSettingsAction": "Save settings",
+  "accountSettingsSavedMessage": "Account settings saved.",
+  "discardChangesTitle": "Discard changes?",
+  "discardChangesMessage": "You have unsaved changes in this form.",
+  "discardChangesAction": "Discard",
+  "subItemsExceedTotalValidation": "Sub-items cannot be higher than the expense total.",
+  "subItemAmountExceedsTotalValidation": "This sub-item is higher than the expense total.",
+  "remainingForSubItemsLabel": "Remaining for sub-items",
   "accountLabelPersonal": "Personal expenses",
   "accountLabelBusiness": "Business expenses",
   "accountLabelInSentencePersonal": "personal expenses",
@@ -56,6 +68,38 @@
   "unknownVendor": "Unknown vendor",
   "deductibleLabel": "Deductible",
   "notDeductibleLabel": "Not deductible",
+  "offlineOcrPrivacyNote": "Scan bills offline on-device. No image or text leaves your phone.",
+  "scanReceiptAction": "Scan receipt",
+  "scanDocumentAction": "Scan A4 bill",
+  "ocrNoTextFound": "No readable text found on the bill.",
+  "ocrAppliedMessage": "Bill data was inserted into the form.",
+  "ocrErrorMessage": "Bill scan failed. Please try again.",
+  "scanFromCameraAction": "Take photo",
+  "scanFromGalleryAction": "Choose from photos",
+  "stepExpenseDetailsTitle": "Expense details",
+  "stepSubItemsTitle": "Sub-items",
+  "stepNextAction": "Next",
+  "stepBackAction": "Back",
+  "subItemsHelpText": "Add line items from the bill. The expense can be composed of multiple sub-items.",
+  "addSubItemAction": "Add sub-item",
+  "editSubItemAction": "Edit sub-item",
+  "noSubItemsYet": "No sub-items added yet.",
+  "subItemsTotalLabel": "Sub-items total",
+  "subItemsCountLabel": "{count, plural, one{# sub-item} other{# sub-items}}",
+  "@subItemsCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "applySubItemsTotalAction": "Use sub-items total as expense amount",
+  "subItemsSumHint": "Sub-items sum: {amount}",
+  "@subItemsSumHint": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
   "pdfTitle": "{account} – deductible expenses",
   "@pdfTitle": {
     "placeholders": {

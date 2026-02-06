@@ -122,6 +122,78 @@ abstract class AppLocalizations {
   /// **'Ausgabenkonto'**
   String get expenseAccountLabel;
 
+  /// No description provided for @accountSettingsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontoeinstellungen'**
+  String get accountSettingsTitle;
+
+  /// No description provided for @accountDisplayNameLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontobezeichnung'**
+  String get accountDisplayNameLabel;
+
+  /// No description provided for @firmenbuchnummerLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Firmenbuchnummer'**
+  String get firmenbuchnummerLabel;
+
+  /// No description provided for @firmenbuchnummerValidation.
+  ///
+  /// In de, this message translates to:
+  /// **'Nur Buchstaben, Zahlen, Leerzeichen, / und - sind erlaubt.'**
+  String get firmenbuchnummerValidation;
+
+  /// No description provided for @saveSettingsAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Einstellungen speichern'**
+  String get saveSettingsAction;
+
+  /// No description provided for @accountSettingsSavedMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontoeinstellungen gespeichert.'**
+  String get accountSettingsSavedMessage;
+
+  /// No description provided for @discardChangesTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Änderungen verwerfen?'**
+  String get discardChangesTitle;
+
+  /// No description provided for @discardChangesMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Du hast ungespeicherte Änderungen in diesem Formular.'**
+  String get discardChangesMessage;
+
+  /// No description provided for @discardChangesAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Verwerfen'**
+  String get discardChangesAction;
+
+  /// No description provided for @subItemsExceedTotalValidation.
+  ///
+  /// In de, this message translates to:
+  /// **'Unterpositionen dürfen nicht höher als der Ausgabenbetrag sein.'**
+  String get subItemsExceedTotalValidation;
+
+  /// No description provided for @subItemAmountExceedsTotalValidation.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Unterposition ist höher als der Ausgabenbetrag.'**
+  String get subItemAmountExceedsTotalValidation;
+
+  /// No description provided for @remainingForSubItemsLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Verbleibend für Unterpositionen'**
+  String get remainingForSubItemsLabel;
+
   /// No description provided for @accountLabelPersonal.
   ///
   /// In de, this message translates to:
@@ -361,6 +433,126 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Nicht absetzbar'**
   String get notDeductibleLabel;
+
+  /// No description provided for @offlineOcrPrivacyNote.
+  ///
+  /// In de, this message translates to:
+  /// **'Belege werden offline auf dem Gerät gescannt. Keine Bild- oder Textdaten verlassen dein Gerät.'**
+  String get offlineOcrPrivacyNote;
+
+  /// No description provided for @scanReceiptAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Kassenbon scannen'**
+  String get scanReceiptAction;
+
+  /// No description provided for @scanDocumentAction.
+  ///
+  /// In de, this message translates to:
+  /// **'A4-Rechnung scannen'**
+  String get scanDocumentAction;
+
+  /// No description provided for @ocrNoTextFound.
+  ///
+  /// In de, this message translates to:
+  /// **'Kein lesbarer Text auf dem Beleg gefunden.'**
+  String get ocrNoTextFound;
+
+  /// No description provided for @ocrAppliedMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Belegdaten wurden in das Formular übernommen.'**
+  String get ocrAppliedMessage;
+
+  /// No description provided for @ocrErrorMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Belegscan fehlgeschlagen. Bitte erneut versuchen.'**
+  String get ocrErrorMessage;
+
+  /// No description provided for @scanFromCameraAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Foto aufnehmen'**
+  String get scanFromCameraAction;
+
+  /// No description provided for @scanFromGalleryAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Aus Fotos auswählen'**
+  String get scanFromGalleryAction;
+
+  /// No description provided for @stepExpenseDetailsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Ausgabendetails'**
+  String get stepExpenseDetailsTitle;
+
+  /// No description provided for @stepSubItemsTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Unterpositionen'**
+  String get stepSubItemsTitle;
+
+  /// No description provided for @stepNextAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Weiter'**
+  String get stepNextAction;
+
+  /// No description provided for @stepBackAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Zurück'**
+  String get stepBackAction;
+
+  /// No description provided for @subItemsHelpText.
+  ///
+  /// In de, this message translates to:
+  /// **'Füge Positionen vom Beleg hinzu. Eine Ausgabe kann aus mehreren Unterpositionen bestehen.'**
+  String get subItemsHelpText;
+
+  /// No description provided for @addSubItemAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Unterposition hinzufügen'**
+  String get addSubItemAction;
+
+  /// No description provided for @editSubItemAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Unterposition bearbeiten'**
+  String get editSubItemAction;
+
+  /// No description provided for @noSubItemsYet.
+  ///
+  /// In de, this message translates to:
+  /// **'Noch keine Unterpositionen hinzugefügt.'**
+  String get noSubItemsYet;
+
+  /// No description provided for @subItemsTotalLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Summe Unterpositionen'**
+  String get subItemsTotalLabel;
+
+  /// No description provided for @subItemsCountLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, one{# Unterposition} other{# Unterpositionen}}'**
+  String subItemsCountLabel(int count);
+
+  /// No description provided for @applySubItemsTotalAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Summe der Unterpositionen als Ausgabenbetrag verwenden'**
+  String get applySubItemsTotalAction;
+
+  /// No description provided for @subItemsSumHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Summe Unterpositionen: {amount}'**
+  String subItemsSumHint(Object amount);
 
   /// No description provided for @pdfTitle.
   ///

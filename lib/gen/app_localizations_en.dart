@@ -21,6 +21,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get expenseAccountLabel => 'Expense account';
 
   @override
+  String get accountSettingsTitle => 'Account settings';
+
+  @override
+  String get accountDisplayNameLabel => 'Account display name';
+
+  @override
+  String get firmenbuchnummerLabel => 'Firmenbuchnummer';
+
+  @override
+  String get firmenbuchnummerValidation =>
+      'Only letters, numbers, spaces, / and - are allowed.';
+
+  @override
+  String get saveSettingsAction => 'Save settings';
+
+  @override
+  String get accountSettingsSavedMessage => 'Account settings saved.';
+
+  @override
+  String get discardChangesTitle => 'Discard changes?';
+
+  @override
+  String get discardChangesMessage => 'You have unsaved changes in this form.';
+
+  @override
+  String get discardChangesAction => 'Discard';
+
+  @override
+  String get subItemsExceedTotalValidation =>
+      'Sub-items cannot be higher than the expense total.';
+
+  @override
+  String get subItemAmountExceedsTotalValidation =>
+      'This sub-item is higher than the expense total.';
+
+  @override
+  String get remainingForSubItemsLabel => 'Remaining for sub-items';
+
+  @override
   String get accountLabelPersonal => 'Personal expenses';
 
   @override
@@ -150,6 +189,79 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notDeductibleLabel => 'Not deductible';
+
+  @override
+  String get offlineOcrPrivacyNote =>
+      'Scan bills offline on-device. No image or text leaves your phone.';
+
+  @override
+  String get scanReceiptAction => 'Scan receipt';
+
+  @override
+  String get scanDocumentAction => 'Scan A4 bill';
+
+  @override
+  String get ocrNoTextFound => 'No readable text found on the bill.';
+
+  @override
+  String get ocrAppliedMessage => 'Bill data was inserted into the form.';
+
+  @override
+  String get ocrErrorMessage => 'Bill scan failed. Please try again.';
+
+  @override
+  String get scanFromCameraAction => 'Take photo';
+
+  @override
+  String get scanFromGalleryAction => 'Choose from photos';
+
+  @override
+  String get stepExpenseDetailsTitle => 'Expense details';
+
+  @override
+  String get stepSubItemsTitle => 'Sub-items';
+
+  @override
+  String get stepNextAction => 'Next';
+
+  @override
+  String get stepBackAction => 'Back';
+
+  @override
+  String get subItemsHelpText =>
+      'Add line items from the bill. The expense can be composed of multiple sub-items.';
+
+  @override
+  String get addSubItemAction => 'Add sub-item';
+
+  @override
+  String get editSubItemAction => 'Edit sub-item';
+
+  @override
+  String get noSubItemsYet => 'No sub-items added yet.';
+
+  @override
+  String get subItemsTotalLabel => 'Sub-items total';
+
+  @override
+  String subItemsCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# sub-items',
+      one: '# sub-item',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get applySubItemsTotalAction =>
+      'Use sub-items total as expense amount';
+
+  @override
+  String subItemsSumHint(Object amount) {
+    return 'Sub-items sum: $amount';
+  }
 
   @override
   String pdfTitle(Object account) {

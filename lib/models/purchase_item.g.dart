@@ -20,6 +20,11 @@ _PurchaseItem _$PurchaseItemFromJson(Map<String, dynamic> json) =>
       date: DateTime.parse(json['date'] as String),
       isDeductible: json['isDeductible'] as bool,
       notes: json['notes'] as String,
+      subItems:
+          (json['subItems'] as List<dynamic>?)
+              ?.map((e) => ExpenseSubItem.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <ExpenseSubItem>[],
     );
 
 Map<String, dynamic> _$PurchaseItemToJson(_PurchaseItem instance) =>
@@ -33,6 +38,7 @@ Map<String, dynamic> _$PurchaseItemToJson(_PurchaseItem instance) =>
       'date': instance.date.toIso8601String(),
       'isDeductible': instance.isDeductible,
       'notes': instance.notes,
+      'subItems': instance.subItems,
     };
 
 const _$ExpenseAccountTypeEnumMap = {
