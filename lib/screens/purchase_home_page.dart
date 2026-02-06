@@ -4,9 +4,13 @@ import 'package:intl/intl.dart';
 import '../data/purchase_repository.dart';
 import '../gen/app_localizations.dart';
 import '../localization/app_localizations_ext.dart';
+import '../models/account_settings.dart';
 import '../models/expense_account_type.dart';
+import '../models/expense_sub_item.dart';
+import '../models/ocr_bill_data.dart';
 import '../models/purchase_item.dart';
 import '../screens/purchase_detail_page.dart';
+import '../services/offline_bill_ocr_service.dart';
 import '../services/pdf_exporter.dart';
 import '../widgets/info_chip.dart';
 
@@ -20,6 +24,7 @@ class PurchaseHomePage extends StatefulWidget {
 class _PurchaseHomePageState extends State<PurchaseHomePage> {
   final PurchaseRepository _repository = PurchaseRepository();
   final PdfExporter _pdfExporter = PdfExporter();
+  final OfflineBillOcrService _offlineBillOcrService = OfflineBillOcrService();
   final DateFormat _dateFormat = DateFormat('dd.MM.yyyy');
   final NumberFormat _currencyFormat = NumberFormat.currency(
     locale: 'de_AT',
@@ -29,6 +34,14 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
   ExpenseAccountType _selectedAccount = ExpenseAccountType.business;
   List<PurchaseItem> _items = [];
   bool _isLoading = true;
+  Map<ExpenseAccountType, AccountSettings> _accountSettings = {
+    ExpenseAccountType.personal: const AccountSettings(
+      accountType: ExpenseAccountType.personal,
+    ),
+    ExpenseAccountType.business: const AccountSettings(
+      accountType: ExpenseAccountType.business,
+    ),
+  };
 
   double get _totalAmount =>
       _items.fold(0, (total, item) => total + item.amount);
@@ -62,7 +75,26 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
   @override
   void initState() {
     super.initState();
+    _loadAccountSettings();
     _loadItems();
+  }
+
+  @override
+  void dispose() {
+    _offlineBillOcrService.dispose();
+    super.dispose();
+  }
+
+  List<PurchaseItem> _sortItemsByDate(List<PurchaseItem> items) {
+    final sorted = List<PurchaseItem>.from(items)
+      ..sort((a, b) {
+        final byDate = b.date.compareTo(a.date);
+        if (byDate != 0) {
+          return byDate;
+        }
+        return (b.id ?? 0).compareTo(a.id ?? 0);
+      });
+    return sorted;
   }
 
   Future<void> _loadItems() async {
@@ -74,8 +106,18 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
       return;
     }
     setState(() {
-      _items = items;
+      _items = _sortItemsByDate(items);
       _isLoading = false;
+    });
+  }
+
+  Future<void> _loadAccountSettings() async {
+    final settings = await _repository.fetchAccountSettings();
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _accountSettings = settings;
     });
   }
 
@@ -92,6 +134,171 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
       account: _selectedAccount,
       items: _items,
       localizations: l10n,
+      accountSettings: _accountSettings[_selectedAccount],
+    );
+  }
+
+  void _openAccountSettingsSheet() {
+    final l10n = AppLocalizations.of(context)!;
+    final formKey = GlobalKey<FormState>();
+
+    ExpenseAccountType editingAccount = _selectedAccount;
+    final personalNameController = TextEditingController(
+      text: _accountSettings[ExpenseAccountType.personal]?.displayName ?? '',
+    );
+    final businessNameController = TextEditingController(
+      text: _accountSettings[ExpenseAccountType.business]?.displayName ?? '',
+    );
+    final firmenbuchnummerController = TextEditingController(
+      text:
+          _accountSettings[ExpenseAccountType.business]
+              ?.companyRegisterNumber ??
+          '',
+    );
+
+    showModalBottomSheet(
+      context: context,
+      useSafeArea: true,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final isBusiness = editingAccount == ExpenseAccountType.business;
+            final currentNameController = isBusiness
+                ? businessNameController
+                : personalNameController;
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 8,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+              ),
+              child: Form(
+                key: formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: 12,
+                    children: [
+                      Text(
+                        l10n.accountSettingsTitle,
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      DropdownButtonFormField<ExpenseAccountType>(
+                        initialValue: editingAccount,
+                        decoration: InputDecoration(
+                          labelText: l10n.expenseAccountLabel,
+                        ),
+                        items: ExpenseAccountType.values
+                            .map(
+                              (account) => DropdownMenuItem(
+                                value: account,
+                                child: Text(l10n.accountLabel(account)),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) {
+                          if (value == null) {
+                            return;
+                          }
+                          setModalState(() {
+                            editingAccount = value;
+                          });
+                        },
+                      ),
+                      TextFormField(
+                        controller: currentNameController,
+                        decoration: InputDecoration(
+                          labelText: l10n.accountDisplayNameLabel,
+                        ),
+                      ),
+                      if (isBusiness)
+                        TextFormField(
+                          controller: firmenbuchnummerController,
+                          decoration: InputDecoration(
+                            labelText: l10n.firmenbuchnummerLabel,
+                          ),
+                          validator: (value) {
+                            final text = (value ?? '').trim();
+                            if (text.isEmpty) {
+                              return null;
+                            }
+                            if (!RegExp(
+                              r'^[A-Za-z0-9\-\s/]+$',
+                            ).hasMatch(text)) {
+                              return l10n.firmenbuchnummerValidation;
+                            }
+                            return null;
+                          },
+                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        spacing: 8,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(l10n.cancelAction),
+                          ),
+                          FilledButton(
+                            onPressed: () async {
+                              final navigator = Navigator.of(context);
+                              if (!formKey.currentState!.validate()) {
+                                return;
+                              }
+
+                              final personalSettings = AccountSettings(
+                                accountType: ExpenseAccountType.personal,
+                                displayName: personalNameController.text.trim(),
+                              );
+                              final businessSettings = AccountSettings(
+                                accountType: ExpenseAccountType.business,
+                                displayName: businessNameController.text.trim(),
+                                companyRegisterNumber:
+                                    firmenbuchnummerController.text.trim(),
+                              );
+
+                              await _repository.saveAccountSettings(
+                                personalSettings,
+                              );
+                              await _repository.saveAccountSettings(
+                                businessSettings,
+                              );
+
+                              if (!mounted) {
+                                return;
+                              }
+
+                              setState(() {
+                                _accountSettings = {
+                                  ExpenseAccountType.personal: personalSettings,
+                                  ExpenseAccountType.business: businessSettings,
+                                };
+                              });
+
+                              navigator.pop();
+                              ScaffoldMessenger.of(this.context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    l10n.accountSettingsSavedMessage,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(l10n.saveSettingsAction),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -114,12 +321,27 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
       selectedCategory = categories.first;
     }
     bool isDeductible = item?.isDeductible ?? true;
+    bool isScanning = false;
+    int currentStep = 0;
+    final pageController = PageController(initialPage: 0);
+    final subItems = List<ExpenseSubItem>.from(item?.subItems ?? const []);
+
+    final initialDescription = descriptionController.text.trim();
+    final initialVendor = vendorController.text.trim();
+    final initialAmount = amountController.text.trim();
+    final initialNotes = notesController.text.trim();
+    final initialCategory = selectedCategory;
+    final initialDate = selectedDate;
+    final initialIsDeductible = isDeductible;
+    final initialSubItems = List<ExpenseSubItem>.from(subItems);
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       showDragHandle: true,
+      isDismissible: false,
+      enableDrag: false,
       clipBehavior: Clip.antiAlias,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -129,12 +351,69 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
       builder: (context) {
         Future<void> submitForm() async {
           final navigator = Navigator.of(context);
+          if (amountController.text.trim().isEmpty && subItems.isNotEmpty) {
+            final sum = subItems.fold<double>(
+              0,
+              (total, subItem) => total + subItem.amount,
+            );
+            amountController.text = sum.toStringAsFixed(2);
+          }
+
+          final hasMinimumDetails =
+              descriptionController.text.trim().isNotEmpty &&
+              amountController.text.trim().isNotEmpty;
+
+          if (!hasMinimumDetails) {
+            if (currentStep != 0) {
+              await pageController.animateToPage(
+                0,
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+              );
+            }
+            formKey.currentState!.validate();
+            return;
+          }
+
           if (!formKey.currentState!.validate()) {
+            if (currentStep != 0) {
+              await pageController.animateToPage(
+                0,
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+              );
+            }
             return;
           }
           final parsedAmount = double.parse(
             amountController.text.replaceAll(',', '.'),
           );
+
+          final subItemsSum = subItems.fold<double>(
+            0,
+            (total, subItem) => total + subItem.amount,
+          );
+          final hasSubItemAboveTotal = subItems.any(
+            (subItem) => subItem.amount > parsedAmount,
+          );
+
+          if (hasSubItemAboveTotal || subItemsSum > parsedAmount) {
+            if (currentStep != 1) {
+              await pageController.animateToPage(
+                1,
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOut,
+              );
+            }
+            if (!mounted) {
+              return;
+            }
+            ScaffoldMessenger.of(this.context).showSnackBar(
+              SnackBar(content: Text(l10n.subItemsExceedTotalValidation)),
+            );
+            return;
+          }
+
           final updatedItem = PurchaseItem(
             id: item?.id,
             accountType: _selectedAccount,
@@ -145,6 +424,7 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
             date: selectedDate,
             isDeductible: isDeductible,
             notes: notesController.text.trim(),
+            subItems: subItems,
           );
           if (item == null) {
             final savedItem = await _repository.insertPurchase(updatedItem);
@@ -152,7 +432,7 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
               return;
             }
             setState(() {
-              _items = [savedItem, ..._items];
+              _items = _sortItemsByDate([savedItem, ..._items]);
             });
           } else {
             await _repository.updatePurchase(updatedItem);
@@ -164,7 +444,9 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
                 (existing) => existing.id == updatedItem.id,
               );
               if (index != -1) {
-                _items = List.from(_items)..[index] = updatedItem;
+                _items = _sortItemsByDate(
+                  List.from(_items)..[index] = updatedItem,
+                );
               }
             });
           }
@@ -183,191 +465,882 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
             curve: Curves.easeOut,
             child: StatefulBuilder(
               builder: (context, setModalState) {
-                return Form(
-                  key: formKey,
-                  child: SingleChildScrollView(
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      spacing: 12,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Future<void> scanBill(
+                  BillScanMode mode, {
+                  BillImageSource source = BillImageSource.camera,
+                }) async {
+                  if (isScanning) {
+                    return;
+                  }
+
+                  setModalState(() {
+                    isScanning = true;
+                  });
+
+                  try {
+                    final data = await _offlineBillOcrService.scanBill(
+                      mode: mode,
+                      source: source,
+                    );
+                    if (!mounted) {
+                      return;
+                    }
+
+                    if (data == null) {
+                      return;
+                    }
+
+                    if (data.rawText.isEmpty) {
+                      ScaffoldMessenger.of(this.context).showSnackBar(
+                        SnackBar(content: Text(l10n.ocrNoTextFound)),
+                      );
+                      return;
+                    }
+
+                    setModalState(() {
+                      _applyOcrDataToForm(
+                        data,
+                        descriptionController: descriptionController,
+                        vendorController: vendorController,
+                        amountController: amountController,
+                        notesController: notesController,
+                        selectedDateSetter: (date) => selectedDate = date,
+                        subItemsSetter: (items) {
+                          subItems
+                            ..clear()
+                            ..addAll(items);
+                        },
+                      );
+                    });
+
+                    ScaffoldMessenger.of(this.context).showSnackBar(
+                      SnackBar(content: Text(l10n.ocrAppliedMessage)),
+                    );
+                  } catch (_) {
+                    if (!mounted) {
+                      return;
+                    }
+                    ScaffoldMessenger.of(this.context).showSnackBar(
+                      SnackBar(content: Text(l10n.ocrErrorMessage)),
+                    );
+                  } finally {
+                    if (mounted) {
+                      setModalState(() {
+                        isScanning = false;
+                      });
+                    }
+                  }
+                }
+
+                Future<void> scanA4Bill() async {
+                  final source = await showModalBottomSheet<BillImageSource>(
+                    context: context,
+                    builder: (context) {
+                      return SafeArea(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: Text(l10n.cancelAction),
+                            ListTile(
+                              leading: const Icon(Icons.camera_alt_outlined),
+                              title: Text(l10n.scanFromCameraAction),
+                              onTap: () => Navigator.pop(
+                                context,
+                                BillImageSource.camera,
+                              ),
                             ),
-                            FilledButton.icon(
-                              onPressed: submitForm,
-                              icon: Icon(item == null ? Icons.add : Icons.save),
-                              label: Text(
-                                item == null
-                                    ? l10n.addPurchase
-                                    : l10n.savePurchaseAction,
+                            ListTile(
+                              leading: const Icon(Icons.photo_library_outlined),
+                              title: Text(l10n.scanFromGalleryAction),
+                              onTap: () => Navigator.pop(
+                                context,
+                                BillImageSource.gallery,
                               ),
                             ),
                           ],
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _accountColor(
-                              context,
-                            ).withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: _accountColor(
-                                context,
-                              ).withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Row(
+                      );
+                    },
+                  );
+
+                  if (source == null) {
+                    return;
+                  }
+
+                  await scanBill(BillScanMode.a4Bill, source: source);
+                }
+
+                Future<void> addOrEditSubItem({int? index}) async {
+                  final existing = index != null ? subItems[index] : null;
+                  final totalAmount = double.tryParse(
+                    amountController.text.replaceAll(',', '.'),
+                  );
+                  final allocatedWithoutCurrent =
+                      subItems.fold<double>(
+                        0,
+                        (total, subItem) => total + subItem.amount,
+                      ) -
+                      (existing?.amount ?? 0);
+
+                  if (index == null &&
+                      totalAmount != null &&
+                      allocatedWithoutCurrent >= totalAmount) {
+                    ScaffoldMessenger.of(this.context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.subItemsExceedTotalValidation),
+                      ),
+                    );
+                    return;
+                  }
+
+                  final subItemDescriptionController = TextEditingController(
+                    text: existing?.description ?? '',
+                  );
+                  final subItemAmountController = TextEditingController(
+                    text: existing != null
+                        ? existing.amount.toStringAsFixed(2)
+                        : '',
+                  );
+
+                  final added = await showDialog<ExpenseSubItem>(
+                    context: context,
+                    builder: (context) {
+                      final dialogFormKey = GlobalKey<FormState>();
+                      return AlertDialog(
+                        title: Text(
+                          existing == null
+                              ? l10n.addSubItemAction
+                              : l10n.editSubItemAction,
+                        ),
+                        content: Form(
+                          key: dialogFormKey,
+                          child: Column(
                             mainAxisSize: MainAxisSize.min,
-                            spacing: 8,
+                            spacing: 10,
                             children: [
-                              Icon(
-                                _selectedAccount == ExpenseAccountType.business
-                                    ? Icons.business
-                                    : Icons.person,
-                                color: _accountColor(context),
+                              TextFormField(
+                                controller: subItemDescriptionController,
+                                decoration: InputDecoration(
+                                  labelText: l10n.descriptionLabel,
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return l10n.descriptionValidation;
+                                  }
+                                  return null;
+                                },
                               ),
-                              Text(
-                                l10n.accountLabel(_selectedAccount),
-                                style: Theme.of(context).textTheme.titleSmall
-                                    ?.copyWith(
-                                      color: _accountColor(context),
-                                      fontWeight: FontWeight.w600,
+                              TextFormField(
+                                controller: subItemAmountController,
+                                decoration: InputDecoration(
+                                  labelText: l10n.amountLabel,
+                                ),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
                                     ),
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return l10n.amountValidation;
+                                  }
+                                  final parsed = double.tryParse(
+                                    value.replaceAll(',', '.'),
+                                  );
+                                  if (parsed == null || parsed <= 0) {
+                                    return l10n.amountInvalidValidation;
+                                  }
+
+                                  if (totalAmount != null) {
+                                    if (parsed > totalAmount) {
+                                      return l10n
+                                          .subItemAmountExceedsTotalValidation;
+                                    }
+                                    if (allocatedWithoutCurrent + parsed >
+                                        totalAmount) {
+                                      return l10n.subItemsExceedTotalValidation;
+                                    }
+                                  }
+                                  return null;
+                                },
                               ),
                             ],
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: Text(
-                            item == null
-                                ? l10n.addPurchaseTitle
-                                : l10n.editPurchaseTitle,
-                            style: Theme.of(context).textTheme.headlineSmall,
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(l10n.cancelAction),
                           ),
-                        ),
-                        TextFormField(
-                          controller: descriptionController,
-                          decoration: InputDecoration(
-                            labelText: l10n.descriptionLabel,
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return l10n.descriptionValidation;
-                            }
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          controller: vendorController,
-                          decoration: InputDecoration(
-                            labelText: l10n.vendorLabel,
-                          ),
-                        ),
-                        TextFormField(
-                          controller: amountController,
-                          decoration: InputDecoration(
-                            labelText: l10n.amountLabel,
-                          ),
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return l10n.amountValidation;
-                            }
-                            final parsed = double.tryParse(
-                              value.replaceAll(',', '.'),
-                            );
-                            if (parsed == null || parsed <= 0) {
-                              return l10n.amountInvalidValidation;
-                            }
-                            return null;
-                          },
-                        ),
-                        DropdownButtonFormField<String>(
-                          initialValue: selectedCategory,
-                          decoration: InputDecoration(
-                            labelText: l10n.categoryLabel,
-                          ),
-                          items: categories
-                              .map(
-                                (category) => DropdownMenuItem(
-                                  value: category,
-                                  child: Text(category),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (value) {
-                            if (value == null) {
-                              return;
-                            }
-                            setModalState(() {
-                              selectedCategory = value;
-                            });
-                          },
-                        ),
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(l10n.dateOfPurchaseLabel),
-                          subtitle: Text(_dateFormat.format(selectedDate)),
-                          trailing: TextButton.icon(
-                            onPressed: () async {
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: selectedDate,
-                                firstDate: DateTime(2015),
-                                lastDate: DateTime.now(),
-                              );
-                              if (picked != null) {
-                                setModalState(() {
-                                  selectedDate = picked;
-                                });
+                          FilledButton(
+                            onPressed: () {
+                              if (!dialogFormKey.currentState!.validate()) {
+                                return;
                               }
+
+                              final amount = double.parse(
+                                subItemAmountController.text.replaceAll(
+                                  ',',
+                                  '.',
+                                ),
+                              );
+
+                              Navigator.pop(
+                                context,
+                                ExpenseSubItem(
+                                  description: subItemDescriptionController.text
+                                      .trim(),
+                                  amount: amount,
+                                ),
+                              );
                             },
-                            icon: const Icon(Icons.calendar_today),
-                            label: Text(l10n.pickDate),
+                            child: Text(l10n.savePurchaseAction),
                           ),
+                        ],
+                      );
+                    },
+                  );
+
+                  if (added == null || !mounted) {
+                    return;
+                  }
+
+                  final candidateSubItems = List<ExpenseSubItem>.from(subItems);
+                  if (index == null) {
+                    candidateSubItems.add(added);
+                  } else {
+                    candidateSubItems[index] = added;
+                  }
+
+                  if (totalAmount != null) {
+                    final subItemsSum = candidateSubItems.fold<double>(
+                      0,
+                      (total, subItem) => total + subItem.amount,
+                    );
+                    final hasItemAboveTotal = candidateSubItems.any(
+                      (subItem) => subItem.amount > totalAmount,
+                    );
+
+                    if (hasItemAboveTotal || subItemsSum > totalAmount) {
+                      ScaffoldMessenger.of(this.context).showSnackBar(
+                        SnackBar(
+                          content: Text(l10n.subItemsExceedTotalValidation),
                         ),
-                        SwitchListTile(
-                          title: Text(l10n.vatDeductibleLabel),
-                          value: isDeductible,
-                          onChanged: (value) {
-                            setModalState(() {
-                              isDeductible = value;
-                            });
-                          },
+                      );
+                      return;
+                    }
+                  }
+
+                  setModalState(() {
+                    if (index == null) {
+                      subItems.add(added);
+                    } else {
+                      subItems[index] = added;
+                    }
+                  });
+                }
+
+                bool hasUnsavedChanges() {
+                  if (descriptionController.text.trim() != initialDescription) {
+                    return true;
+                  }
+                  if (vendorController.text.trim() != initialVendor) {
+                    return true;
+                  }
+                  if (amountController.text.trim() != initialAmount) {
+                    return true;
+                  }
+                  if (notesController.text.trim() != initialNotes) {
+                    return true;
+                  }
+                  if (selectedCategory != initialCategory) {
+                    return true;
+                  }
+                  if (selectedDate != initialDate) {
+                    return true;
+                  }
+                  if (isDeductible != initialIsDeductible) {
+                    return true;
+                  }
+                  if (subItems.length != initialSubItems.length) {
+                    return true;
+                  }
+                  for (var i = 0; i < subItems.length; i++) {
+                    final current = subItems[i];
+                    final initial = initialSubItems[i];
+                    if (current.description != initial.description ||
+                        current.amount != initial.amount) {
+                      return true;
+                    }
+                  }
+                  return false;
+                }
+
+                Future<void> requestClose() async {
+                  final navigator = Navigator.of(context);
+                  if (!hasUnsavedChanges()) {
+                    navigator.pop();
+                    return;
+                  }
+
+                  final shouldDiscard = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text(l10n.discardChangesTitle),
+                      content: Text(l10n.discardChangesMessage),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: Text(l10n.cancelAction),
                         ),
-                        TextFormField(
-                          controller: notesController,
-                          decoration: InputDecoration(
-                            labelText: l10n.notesLabel,
-                          ),
-                          maxLines: 3,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8, bottom: 12),
-                          child: FilledButton.icon(
-                            onPressed: submitForm,
-                            icon: Icon(item == null ? Icons.add : Icons.save),
-                            label: Text(
-                              item == null
-                                  ? l10n.addPurchase
-                                  : l10n.savePurchaseAction,
-                            ),
-                          ),
+                        FilledButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: Text(l10n.discardChangesAction),
                         ),
                       ],
+                    ),
+                  );
+
+                  if (shouldDiscard == true && mounted) {
+                    navigator.pop();
+                  }
+                }
+
+                final subItemsTotal = subItems.fold<double>(
+                  0,
+                  (total, entry) => total + entry.amount,
+                );
+                final totalAmountValue = double.tryParse(
+                  amountController.text.replaceAll(',', '.'),
+                );
+                final remainingForSubItems = totalAmountValue != null
+                    ? (totalAmountValue - subItemsTotal)
+                    : null;
+                final canAddSubItem =
+                    remainingForSubItems == null || remainingForSubItems > 0;
+                final subItemsOverAllocated =
+                    remainingForSubItems != null && remainingForSubItems < 0;
+
+                return PopScope(
+                  canPop: false,
+                  onPopInvokedWithResult: (didPop, result) {
+                    if (!didPop) {
+                      requestClose();
+                    }
+                  },
+                  child: Form(
+                    key: formKey,
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.82,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _accountColor(
+                                context,
+                              ).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: _accountColor(
+                                  context,
+                                ).withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              spacing: 8,
+                              children: [
+                                Icon(
+                                  _selectedAccount ==
+                                          ExpenseAccountType.business
+                                      ? Icons.business
+                                      : Icons.person,
+                                  color: _accountColor(context),
+                                ),
+                                Text(
+                                  l10n.accountLabel(_selectedAccount),
+                                  style: Theme.of(context).textTheme.titleSmall
+                                      ?.copyWith(
+                                        color: _accountColor(context),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8, bottom: 4),
+                            child: Text(
+                              item == null
+                                  ? l10n.addPurchaseTitle
+                                  : l10n.editPurchaseTitle,
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                          ),
+                          Text(
+                            currentStep == 0
+                                ? l10n.stepExpenseDetailsTitle
+                                : currentStep == 1
+                                ? l10n.stepSubItemsTitle
+                                : l10n.notesLabel,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(3, (index) {
+                              final isActive = index == currentStep;
+                              return AnimatedContainer(
+                                duration: const Duration(milliseconds: 180),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                                height: 8,
+                                width: isActive ? 22 : 8,
+                                decoration: BoxDecoration(
+                                  color: isActive
+                                      ? _accountColor(context)
+                                      : Theme.of(
+                                          context,
+                                        ).colorScheme.outlineVariant,
+                                  borderRadius: BorderRadius.circular(99),
+                                ),
+                              );
+                            }),
+                          ),
+                          const SizedBox(height: 10),
+                          Expanded(
+                            child: PageView(
+                              controller: pageController,
+                              onPageChanged: (index) {
+                                setModalState(() {
+                                  currentStep = index;
+                                });
+                              },
+                              children: [
+                                ListView(
+                                  padding: EdgeInsets.zero,
+                                  children: [
+                                    Text(
+                                      l10n.offlineOcrPrivacyNote,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: OutlinedButton.icon(
+                                            onPressed: isScanning
+                                                ? null
+                                                : () => scanBill(
+                                                    BillScanMode.shopReceipt,
+                                                  ),
+                                            icon: const Icon(
+                                              Icons.receipt_long,
+                                            ),
+                                            label: Text(l10n.scanReceiptAction),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: OutlinedButton.icon(
+                                            onPressed: isScanning
+                                                ? null
+                                                : scanA4Bill,
+                                            icon: const Icon(
+                                              Icons.document_scanner_outlined,
+                                            ),
+                                            label: Text(
+                                              l10n.scanDocumentAction,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    if (isScanning) ...[
+                                      const SizedBox(height: 12),
+                                      const LinearProgressIndicator(),
+                                    ],
+                                    const SizedBox(height: 12),
+                                    TextFormField(
+                                      controller: descriptionController,
+                                      decoration: InputDecoration(
+                                        labelText: l10n.descriptionLabel,
+                                      ),
+                                      validator: (value) {
+                                        if (value == null ||
+                                            value.trim().isEmpty) {
+                                          return l10n.descriptionValidation;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 12),
+                                    TextFormField(
+                                      controller: vendorController,
+                                      decoration: InputDecoration(
+                                        labelText: l10n.vendorLabel,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    TextFormField(
+                                      controller: amountController,
+                                      decoration: InputDecoration(
+                                        labelText: l10n.amountLabel,
+                                        helperText: subItems.isNotEmpty
+                                            ? l10n.subItemsSumHint(
+                                                _currencyFormat.format(
+                                                  subItemsTotal,
+                                                ),
+                                              )
+                                            : null,
+                                      ),
+                                      keyboardType:
+                                          const TextInputType.numberWithOptions(
+                                            decimal: true,
+                                          ),
+                                      validator: (value) {
+                                        if (value == null ||
+                                            value.trim().isEmpty) {
+                                          return l10n.amountValidation;
+                                        }
+                                        final parsed = double.tryParse(
+                                          value.replaceAll(',', '.'),
+                                        );
+                                        if (parsed == null || parsed <= 0) {
+                                          return l10n.amountInvalidValidation;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 12),
+                                    DropdownButtonFormField<String>(
+                                      initialValue: selectedCategory,
+                                      decoration: InputDecoration(
+                                        labelText: l10n.categoryLabel,
+                                      ),
+                                      items: categories
+                                          .map(
+                                            (category) => DropdownMenuItem(
+                                              value: category,
+                                              child: Text(category),
+                                            ),
+                                          )
+                                          .toList(),
+                                      onChanged: (value) {
+                                        if (value == null) {
+                                          return;
+                                        }
+                                        setModalState(() {
+                                          selectedCategory = value;
+                                        });
+                                      },
+                                    ),
+                                    const SizedBox(height: 4),
+                                    ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      title: Text(l10n.dateOfPurchaseLabel),
+                                      subtitle: Text(
+                                        _dateFormat.format(selectedDate),
+                                      ),
+                                      trailing: TextButton.icon(
+                                        onPressed: () async {
+                                          final picked = await showDatePicker(
+                                            context: context,
+                                            initialDate: selectedDate,
+                                            firstDate: DateTime(2015),
+                                            lastDate: DateTime.now(),
+                                          );
+                                          if (picked != null) {
+                                            setModalState(() {
+                                              selectedDate = picked;
+                                            });
+                                          }
+                                        },
+                                        icon: const Icon(Icons.calendar_today),
+                                        label: Text(l10n.pickDate),
+                                      ),
+                                    ),
+                                    SwitchListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      title: Text(l10n.vatDeductibleLabel),
+                                      value: isDeductible,
+                                      onChanged: (value) {
+                                        setModalState(() {
+                                          isDeductible = value;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                ListView(
+                                  padding: EdgeInsets.zero,
+                                  children: [
+                                    Text(
+                                      l10n.subItemsHelpText,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall,
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Card(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.surfaceContainerHighest,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          spacing: 4,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(l10n.subItemsTotalLabel),
+                                                Text(
+                                                  _currencyFormat.format(
+                                                    subItemsTotal,
+                                                  ),
+                                                  style: Theme.of(
+                                                    context,
+                                                  ).textTheme.titleSmall,
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  l10n.remainingForSubItemsLabel,
+                                                ),
+                                                Text(
+                                                  remainingForSubItems == null
+                                                      ? '—'
+                                                      : _currencyFormat.format(
+                                                          remainingForSubItems,
+                                                        ),
+                                                  style: Theme.of(
+                                                    context,
+                                                  ).textTheme.titleSmall,
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    OutlinedButton.icon(
+                                      onPressed: canAddSubItem
+                                          ? () => addOrEditSubItem()
+                                          : null,
+                                      icon: const Icon(Icons.add),
+                                      label: Text(l10n.addSubItemAction),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    if (subItemsOverAllocated)
+                                      Text(
+                                        l10n.subItemsExceedTotalValidation,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.error,
+                                            ),
+                                      ),
+                                    if (subItems.isEmpty)
+                                      Text(
+                                        l10n.noSubItemsYet,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodySmall,
+                                      ),
+                                    ...subItems.asMap().entries.map((entry) {
+                                      final index = entry.key;
+                                      final subItem = entry.value;
+                                      return Card(
+                                        child: ListTile(
+                                          title: Text(subItem.description),
+                                          subtitle: Text(
+                                            _currencyFormat.format(
+                                              subItem.amount,
+                                            ),
+                                          ),
+                                          trailing: Wrap(
+                                            spacing: 4,
+                                            children: [
+                                              IconButton(
+                                                tooltip: l10n.editSubItemAction,
+                                                onPressed: () =>
+                                                    addOrEditSubItem(
+                                                      index: index,
+                                                    ),
+                                                icon: const Icon(
+                                                  Icons.edit_outlined,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                tooltip:
+                                                    l10n.deletePurchaseAction,
+                                                onPressed: () {
+                                                  setModalState(() {
+                                                    subItems.removeAt(index);
+                                                  });
+                                                },
+                                                icon: const Icon(
+                                                  Icons.delete_outline,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                    if (subItems.isNotEmpty)
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: TextButton(
+                                          onPressed: () {
+                                            setModalState(() {
+                                              amountController.text =
+                                                  subItemsTotal.toStringAsFixed(
+                                                    2,
+                                                  );
+                                            });
+                                          },
+                                          child: Text(
+                                            l10n.applySubItemsTotalAction,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                ListView(
+                                  padding: EdgeInsets.zero,
+                                  children: [
+                                    Text(
+                                      l10n.notesLabel,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleSmall,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    TextFormField(
+                                      controller: notesController,
+                                      decoration: InputDecoration(
+                                        labelText: l10n.notesLabel,
+                                      ),
+                                      minLines: 6,
+                                      maxLines: 10,
+                                      textInputAction: TextInputAction.done,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: currentStep == 0
+                                      ? null
+                                      : () {
+                                          pageController.previousPage(
+                                            duration: const Duration(
+                                              milliseconds: 220,
+                                            ),
+                                            curve: Curves.easeOut,
+                                          );
+                                        },
+                                  icon: const Icon(Icons.arrow_back_rounded),
+                                  label: Text(l10n.stepBackAction),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: FilledButton.icon(
+                                  onPressed: currentStep == 2
+                                      ? null
+                                      : () {
+                                          pageController.nextPage(
+                                            duration: const Duration(
+                                              milliseconds: 220,
+                                            ),
+                                            curve: Curves.easeOut,
+                                          );
+                                        },
+                                  icon: const Icon(Icons.arrow_forward_rounded),
+                                  label: Text(l10n.stepNextAction),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: requestClose,
+                                  child: Text(l10n.cancelAction),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: ValueListenableBuilder<TextEditingValue>(
+                                  valueListenable: descriptionController,
+                                  builder: (context, descriptionValue, child) {
+                                    return ValueListenableBuilder<
+                                      TextEditingValue
+                                    >(
+                                      valueListenable: amountController,
+                                      builder: (context, amountValue, child) {
+                                        final hasMinimumDetails =
+                                            descriptionController.text
+                                                .trim()
+                                                .isNotEmpty &&
+                                            amountController.text
+                                                .trim()
+                                                .isNotEmpty;
+                                        return FilledButton.icon(
+                                          onPressed: hasMinimumDetails
+                                              ? submitForm
+                                              : null,
+                                          icon: Icon(
+                                            item == null
+                                                ? Icons.add
+                                                : Icons.save,
+                                          ),
+                                          label: Text(
+                                            item == null
+                                                ? l10n.addPurchase
+                                                : l10n.savePurchaseAction,
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -377,6 +1350,41 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
         );
       },
     );
+  }
+
+  void _applyOcrDataToForm(
+    OcrBillData data, {
+    required TextEditingController descriptionController,
+    required TextEditingController vendorController,
+    required TextEditingController amountController,
+    required TextEditingController notesController,
+    required ValueChanged<DateTime> selectedDateSetter,
+    required ValueChanged<List<ExpenseSubItem>> subItemsSetter,
+  }) {
+    if (data.description != null && data.description!.trim().isNotEmpty) {
+      descriptionController.text = data.description!.trim();
+    }
+    if (data.vendor != null && data.vendor!.trim().isNotEmpty) {
+      vendorController.text = data.vendor!.trim();
+    }
+    if (data.amount != null && data.amount! > 0) {
+      amountController.text = data.amount!.toStringAsFixed(2);
+    }
+    if (data.date != null) {
+      selectedDateSetter(data.date!);
+    }
+    if (data.subItems.isNotEmpty) {
+      subItemsSetter(data.subItems);
+      if (data.amount == null || data.amount! <= 0) {
+        final sum = data.subItems.fold<double>(
+          0,
+          (total, subItem) => total + subItem.amount,
+        );
+        if (sum > 0) {
+          amountController.text = sum.toStringAsFixed(2);
+        }
+      }
+    }
   }
 
   Widget _buildEmptyState(AppLocalizations l10n) {
@@ -515,6 +1523,11 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
                           ? l10n.deductibleLabel
                           : l10n.notDeductibleLabel,
                     ),
+                    if (item.subItems.isNotEmpty)
+                      InfoChip(
+                        icon: Icons.format_list_bulleted,
+                        label: l10n.subItemsCountLabel(item.subItems.length),
+                      ),
                   ],
                 ),
               ),
@@ -524,6 +1537,8 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
                   child: Text(
                     item.notes,
                     style: Theme.of(context).textTheme.bodySmall,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
             ],
@@ -624,32 +1639,35 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
           var sectionIndex = 0;
           sectionIndex < sections.length;
           sectionIndex++
-        ) ...[
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: _MonthHeaderDelegate(
-              title: monthFormat.format(sections[sectionIndex].month),
-            ),
+        )
+          SliverMainAxisGroup(
+            slivers: [
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _MonthHeaderDelegate(
+                  title: monthFormat.format(sections[sectionIndex].month),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverList.builder(
+                  itemCount: sections[sectionIndex].items.length,
+                  itemBuilder: (context, itemIndex) {
+                    final item = sections[sectionIndex].items[itemIndex];
+                    final isLastInSection =
+                        itemIndex == sections[sectionIndex].items.length - 1;
+                    final isLastSection = sectionIndex == sections.length - 1;
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: isLastInSection && isLastSection ? 0 : 12,
+                      ),
+                      child: _buildExpenseCard(item, l10n),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverList.builder(
-              itemCount: sections[sectionIndex].items.length,
-              itemBuilder: (context, itemIndex) {
-                final item = sections[sectionIndex].items[itemIndex];
-                final isLastInSection =
-                    itemIndex == sections[sectionIndex].items.length - 1;
-                final isLastSection = sectionIndex == sections.length - 1;
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: isLastInSection && isLastSection ? 0 : 12,
-                  ),
-                  child: _buildExpenseCard(item, l10n),
-                );
-              },
-            ),
-          ),
-        ],
         SliverToBoxAdapter(child: SizedBox(height: 96 + bottomInset)),
       ],
     );
@@ -662,6 +1680,11 @@ class _PurchaseHomePageState extends State<PurchaseHomePage> {
       appBar: AppBar(
         title: Text(l10n.taxRefundPurchasesTitle),
         actions: [
+          IconButton(
+            tooltip: l10n.accountSettingsTitle,
+            onPressed: _openAccountSettingsSheet,
+            icon: const Icon(Icons.settings_outlined),
+          ),
           IconButton(
             tooltip: l10n.exportPdfTooltip,
             onPressed: _exportPdf,
