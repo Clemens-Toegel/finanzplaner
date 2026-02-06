@@ -176,6 +176,12 @@ abstract class AppLocalizations {
   /// **'Excel-Datei ist zum Teilen bereit.'**
   String get exportExcelSuccessMessage;
 
+  /// No description provided for @exportInProgressMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Export läuft…'**
+  String get exportInProgressMessage;
+
   /// No description provided for @discardChangesTitle.
   ///
   /// In de, this message translates to:

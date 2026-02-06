@@ -13,6 +13,7 @@
   "dataExportTitle": "Data export",
   "exportExcelForTaxConsultantAction": "Export Excel for tax consultant",
   "exportExcelSuccessMessage": "Excel file is ready to share.",
+  "exportInProgressMessage": "Export in progress…",
   "discardChangesTitle": "Discard changes?",
   "discardChangesMessage": "You have unsaved changes in this form.",
   "discardChangesAction": "Discard",

@@ -50,6 +50,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get exportExcelSuccessMessage => 'Excel-Datei ist zum Teilen bereit.';
 
   @override
+  String get exportInProgressMessage => 'Export läuft…';
+
+  @override
   String get discardChangesTitle => 'Änderungen verwerfen?';
 
   @override
