@@ -135,11 +135,7 @@ class _AccountSettingsSheetContent extends StatelessWidget {
                             }
                           },
                     icon: controller.isExporting
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
+                        ? const CircularProgressIndicator(strokeWidth: 2)
                         : const Icon(Icons.table_view_outlined),
                     label: Text(l10n.exportExcelForTaxConsultantAction),
                   ),

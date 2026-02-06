@@ -418,8 +418,9 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
           },
           child: Form(
             key: _formKey,
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.9,
+            child: FractionallySizedBox(
+              heightFactor: 0.9,
+              alignment: Alignment.topCenter,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [

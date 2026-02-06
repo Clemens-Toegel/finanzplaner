@@ -19,7 +19,7 @@ class AddEditPurchaseController extends ChangeNotifier {
       text: item != null ? item!.amount.toStringAsFixed(2) : '',
     );
     notesController = TextEditingController(text: item?.notes ?? '');
-    pageController = PageController(initialPage: 0);
+    pageController = PageController();
 
     selectedDate = item?.date ?? DateTime.now();
     selectedCategory = item?.category ?? categories.first;

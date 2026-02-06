@@ -74,33 +74,37 @@ class PurchaseDetailPage extends StatelessWidget {
               item.description,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 8,
-              children: [
-                InfoChip(
-                  icon: Icons.calendar_today,
-                  label: dateFormat.format(item.date),
-                ),
-                InfoChip(
-                  icon: Icons.euro,
-                  label: currencyFormat.format(item.amount),
-                ),
-                InfoChip(
-                  icon: item.isDeductible
-                      ? Icons.check_circle
-                      : Icons.info_outline,
-                  label: item.isDeductible
-                      ? l10n.deductibleLabel
-                      : l10n.notDeductibleLabel,
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                children: [
+                  InfoChip(
+                    icon: Icons.calendar_today,
+                    label: dateFormat.format(item.date),
+                  ),
+                  InfoChip(
+                    icon: Icons.euro,
+                    label: currencyFormat.format(item.amount),
+                  ),
+                  InfoChip(
+                    icon: item.isDeductible
+                        ? Icons.check_circle
+                        : Icons.info_outline,
+                    label: item.isDeductible
+                        ? l10n.deductibleLabel
+                        : l10n.notDeductibleLabel,
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 20),
-            _DetailTile(
-              label: l10n.vendorLabel,
-              value: item.vendor.isEmpty ? l10n.unknownVendor : item.vendor,
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: _DetailTile(
+                label: l10n.vendorLabel,
+                value: item.vendor.isEmpty ? l10n.unknownVendor : item.vendor,
+              ),
             ),
             _DetailTile(label: l10n.categoryLabel, value: item.category),
             _DetailTile(
@@ -112,15 +116,16 @@ class PurchaseDetailPage extends StatelessWidget {
               value: item.isDeductible ? l10n.yesLabel : l10n.noLabel,
             ),
             if (item.subItems.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Text(
-                l10n.stepSubItemsTitle,
-                style: Theme.of(context).textTheme.titleSmall,
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(
+                  l10n.stepSubItemsTitle,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
               ),
-              const SizedBox(height: 8),
               ...item.subItems.map(
                 (subItem) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.only(top: 8, bottom: 4),
                   child: Row(
                     children: [
                       Expanded(child: Text(subItem.description)),
@@ -131,13 +136,17 @@ class PurchaseDetailPage extends StatelessWidget {
               ),
             ],
             if (item.notes.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(
-                l10n.notesLabel,
-                style: Theme.of(context).textTheme.titleSmall,
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  l10n.notesLabel,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
               ),
-              const SizedBox(height: 6),
-              Text(item.notes),
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(item.notes),
+              ),
             ],
           ],
         ),

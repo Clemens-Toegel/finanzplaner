@@ -89,7 +89,12 @@ class PurchaseExpensesTab extends StatelessWidget {
               ),
             ],
           ),
-        SliverToBoxAdapter(child: SizedBox(height: 96 + bottomInset)),
+        SliverPadding(
+          padding: EdgeInsets.only(bottom: 96 + bottomInset),
+          sliver: const SliverToBoxAdapter(
+            child: ColoredBox(color: Colors.transparent),
+          ),
+        ),
       ],
     );
   }

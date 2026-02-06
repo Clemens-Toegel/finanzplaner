@@ -200,11 +200,7 @@ class _PurchaseHomeView extends StatelessWidget {
                 ? null
                 : () => _exportPdf(context, l10n, controller, items),
             icon: isExporting
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
+                ? const CircularProgressIndicator(strokeWidth: 2)
                 : const Icon(Icons.picture_as_pdf),
           ),
         ],
@@ -286,8 +282,10 @@ class _PurchaseHomeView extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const CircularProgressIndicator(),
-                            const SizedBox(height: 12),
-                            Text(l10n.exportInProgressMessage),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: Text(l10n.exportInProgressMessage),
+                            ),
                           ],
                         ),
                       ),
