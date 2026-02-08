@@ -111,18 +111,16 @@ flutter:
 
 flutter_launcher_icons:
   android: true
-  ios: true
-  image_path: assets/branding/generated/pilo_mark_1024.png
-  image_path_ios: assets/branding/generated/pilo_icon_ios_1024.png
-  adaptive_icon_background: "#071225"
-  adaptive_icon_foreground: assets/branding/generated/pilo_mark_1024.png
-  remove_alpha_ios: true
+  image_path: assets/branding/generated/pilo_mark_1024_no_bg.png
+  adaptive_icon_background: "#1F8CFF"
+  adaptive_icon_foreground: assets/branding/generated/pilo_mark_1024_no_bg.png
 
 flutter_native_splash:
   color: "#071225"
   image: assets/branding/generated/pilo_mark_512.png
   android: true
-  ios: true
+  ios: false
+  web: false
   android_12:
     color: "#071225"
-    image: assets/branding/generated/pilo_mark_512.png
+    image: assets/branding/generated/pilo_mark_512_android12_padded.png
