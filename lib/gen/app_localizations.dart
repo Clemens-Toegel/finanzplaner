@@ -101,13 +101,13 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In de, this message translates to:
-  /// **'BelegPilot'**
+  /// **'Pilo'**
   String get appTitle;
 
   /// No description provided for @taxRefundPurchasesTitle.
   ///
   /// In de, this message translates to:
-  /// **'BelegPilot'**
+  /// **'Pilo'**
   String get taxRefundPurchasesTitle;
 
   /// No description provided for @exportPdfTooltip.
