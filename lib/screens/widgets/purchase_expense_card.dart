@@ -100,6 +100,13 @@ class PurchaseExpenseCard extends StatelessWidget {
                           item.subItems.length,
                         ),
                       ),
+                    if (item.secondaryAttachmentPaths.isNotEmpty)
+                      InfoChip(
+                        icon: Icons.photo_library_outlined,
+                        label: localizations.secondaryAttachmentsCountLabel(
+                          item.secondaryAttachmentPaths.length,
+                        ),
+                      ),
                   ],
                 ),
               ),

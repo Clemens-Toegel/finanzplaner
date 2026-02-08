@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PurchaseItem {
 
- int? get id; ExpenseAccountType get accountType; String get description; String get vendor; String get category; double get amount; DateTime get date; bool get isDeductible; String get notes; String? get attachmentPath; List<ExpenseSubItem> get subItems;
+ int? get id; ExpenseAccountType get accountType; String get description; String get vendor; String get category; double get amount; DateTime get date; bool get isDeductible; String get notes; String? get attachmentPath; List<String> get secondaryAttachmentPaths; List<String> get secondaryAttachmentNames; List<ExpenseSubItem> get subItems;
 /// Create a copy of PurchaseItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $PurchaseItemCopyWith<PurchaseItem> get copyWith => _$PurchaseItemCopyWithImpl<P
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PurchaseItem&&(identical(other.id, id) || other.id == id)&&(identical(other.accountType, accountType) || other.accountType == accountType)&&(identical(other.description, description) || other.description == description)&&(identical(other.vendor, vendor) || other.vendor == vendor)&&(identical(other.category, category) || other.category == category)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.date, date) || other.date == date)&&(identical(other.isDeductible, isDeductible) || other.isDeductible == isDeductible)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.attachmentPath, attachmentPath) || other.attachmentPath == attachmentPath)&&const DeepCollectionEquality().equals(other.subItems, subItems));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PurchaseItem&&(identical(other.id, id) || other.id == id)&&(identical(other.accountType, accountType) || other.accountType == accountType)&&(identical(other.description, description) || other.description == description)&&(identical(other.vendor, vendor) || other.vendor == vendor)&&(identical(other.category, category) || other.category == category)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.date, date) || other.date == date)&&(identical(other.isDeductible, isDeductible) || other.isDeductible == isDeductible)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.attachmentPath, attachmentPath) || other.attachmentPath == attachmentPath)&&const DeepCollectionEquality().equals(other.secondaryAttachmentPaths, secondaryAttachmentPaths)&&const DeepCollectionEquality().equals(other.secondaryAttachmentNames, secondaryAttachmentNames)&&const DeepCollectionEquality().equals(other.subItems, subItems));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,accountType,description,vendor,category,amount,date,isDeductible,notes,attachmentPath,const DeepCollectionEquality().hash(subItems));
+int get hashCode => Object.hash(runtimeType,id,accountType,description,vendor,category,amount,date,isDeductible,notes,attachmentPath,const DeepCollectionEquality().hash(secondaryAttachmentPaths),const DeepCollectionEquality().hash(secondaryAttachmentNames),const DeepCollectionEquality().hash(subItems));
 
 @override
 String toString() {
-  return 'PurchaseItem(id: $id, accountType: $accountType, description: $description, vendor: $vendor, category: $category, amount: $amount, date: $date, isDeductible: $isDeductible, notes: $notes, attachmentPath: $attachmentPath, subItems: $subItems)';
+  return 'PurchaseItem(id: $id, accountType: $accountType, description: $description, vendor: $vendor, category: $category, amount: $amount, date: $date, isDeductible: $isDeductible, notes: $notes, attachmentPath: $attachmentPath, secondaryAttachmentPaths: $secondaryAttachmentPaths, secondaryAttachmentNames: $secondaryAttachmentNames, subItems: $subItems)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $PurchaseItemCopyWith<$Res>  {
   factory $PurchaseItemCopyWith(PurchaseItem value, $Res Function(PurchaseItem) _then) = _$PurchaseItemCopyWithImpl;
 @useResult
 $Res call({
- int? id, ExpenseAccountType accountType, String description, String vendor, String category, double amount, DateTime date, bool isDeductible, String notes, String? attachmentPath, List<ExpenseSubItem> subItems
+ int? id, ExpenseAccountType accountType, String description, String vendor, String category, double amount, DateTime date, bool isDeductible, String notes, String? attachmentPath, List<String> secondaryAttachmentPaths, List<String> secondaryAttachmentNames, List<ExpenseSubItem> subItems
 });
 
 
@@ -65,7 +65,7 @@ class _$PurchaseItemCopyWithImpl<$Res>
 
 /// Create a copy of PurchaseItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? accountType = null,Object? description = null,Object? vendor = null,Object? category = null,Object? amount = null,Object? date = null,Object? isDeductible = null,Object? notes = null,Object? attachmentPath = freezed,Object? subItems = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? accountType = null,Object? description = null,Object? vendor = null,Object? category = null,Object? amount = null,Object? date = null,Object? isDeductible = null,Object? notes = null,Object? attachmentPath = freezed,Object? secondaryAttachmentPaths = null,Object? secondaryAttachmentNames = null,Object? subItems = null,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,accountType: null == accountType ? _self.accountType : accountType // ignore: cast_nullable_to_non_nullable
@@ -77,7 +77,9 @@ as double,date: null == date ? _self.date : date // ignore: cast_nullable_to_non
 as DateTime,isDeductible: null == isDeductible ? _self.isDeductible : isDeductible // ignore: cast_nullable_to_non_nullable
 as bool,notes: null == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String,attachmentPath: freezed == attachmentPath ? _self.attachmentPath : attachmentPath // ignore: cast_nullable_to_non_nullable
-as String?,subItems: null == subItems ? _self.subItems : subItems // ignore: cast_nullable_to_non_nullable
+as String?,secondaryAttachmentPaths: null == secondaryAttachmentPaths ? _self.secondaryAttachmentPaths : secondaryAttachmentPaths // ignore: cast_nullable_to_non_nullable
+as List<String>,secondaryAttachmentNames: null == secondaryAttachmentNames ? _self.secondaryAttachmentNames : secondaryAttachmentNames // ignore: cast_nullable_to_non_nullable
+as List<String>,subItems: null == subItems ? _self.subItems : subItems // ignore: cast_nullable_to_non_nullable
 as List<ExpenseSubItem>,
   ));
 }
@@ -163,10 +165,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  ExpenseAccountType accountType,  String description,  String vendor,  String category,  double amount,  DateTime date,  bool isDeductible,  String notes,  String? attachmentPath,  List<ExpenseSubItem> subItems)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  ExpenseAccountType accountType,  String description,  String vendor,  String category,  double amount,  DateTime date,  bool isDeductible,  String notes,  String? attachmentPath,  List<String> secondaryAttachmentPaths,  List<String> secondaryAttachmentNames,  List<ExpenseSubItem> subItems)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PurchaseItem() when $default != null:
-return $default(_that.id,_that.accountType,_that.description,_that.vendor,_that.category,_that.amount,_that.date,_that.isDeductible,_that.notes,_that.attachmentPath,_that.subItems);case _:
+return $default(_that.id,_that.accountType,_that.description,_that.vendor,_that.category,_that.amount,_that.date,_that.isDeductible,_that.notes,_that.attachmentPath,_that.secondaryAttachmentPaths,_that.secondaryAttachmentNames,_that.subItems);case _:
   return orElse();
 
 }
@@ -184,10 +186,10 @@ return $default(_that.id,_that.accountType,_that.description,_that.vendor,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  ExpenseAccountType accountType,  String description,  String vendor,  String category,  double amount,  DateTime date,  bool isDeductible,  String notes,  String? attachmentPath,  List<ExpenseSubItem> subItems)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  ExpenseAccountType accountType,  String description,  String vendor,  String category,  double amount,  DateTime date,  bool isDeductible,  String notes,  String? attachmentPath,  List<String> secondaryAttachmentPaths,  List<String> secondaryAttachmentNames,  List<ExpenseSubItem> subItems)  $default,) {final _that = this;
 switch (_that) {
 case _PurchaseItem():
-return $default(_that.id,_that.accountType,_that.description,_that.vendor,_that.category,_that.amount,_that.date,_that.isDeductible,_that.notes,_that.attachmentPath,_that.subItems);case _:
+return $default(_that.id,_that.accountType,_that.description,_that.vendor,_that.category,_that.amount,_that.date,_that.isDeductible,_that.notes,_that.attachmentPath,_that.secondaryAttachmentPaths,_that.secondaryAttachmentNames,_that.subItems);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +206,10 @@ return $default(_that.id,_that.accountType,_that.description,_that.vendor,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  ExpenseAccountType accountType,  String description,  String vendor,  String category,  double amount,  DateTime date,  bool isDeductible,  String notes,  String? attachmentPath,  List<ExpenseSubItem> subItems)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  ExpenseAccountType accountType,  String description,  String vendor,  String category,  double amount,  DateTime date,  bool isDeductible,  String notes,  String? attachmentPath,  List<String> secondaryAttachmentPaths,  List<String> secondaryAttachmentNames,  List<ExpenseSubItem> subItems)?  $default,) {final _that = this;
 switch (_that) {
 case _PurchaseItem() when $default != null:
-return $default(_that.id,_that.accountType,_that.description,_that.vendor,_that.category,_that.amount,_that.date,_that.isDeductible,_that.notes,_that.attachmentPath,_that.subItems);case _:
+return $default(_that.id,_that.accountType,_that.description,_that.vendor,_that.category,_that.amount,_that.date,_that.isDeductible,_that.notes,_that.attachmentPath,_that.secondaryAttachmentPaths,_that.secondaryAttachmentNames,_that.subItems);case _:
   return null;
 
 }
@@ -219,7 +221,7 @@ return $default(_that.id,_that.accountType,_that.description,_that.vendor,_that.
 @JsonSerializable()
 
 class _PurchaseItem extends PurchaseItem {
-  const _PurchaseItem({this.id, required this.accountType, required this.description, required this.vendor, required this.category, required this.amount, required this.date, required this.isDeductible, required this.notes, this.attachmentPath, final  List<ExpenseSubItem> subItems = const <ExpenseSubItem>[]}): _subItems = subItems,super._();
+  const _PurchaseItem({this.id, required this.accountType, required this.description, required this.vendor, required this.category, required this.amount, required this.date, required this.isDeductible, required this.notes, this.attachmentPath, final  List<String> secondaryAttachmentPaths = const <String>[], final  List<String> secondaryAttachmentNames = const <String>[], final  List<ExpenseSubItem> subItems = const <ExpenseSubItem>[]}): _secondaryAttachmentPaths = secondaryAttachmentPaths,_secondaryAttachmentNames = secondaryAttachmentNames,_subItems = subItems,super._();
   factory _PurchaseItem.fromJson(Map<String, dynamic> json) => _$PurchaseItemFromJson(json);
 
 @override final  int? id;
@@ -232,6 +234,20 @@ class _PurchaseItem extends PurchaseItem {
 @override final  bool isDeductible;
 @override final  String notes;
 @override final  String? attachmentPath;
+ final  List<String> _secondaryAttachmentPaths;
+@override@JsonKey() List<String> get secondaryAttachmentPaths {
+  if (_secondaryAttachmentPaths is EqualUnmodifiableListView) return _secondaryAttachmentPaths;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_secondaryAttachmentPaths);
+}
+
+ final  List<String> _secondaryAttachmentNames;
+@override@JsonKey() List<String> get secondaryAttachmentNames {
+  if (_secondaryAttachmentNames is EqualUnmodifiableListView) return _secondaryAttachmentNames;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_secondaryAttachmentNames);
+}
+
  final  List<ExpenseSubItem> _subItems;
 @override@JsonKey() List<ExpenseSubItem> get subItems {
   if (_subItems is EqualUnmodifiableListView) return _subItems;
@@ -253,16 +269,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PurchaseItem&&(identical(other.id, id) || other.id == id)&&(identical(other.accountType, accountType) || other.accountType == accountType)&&(identical(other.description, description) || other.description == description)&&(identical(other.vendor, vendor) || other.vendor == vendor)&&(identical(other.category, category) || other.category == category)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.date, date) || other.date == date)&&(identical(other.isDeductible, isDeductible) || other.isDeductible == isDeductible)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.attachmentPath, attachmentPath) || other.attachmentPath == attachmentPath)&&const DeepCollectionEquality().equals(other._subItems, _subItems));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PurchaseItem&&(identical(other.id, id) || other.id == id)&&(identical(other.accountType, accountType) || other.accountType == accountType)&&(identical(other.description, description) || other.description == description)&&(identical(other.vendor, vendor) || other.vendor == vendor)&&(identical(other.category, category) || other.category == category)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.date, date) || other.date == date)&&(identical(other.isDeductible, isDeductible) || other.isDeductible == isDeductible)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.attachmentPath, attachmentPath) || other.attachmentPath == attachmentPath)&&const DeepCollectionEquality().equals(other._secondaryAttachmentPaths, _secondaryAttachmentPaths)&&const DeepCollectionEquality().equals(other._secondaryAttachmentNames, _secondaryAttachmentNames)&&const DeepCollectionEquality().equals(other._subItems, _subItems));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,accountType,description,vendor,category,amount,date,isDeductible,notes,attachmentPath,const DeepCollectionEquality().hash(_subItems));
+int get hashCode => Object.hash(runtimeType,id,accountType,description,vendor,category,amount,date,isDeductible,notes,attachmentPath,const DeepCollectionEquality().hash(_secondaryAttachmentPaths),const DeepCollectionEquality().hash(_secondaryAttachmentNames),const DeepCollectionEquality().hash(_subItems));
 
 @override
 String toString() {
-  return 'PurchaseItem(id: $id, accountType: $accountType, description: $description, vendor: $vendor, category: $category, amount: $amount, date: $date, isDeductible: $isDeductible, notes: $notes, attachmentPath: $attachmentPath, subItems: $subItems)';
+  return 'PurchaseItem(id: $id, accountType: $accountType, description: $description, vendor: $vendor, category: $category, amount: $amount, date: $date, isDeductible: $isDeductible, notes: $notes, attachmentPath: $attachmentPath, secondaryAttachmentPaths: $secondaryAttachmentPaths, secondaryAttachmentNames: $secondaryAttachmentNames, subItems: $subItems)';
 }
 
 
@@ -273,7 +289,7 @@ abstract mixin class _$PurchaseItemCopyWith<$Res> implements $PurchaseItemCopyWi
   factory _$PurchaseItemCopyWith(_PurchaseItem value, $Res Function(_PurchaseItem) _then) = __$PurchaseItemCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, ExpenseAccountType accountType, String description, String vendor, String category, double amount, DateTime date, bool isDeductible, String notes, String? attachmentPath, List<ExpenseSubItem> subItems
+ int? id, ExpenseAccountType accountType, String description, String vendor, String category, double amount, DateTime date, bool isDeductible, String notes, String? attachmentPath, List<String> secondaryAttachmentPaths, List<String> secondaryAttachmentNames, List<ExpenseSubItem> subItems
 });
 
 
@@ -290,7 +306,7 @@ class __$PurchaseItemCopyWithImpl<$Res>
 
 /// Create a copy of PurchaseItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? accountType = null,Object? description = null,Object? vendor = null,Object? category = null,Object? amount = null,Object? date = null,Object? isDeductible = null,Object? notes = null,Object? attachmentPath = freezed,Object? subItems = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? accountType = null,Object? description = null,Object? vendor = null,Object? category = null,Object? amount = null,Object? date = null,Object? isDeductible = null,Object? notes = null,Object? attachmentPath = freezed,Object? secondaryAttachmentPaths = null,Object? secondaryAttachmentNames = null,Object? subItems = null,}) {
   return _then(_PurchaseItem(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,accountType: null == accountType ? _self.accountType : accountType // ignore: cast_nullable_to_non_nullable
@@ -302,7 +318,9 @@ as double,date: null == date ? _self.date : date // ignore: cast_nullable_to_non
 as DateTime,isDeductible: null == isDeductible ? _self.isDeductible : isDeductible // ignore: cast_nullable_to_non_nullable
 as bool,notes: null == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String,attachmentPath: freezed == attachmentPath ? _self.attachmentPath : attachmentPath // ignore: cast_nullable_to_non_nullable
-as String?,subItems: null == subItems ? _self._subItems : subItems // ignore: cast_nullable_to_non_nullable
+as String?,secondaryAttachmentPaths: null == secondaryAttachmentPaths ? _self._secondaryAttachmentPaths : secondaryAttachmentPaths // ignore: cast_nullable_to_non_nullable
+as List<String>,secondaryAttachmentNames: null == secondaryAttachmentNames ? _self._secondaryAttachmentNames : secondaryAttachmentNames // ignore: cast_nullable_to_non_nullable
+as List<String>,subItems: null == subItems ? _self._subItems : subItems // ignore: cast_nullable_to_non_nullable
 as List<ExpenseSubItem>,
   ));
 }

@@ -95,7 +95,7 @@ class AddEditPurchaseDetailsStep extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 6),
                   child: Text(
-                    'Beleg angehängt',
+                    l10n.receiptAttachedLabel,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
@@ -129,9 +129,7 @@ class AddEditPurchaseDetailsStep extends StatelessWidget {
             decoration: InputDecoration(
               labelText: l10n.amountLabel,
               helperText: vm.hasSubItems
-                  ? l10n.subItemsSumHint(
-                      currencyFormat.format(vm.subItemsTotal),
-                    )
+                  ? '${l10n.subItemsSumHint(currencyFormat.format(vm.subItemsTotal))}\n${l10n.minimumAmountFromSubItemsHint(currencyFormat.format(vm.subItemsTotal))}'
                   : null,
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -142,6 +140,9 @@ class AddEditPurchaseDetailsStep extends StatelessWidget {
               final parsed = double.tryParse(value.replaceAll(',', '.'));
               if (parsed == null || parsed <= 0) {
                 return l10n.amountInvalidValidation;
+              }
+              if (parsed < vm.subItemsTotal) {
+                return l10n.subItemsExceedTotalValidation;
               }
               return null;
             },
@@ -229,7 +230,8 @@ class _PiloScanningStatusState extends State<_PiloScanningStatus>
       animation: _controller,
       builder: (context, child) {
         final dots = (_controller.value * 3).floor() + 1;
-        final label = 'Pilo scannt deinen Beleg${'.' * dots}';
+        final l10n = AppLocalizations.of(context)!;
+        final label = l10n.scanningReceiptProgress('.' * dots);
 
         return Column(
           mainAxisSize: MainAxisSize.min,

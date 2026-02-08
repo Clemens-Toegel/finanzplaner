@@ -38,6 +38,8 @@ class PurchaseRepository {
             deductible INTEGER NOT NULL,
             notes TEXT,
             attachment_path TEXT,
+            secondary_attachment_paths TEXT NOT NULL DEFAULT '[]',
+            secondary_attachment_names TEXT NOT NULL DEFAULT '[]',
             sub_items TEXT NOT NULL DEFAULT '[]'
           )
           ''');

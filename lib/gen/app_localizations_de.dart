@@ -53,6 +53,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get exportInProgressMessage => 'Export läuft…';
 
   @override
+  String get exportDateRangeTitle => 'Exportzeitraum auswählen';
+
+  @override
+  String get confirmDateRangeAction => 'Zeitraum verwenden';
+
+  @override
+  String get noItemsInDateRangeMessage =>
+      'Im ausgewählten Zeitraum wurden keine Ausgaben gefunden.';
+
+  @override
   String get discardChangesTitle => 'Änderungen verwerfen?';
 
   @override
@@ -61,6 +71,31 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get discardChangesAction => 'Verwerfen';
+
+  @override
+  String selectionCountLabel(int count) {
+    return '$count ausgewählt';
+  }
+
+  @override
+  String get deleteSelectionTooltip => 'Auswahl löschen';
+
+  @override
+  String get clearSelectionTooltip => 'Auswahl beenden';
+
+  @override
+  String get deleteSelectedExpensesTitle => 'Ausgewählte Ausgaben löschen?';
+
+  @override
+  String deleteSelectedExpensesMessage(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# Einträge werden gelöscht.',
+      one: '# Eintrag wird gelöscht.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get subItemsExceedTotalValidation =>
@@ -219,6 +254,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get ocrNoTextFound => 'Kein lesbarer Text auf dem Beleg gefunden.';
 
   @override
+  String get ocrNoTextFoundWithAttachment =>
+      'Kein lesbarer Text auf dem Beleg gefunden. Das Belegfoto wurde angehängt.';
+
+  @override
   String get ocrAppliedMessage =>
       'Belegdaten wurden in das Formular übernommen.';
 
@@ -227,10 +266,70 @@ class AppLocalizationsDe extends AppLocalizations {
       'Belegscan fehlgeschlagen. Bitte erneut versuchen.';
 
   @override
+  String get imageSaveFailedMessage => 'Bild konnte nicht gespeichert werden.';
+
+  @override
+  String get secondaryImageAddedMessage => 'Zusätzliches Bild hinzugefügt.';
+
+  @override
+  String get renameImageTitle => 'Bildname ändern';
+
+  @override
+  String get nameLabel => 'Name';
+
+  @override
   String get scanFromCameraAction => 'Foto aufnehmen';
 
   @override
   String get scanFromGalleryAction => 'Aus Fotos auswählen';
+
+  @override
+  String get receiptAttachedLabel => 'Beleg angehängt';
+
+  @override
+  String scanningReceiptProgress(Object dots) {
+    return 'Pilo scannt deinen Beleg$dots';
+  }
+
+  @override
+  String get receiptFileNotFoundMessage =>
+      'Die Belegdatei wurde nicht gefunden.';
+
+  @override
+  String get receiptSectionTitle => 'Beleg';
+
+  @override
+  String get downloadReceiptAction => 'Beleg herunterladen';
+
+  @override
+  String get additionalImagesSectionTitle => 'Zusätzliche Bilder';
+
+  @override
+  String get additionalImagesAddAction => 'Zusätzliche Bilder hinzufügen';
+
+  @override
+  String additionalImagesCountAction(int count) {
+    return 'Zusätzliche Bilder ($count)';
+  }
+
+  @override
+  String get renameImageTooltip => 'Namen ändern';
+
+  @override
+  String get moveUpTooltip => 'Nach oben';
+
+  @override
+  String get moveDownTooltip => 'Nach unten';
+
+  @override
+  String imageNumberLabel(int index) {
+    return 'Bild $index';
+  }
+
+  @override
+  String downloadNamedImageAction(Object name) {
+    return '$name herunterladen';
+  }
 
   @override
   String get stepExpenseDetailsTitle => 'Ausgabendetails';
@@ -272,6 +371,17 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String secondaryAttachmentsCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# Zusatzbilder',
+      one: '# Zusatzbild',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get applySubItemsTotalAction =>
       'Summe der Unterpositionen als Ausgabenbetrag verwenden';
 
@@ -281,14 +391,106 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String minimumAmountFromSubItemsHint(Object amount) {
+    return 'Mindestbetrag basierend auf Unterpositionen: $amount';
+  }
+
+  @override
   String pdfTitle(Object account) {
-    return '$account – absetzbare Ausgaben';
+    return '$account';
   }
 
   @override
   String pdfGeneratedAt(Object date) {
     return 'Erstellt am $date';
   }
+
+  @override
+  String get pdfMetaReportIdLabel => 'Report-ID';
+
+  @override
+  String get pdfMetaAccountLabel => 'Konto';
+
+  @override
+  String get pdfMetaAccountNameLabel => 'Kontobezeichnung';
+
+  @override
+  String get pdfMetaPeriodLabel => 'Zeitraum';
+
+  @override
+  String get pdfMetaCurrencyLabel => 'Währung';
+
+  @override
+  String get pdfMetaGeneratedAtUtcLabel => 'Erstellt um UTC (ISO-8601)';
+
+  @override
+  String get pdfMetaSchemaLabel => 'Schema';
+
+  @override
+  String get pdfHeaderId => 'ID';
+
+  @override
+  String get pdfUnknownId => 'N/V';
+
+  @override
+  String get pdfSubItemCategory => 'Unterposition';
+
+  @override
+  String get excelSheetExpensesName => 'Ausgaben';
+
+  @override
+  String get excelSheetSummaryName => 'Zusammenfassung';
+
+  @override
+  String get excelHeaderExpenseId => 'Ausgaben-ID';
+
+  @override
+  String get excelHeaderDate => 'Datum';
+
+  @override
+  String get excelHeaderCompanyRegisterNumber => 'Firmenbuchnummer';
+
+  @override
+  String get excelHeaderVendor => 'Anbieter';
+
+  @override
+  String get excelHeaderDescription => 'Beschreibung';
+
+  @override
+  String get excelHeaderCategory => 'Kategorie';
+
+  @override
+  String get excelHeaderAmountEur => 'Betrag EUR';
+
+  @override
+  String get excelHeaderDeductible => 'Absetzbar';
+
+  @override
+  String get excelHeaderNotes => 'Notizen';
+
+  @override
+  String get excelHeaderSubItemDescription => 'Unterpositionsbeschreibung';
+
+  @override
+  String get excelHeaderSubItemAmountEur => 'Unterpositionsbetrag EUR';
+
+  @override
+  String get excelSummaryHeaderAccount => 'Konto';
+
+  @override
+  String get excelSummaryHeaderEntries => 'Einträge';
+
+  @override
+  String get excelSummaryHeaderTotalEur => 'Gesamt EUR';
+
+  @override
+  String get excelSummaryHeaderDeductibleEur => 'Absetzbar EUR';
+
+  @override
+  String get excelSummaryHeaderNonDeductibleEur => 'Nicht absetzbar EUR';
+
+  @override
+  String get excelFileNamePrefix => 'ausgaben_steuerberatung';
 
   @override
   String get pdfHeaderDate => 'Datum';

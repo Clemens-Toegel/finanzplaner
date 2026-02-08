@@ -25,9 +25,10 @@ class PurchaseDetailPage extends StatelessWidget {
       if (!context.mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Die Belegdatei wurde nicht gefunden.')),
-      );
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.receiptFileNotFoundMessage)));
       return;
     }
 
@@ -163,7 +164,7 @@ class PurchaseDetailPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 12),
                 child: Text(
-                  'Beleg',
+                  l10n.receiptSectionTitle,
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
               ),
@@ -173,7 +174,32 @@ class PurchaseDetailPage extends StatelessWidget {
                   onPressed: () =>
                       _downloadAttachment(context, item.attachmentPath!.trim()),
                   icon: const Icon(Icons.download_rounded),
-                  label: const Text('Beleg herunterladen'),
+                  label: Text(l10n.downloadReceiptAction),
+                ),
+              ),
+            ],
+            if (item.secondaryAttachmentPaths.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(
+                  l10n.additionalImagesSectionTitle,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+              ),
+              ...item.secondaryAttachmentPaths.asMap().entries.map(
+                (entry) => Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: OutlinedButton.icon(
+                    onPressed: () => _downloadAttachment(context, entry.value),
+                    icon: const Icon(Icons.image_outlined),
+                    label: Text(
+                      l10n.downloadNamedImageAction(
+                        entry.key < item.secondaryAttachmentNames.length
+                            ? item.secondaryAttachmentNames[entry.key]
+                            : l10n.imageNumberLabel(entry.key + 1),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],

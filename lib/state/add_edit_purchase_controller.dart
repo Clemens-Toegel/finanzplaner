@@ -21,6 +21,13 @@ class AddEditPurchaseController extends ChangeNotifier {
     notesController = TextEditingController(text: item?.notes ?? '');
 
     attachmentPath = item?.attachmentPath;
+    secondaryAttachmentPaths = List<String>.from(
+      item?.secondaryAttachmentPaths ?? const [],
+    );
+    secondaryAttachmentNames = List<String>.from(
+      item?.secondaryAttachmentNames ?? const [],
+    );
+    _normalizeSecondaryAttachmentNames();
 
     selectedDate = item?.date ?? DateTime.now();
     selectedCategory = item?.category ?? categories.first;
@@ -35,6 +42,12 @@ class AddEditPurchaseController extends ChangeNotifier {
     initialAmount = amountController.text.trim();
     initialNotes = notesController.text.trim();
     initialAttachmentPath = (attachmentPath ?? '').trim();
+    initialSecondaryAttachmentPaths = List<String>.from(
+      secondaryAttachmentPaths,
+    );
+    initialSecondaryAttachmentNames = List<String>.from(
+      secondaryAttachmentNames,
+    );
     initialCategory = selectedCategory;
     initialDate = selectedDate;
     initialIsDeductible = isDeductible;
@@ -55,6 +68,8 @@ class AddEditPurchaseController extends ChangeNotifier {
   late bool isDeductible;
   bool isScanning = false;
   String? attachmentPath;
+  List<String> secondaryAttachmentPaths = <String>[];
+  List<String> secondaryAttachmentNames = <String>[];
   String? pendingAttachmentSourcePath;
   late List<ExpenseSubItem> subItems;
 
@@ -63,6 +78,8 @@ class AddEditPurchaseController extends ChangeNotifier {
   late final String initialAmount;
   late final String initialNotes;
   late final String initialAttachmentPath;
+  late final List<String> initialSecondaryAttachmentPaths;
+  late final List<String> initialSecondaryAttachmentNames;
   late final String initialCategory;
   late final DateTime initialDate;
   late final bool initialIsDeductible;
@@ -91,6 +108,113 @@ class AddEditPurchaseController extends ChangeNotifier {
       (attachmentPath != null && attachmentPath!.trim().isNotEmpty) ||
       (pendingAttachmentSourcePath != null &&
           pendingAttachmentSourcePath!.trim().isNotEmpty);
+
+  int get secondaryAttachmentCount => secondaryAttachmentPaths.length;
+
+  String secondaryAttachmentNameAt(int index) {
+    if (index < 0 || index >= secondaryAttachmentNames.length) {
+      return 'Bild';
+    }
+    return secondaryAttachmentNames[index];
+  }
+
+  void addSecondaryAttachmentPath(String sourcePath, {String? name}) {
+    final path = sourcePath.trim();
+    if (path.isEmpty || secondaryAttachmentPaths.contains(path)) {
+      return;
+    }
+    secondaryAttachmentPaths = [...secondaryAttachmentPaths, path];
+    secondaryAttachmentNames = [
+      ...secondaryAttachmentNames,
+      (name ?? _defaultNameFromPath(path)).trim().isEmpty
+          ? _defaultNameFromPath(path)
+          : (name ?? _defaultNameFromPath(path)).trim(),
+    ];
+    _normalizeSecondaryAttachmentNames();
+    notifyListeners();
+  }
+
+  void removeSecondaryAttachmentAt(int index) {
+    if (index < 0 || index >= secondaryAttachmentPaths.length) {
+      return;
+    }
+    final updatedPaths = List<String>.from(secondaryAttachmentPaths)
+      ..removeAt(index);
+    final updatedNames = List<String>.from(secondaryAttachmentNames)
+      ..removeAt(index);
+    secondaryAttachmentPaths = updatedPaths;
+    secondaryAttachmentNames = updatedNames;
+    notifyListeners();
+  }
+
+  void moveSecondaryAttachment(int oldIndex, int newIndex) {
+    if (oldIndex < 0 || oldIndex >= secondaryAttachmentPaths.length) {
+      return;
+    }
+    if (newIndex < 0 || newIndex >= secondaryAttachmentPaths.length) {
+      return;
+    }
+    if (oldIndex == newIndex) {
+      return;
+    }
+
+    final updatedPaths = List<String>.from(secondaryAttachmentPaths);
+    final movedPath = updatedPaths.removeAt(oldIndex);
+    updatedPaths.insert(newIndex, movedPath);
+
+    final updatedNames = List<String>.from(secondaryAttachmentNames);
+    final movedName = updatedNames.removeAt(oldIndex);
+    updatedNames.insert(newIndex, movedName);
+
+    secondaryAttachmentPaths = updatedPaths;
+    secondaryAttachmentNames = updatedNames;
+    notifyListeners();
+  }
+
+  void renameSecondaryAttachment(int index, String name) {
+    if (index < 0 || index >= secondaryAttachmentNames.length) {
+      return;
+    }
+    final trimmed = name.trim();
+    final updated = List<String>.from(secondaryAttachmentNames);
+    updated[index] = trimmed.isEmpty
+        ? _defaultNameFromPath(secondaryAttachmentPaths[index])
+        : trimmed;
+    secondaryAttachmentNames = updated;
+    notifyListeners();
+  }
+
+  String _defaultNameFromPath(String path) {
+    final normalized = path.replaceAll('\\', '/').trim();
+    if (normalized.isEmpty) {
+      return 'Bild';
+    }
+    final parts = normalized
+        .split('/')
+        .where((part) => part.isNotEmpty)
+        .toList();
+    return parts.isEmpty ? 'Bild' : parts.last;
+  }
+
+  void _normalizeSecondaryAttachmentNames() {
+    if (secondaryAttachmentPaths.isEmpty) {
+      secondaryAttachmentNames = <String>[];
+      return;
+    }
+
+    final normalized = <String>[];
+    for (var i = 0; i < secondaryAttachmentPaths.length; i++) {
+      final existing = i < secondaryAttachmentNames.length
+          ? secondaryAttachmentNames[i].trim()
+          : '';
+      normalized.add(
+        existing.isEmpty
+            ? _defaultNameFromPath(secondaryAttachmentPaths[i])
+            : existing,
+      );
+    }
+    secondaryAttachmentNames = normalized;
+  }
 
   void setPendingAttachmentSourcePath(String? sourcePath) {
     pendingAttachmentSourcePath = sourcePath?.trim();
@@ -138,6 +262,7 @@ class AddEditPurchaseController extends ChangeNotifier {
 
   void setSubItems(List<ExpenseSubItem> value) {
     subItems = List<ExpenseSubItem>.from(value);
+    _syncAmountWithSubItems();
     notifyListeners();
   }
 
@@ -149,12 +274,14 @@ class AddEditPurchaseController extends ChangeNotifier {
       updated[index] = value;
     }
     subItems = updated;
+    _syncAmountWithSubItems();
     notifyListeners();
   }
 
   void removeSubItemAt(int index) {
     final updated = List<ExpenseSubItem>.from(subItems)..removeAt(index);
     subItems = updated;
+    _syncAmountWithSubItems();
     notifyListeners();
   }
 
@@ -178,14 +305,10 @@ class AddEditPurchaseController extends ChangeNotifier {
     }
     if (data.subItems.isNotEmpty) {
       subItems = List<ExpenseSubItem>.from(data.subItems);
-      if (data.amount == null || data.amount! <= 0) {
-        final sum = data.subItems.fold<double>(
-          0,
-          (total, subItem) => total + subItem.amount,
-        );
-        if (sum > 0) {
-          amountController.text = sum.toStringAsFixed(2);
-        }
+      _syncAmountWithSubItems();
+      if (data.amount != null && data.amount! > 0) {
+        amountController.text = data.amount!.toStringAsFixed(2);
+        _syncAmountWithSubItems();
       }
     }
     if (data.sourceFilePath != null && data.sourceFilePath!.trim().isNotEmpty) {
@@ -195,8 +318,25 @@ class AddEditPurchaseController extends ChangeNotifier {
   }
 
   void ensureAmountFromSubItemsIfMissing() {
-    if (amountController.text.trim().isEmpty && subItems.isNotEmpty) {
-      amountController.text = subItemsTotal.toStringAsFixed(2);
+    _syncAmountWithSubItems();
+  }
+
+  void _syncAmountWithSubItems() {
+    if (subItems.isEmpty) {
+      return;
+    }
+
+    final currentText = amountController.text.trim();
+    final total = subItemsTotal;
+
+    if (currentText.isEmpty) {
+      amountController.text = total.toStringAsFixed(2);
+      return;
+    }
+
+    final parsed = double.tryParse(currentText.replaceAll(',', '.'));
+    if (parsed == null || parsed < total) {
+      amountController.text = total.toStringAsFixed(2);
     }
   }
 
@@ -218,6 +358,22 @@ class AddEditPurchaseController extends ChangeNotifier {
     }
     if ((pendingAttachmentSourcePath ?? '').trim().isNotEmpty) {
       return true;
+    }
+    if (secondaryAttachmentPaths.length !=
+        initialSecondaryAttachmentPaths.length) {
+      return true;
+    }
+    if (secondaryAttachmentNames.length !=
+        initialSecondaryAttachmentNames.length) {
+      return true;
+    }
+    for (var i = 0; i < secondaryAttachmentPaths.length; i++) {
+      if (secondaryAttachmentPaths[i] != initialSecondaryAttachmentPaths[i]) {
+        return true;
+      }
+      if (secondaryAttachmentNames[i] != initialSecondaryAttachmentNames[i]) {
+        return true;
+      }
     }
     if (selectedCategory != initialCategory) {
       return true;
@@ -261,6 +417,8 @@ class AddEditPurchaseController extends ChangeNotifier {
       isDeductible: isDeductible,
       notes: notesController.text.trim(),
       attachmentPath: attachmentPath,
+      secondaryAttachmentPaths: secondaryAttachmentPaths,
+      secondaryAttachmentNames: secondaryAttachmentNames,
       subItems: subItems,
     );
   }

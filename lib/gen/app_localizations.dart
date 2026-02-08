@@ -182,6 +182,24 @@ abstract class AppLocalizations {
   /// **'Export läuft…'**
   String get exportInProgressMessage;
 
+  /// No description provided for @exportDateRangeTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Exportzeitraum auswählen'**
+  String get exportDateRangeTitle;
+
+  /// No description provided for @confirmDateRangeAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeitraum verwenden'**
+  String get confirmDateRangeAction;
+
+  /// No description provided for @noItemsInDateRangeMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Im ausgewählten Zeitraum wurden keine Ausgaben gefunden.'**
+  String get noItemsInDateRangeMessage;
+
   /// No description provided for @discardChangesTitle.
   ///
   /// In de, this message translates to:
@@ -199,6 +217,36 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Verwerfen'**
   String get discardChangesAction;
+
+  /// No description provided for @selectionCountLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'{count} ausgewählt'**
+  String selectionCountLabel(int count);
+
+  /// No description provided for @deleteSelectionTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Auswahl löschen'**
+  String get deleteSelectionTooltip;
+
+  /// No description provided for @clearSelectionTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Auswahl beenden'**
+  String get clearSelectionTooltip;
+
+  /// No description provided for @deleteSelectedExpensesTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Ausgewählte Ausgaben löschen?'**
+  String get deleteSelectedExpensesTitle;
+
+  /// No description provided for @deleteSelectedExpensesMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, one{# Eintrag wird gelöscht.} other{# Einträge werden gelöscht.}}'**
+  String deleteSelectedExpensesMessage(int count);
 
   /// No description provided for @subItemsExceedTotalValidation.
   ///
@@ -482,6 +530,12 @@ abstract class AppLocalizations {
   /// **'Kein lesbarer Text auf dem Beleg gefunden.'**
   String get ocrNoTextFound;
 
+  /// No description provided for @ocrNoTextFoundWithAttachment.
+  ///
+  /// In de, this message translates to:
+  /// **'Kein lesbarer Text auf dem Beleg gefunden. Das Belegfoto wurde angehängt.'**
+  String get ocrNoTextFoundWithAttachment;
+
   /// No description provided for @ocrAppliedMessage.
   ///
   /// In de, this message translates to:
@@ -494,6 +548,30 @@ abstract class AppLocalizations {
   /// **'Belegscan fehlgeschlagen. Bitte erneut versuchen.'**
   String get ocrErrorMessage;
 
+  /// No description provided for @imageSaveFailedMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Bild konnte nicht gespeichert werden.'**
+  String get imageSaveFailedMessage;
+
+  /// No description provided for @secondaryImageAddedMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Zusätzliches Bild hinzugefügt.'**
+  String get secondaryImageAddedMessage;
+
+  /// No description provided for @renameImageTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Bildname ändern'**
+  String get renameImageTitle;
+
+  /// No description provided for @nameLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Name'**
+  String get nameLabel;
+
   /// No description provided for @scanFromCameraAction.
   ///
   /// In de, this message translates to:
@@ -505,6 +583,84 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Aus Fotos auswählen'**
   String get scanFromGalleryAction;
+
+  /// No description provided for @receiptAttachedLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Beleg angehängt'**
+  String get receiptAttachedLabel;
+
+  /// No description provided for @scanningReceiptProgress.
+  ///
+  /// In de, this message translates to:
+  /// **'Pilo scannt deinen Beleg{dots}'**
+  String scanningReceiptProgress(Object dots);
+
+  /// No description provided for @receiptFileNotFoundMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Die Belegdatei wurde nicht gefunden.'**
+  String get receiptFileNotFoundMessage;
+
+  /// No description provided for @receiptSectionTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Beleg'**
+  String get receiptSectionTitle;
+
+  /// No description provided for @downloadReceiptAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Beleg herunterladen'**
+  String get downloadReceiptAction;
+
+  /// No description provided for @additionalImagesSectionTitle.
+  ///
+  /// In de, this message translates to:
+  /// **'Zusätzliche Bilder'**
+  String get additionalImagesSectionTitle;
+
+  /// No description provided for @additionalImagesAddAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Zusätzliche Bilder hinzufügen'**
+  String get additionalImagesAddAction;
+
+  /// No description provided for @additionalImagesCountAction.
+  ///
+  /// In de, this message translates to:
+  /// **'Zusätzliche Bilder ({count})'**
+  String additionalImagesCountAction(int count);
+
+  /// No description provided for @renameImageTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Namen ändern'**
+  String get renameImageTooltip;
+
+  /// No description provided for @moveUpTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Nach oben'**
+  String get moveUpTooltip;
+
+  /// No description provided for @moveDownTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Nach unten'**
+  String get moveDownTooltip;
+
+  /// No description provided for @imageNumberLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Bild {index}'**
+  String imageNumberLabel(int index);
+
+  /// No description provided for @downloadNamedImageAction.
+  ///
+  /// In de, this message translates to:
+  /// **'{name} herunterladen'**
+  String downloadNamedImageAction(Object name);
 
   /// No description provided for @stepExpenseDetailsTitle.
   ///
@@ -566,6 +722,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{# Unterposition} other{# Unterpositionen}}'**
   String subItemsCountLabel(int count);
 
+  /// No description provided for @secondaryAttachmentsCountLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'{count, plural, one{# Zusatzbild} other{# Zusatzbilder}}'**
+  String secondaryAttachmentsCountLabel(int count);
+
   /// No description provided for @applySubItemsTotalAction.
   ///
   /// In de, this message translates to:
@@ -578,10 +740,16 @@ abstract class AppLocalizations {
   /// **'Summe Unterpositionen: {amount}'**
   String subItemsSumHint(Object amount);
 
+  /// No description provided for @minimumAmountFromSubItemsHint.
+  ///
+  /// In de, this message translates to:
+  /// **'Mindestbetrag basierend auf Unterpositionen: {amount}'**
+  String minimumAmountFromSubItemsHint(Object amount);
+
   /// No description provided for @pdfTitle.
   ///
   /// In de, this message translates to:
-  /// **'{account} – absetzbare Ausgaben'**
+  /// **'{account}'**
   String pdfTitle(Object account);
 
   /// No description provided for @pdfGeneratedAt.
@@ -589,6 +757,180 @@ abstract class AppLocalizations {
   /// In de, this message translates to:
   /// **'Erstellt am {date}'**
   String pdfGeneratedAt(Object date);
+
+  /// No description provided for @pdfMetaReportIdLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Report-ID'**
+  String get pdfMetaReportIdLabel;
+
+  /// No description provided for @pdfMetaAccountLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Konto'**
+  String get pdfMetaAccountLabel;
+
+  /// No description provided for @pdfMetaAccountNameLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Kontobezeichnung'**
+  String get pdfMetaAccountNameLabel;
+
+  /// No description provided for @pdfMetaPeriodLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Zeitraum'**
+  String get pdfMetaPeriodLabel;
+
+  /// No description provided for @pdfMetaCurrencyLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Währung'**
+  String get pdfMetaCurrencyLabel;
+
+  /// No description provided for @pdfMetaGeneratedAtUtcLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Erstellt um UTC (ISO-8601)'**
+  String get pdfMetaGeneratedAtUtcLabel;
+
+  /// No description provided for @pdfMetaSchemaLabel.
+  ///
+  /// In de, this message translates to:
+  /// **'Schema'**
+  String get pdfMetaSchemaLabel;
+
+  /// No description provided for @pdfHeaderId.
+  ///
+  /// In de, this message translates to:
+  /// **'ID'**
+  String get pdfHeaderId;
+
+  /// No description provided for @pdfUnknownId.
+  ///
+  /// In de, this message translates to:
+  /// **'N/V'**
+  String get pdfUnknownId;
+
+  /// No description provided for @pdfSubItemCategory.
+  ///
+  /// In de, this message translates to:
+  /// **'Unterposition'**
+  String get pdfSubItemCategory;
+
+  /// No description provided for @excelSheetExpensesName.
+  ///
+  /// In de, this message translates to:
+  /// **'Ausgaben'**
+  String get excelSheetExpensesName;
+
+  /// No description provided for @excelSheetSummaryName.
+  ///
+  /// In de, this message translates to:
+  /// **'Zusammenfassung'**
+  String get excelSheetSummaryName;
+
+  /// No description provided for @excelHeaderExpenseId.
+  ///
+  /// In de, this message translates to:
+  /// **'Ausgaben-ID'**
+  String get excelHeaderExpenseId;
+
+  /// No description provided for @excelHeaderDate.
+  ///
+  /// In de, this message translates to:
+  /// **'Datum'**
+  String get excelHeaderDate;
+
+  /// No description provided for @excelHeaderCompanyRegisterNumber.
+  ///
+  /// In de, this message translates to:
+  /// **'Firmenbuchnummer'**
+  String get excelHeaderCompanyRegisterNumber;
+
+  /// No description provided for @excelHeaderVendor.
+  ///
+  /// In de, this message translates to:
+  /// **'Anbieter'**
+  String get excelHeaderVendor;
+
+  /// No description provided for @excelHeaderDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Beschreibung'**
+  String get excelHeaderDescription;
+
+  /// No description provided for @excelHeaderCategory.
+  ///
+  /// In de, this message translates to:
+  /// **'Kategorie'**
+  String get excelHeaderCategory;
+
+  /// No description provided for @excelHeaderAmountEur.
+  ///
+  /// In de, this message translates to:
+  /// **'Betrag EUR'**
+  String get excelHeaderAmountEur;
+
+  /// No description provided for @excelHeaderDeductible.
+  ///
+  /// In de, this message translates to:
+  /// **'Absetzbar'**
+  String get excelHeaderDeductible;
+
+  /// No description provided for @excelHeaderNotes.
+  ///
+  /// In de, this message translates to:
+  /// **'Notizen'**
+  String get excelHeaderNotes;
+
+  /// No description provided for @excelHeaderSubItemDescription.
+  ///
+  /// In de, this message translates to:
+  /// **'Unterpositionsbeschreibung'**
+  String get excelHeaderSubItemDescription;
+
+  /// No description provided for @excelHeaderSubItemAmountEur.
+  ///
+  /// In de, this message translates to:
+  /// **'Unterpositionsbetrag EUR'**
+  String get excelHeaderSubItemAmountEur;
+
+  /// No description provided for @excelSummaryHeaderAccount.
+  ///
+  /// In de, this message translates to:
+  /// **'Konto'**
+  String get excelSummaryHeaderAccount;
+
+  /// No description provided for @excelSummaryHeaderEntries.
+  ///
+  /// In de, this message translates to:
+  /// **'Einträge'**
+  String get excelSummaryHeaderEntries;
+
+  /// No description provided for @excelSummaryHeaderTotalEur.
+  ///
+  /// In de, this message translates to:
+  /// **'Gesamt EUR'**
+  String get excelSummaryHeaderTotalEur;
+
+  /// No description provided for @excelSummaryHeaderDeductibleEur.
+  ///
+  /// In de, this message translates to:
+  /// **'Absetzbar EUR'**
+  String get excelSummaryHeaderDeductibleEur;
+
+  /// No description provided for @excelSummaryHeaderNonDeductibleEur.
+  ///
+  /// In de, this message translates to:
+  /// **'Nicht absetzbar EUR'**
+  String get excelSummaryHeaderNonDeductibleEur;
+
+  /// No description provided for @excelFileNamePrefix.
+  ///
+  /// In de, this message translates to:
+  /// **'ausgaben_steuerberatung'**
+  String get excelFileNamePrefix;
 
   /// No description provided for @pdfHeaderDate.
   ///

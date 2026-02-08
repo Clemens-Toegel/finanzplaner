@@ -21,6 +21,8 @@ abstract class PurchaseItem with _$PurchaseItem {
     required bool isDeductible,
     required String notes,
     String? attachmentPath,
+    @Default(<String>[]) List<String> secondaryAttachmentPaths,
+    @Default(<String>[]) List<String> secondaryAttachmentNames,
     @Default(<ExpenseSubItem>[]) List<ExpenseSubItem> subItems,
   }) = _PurchaseItem;
 
@@ -41,12 +43,23 @@ abstract class PurchaseItem with _$PurchaseItem {
       'deductible': isDeductible ? 1 : 0,
       'notes': notes,
       'attachment_path': attachmentPath,
+      'secondary_attachment_paths': jsonEncode(secondaryAttachmentPaths),
+      'secondary_attachment_names': jsonEncode(secondaryAttachmentNames),
       'sub_items': jsonEncode(subItems.map((item) => item.toJson()).toList()),
     };
   }
 
   factory PurchaseItem.fromMap(Map<String, Object?> map) {
     final rawSubItems = map['sub_items'] as String?;
+    final rawSecondaryAttachmentPaths =
+        map['secondary_attachment_paths'] as String?;
+    final rawSecondaryAttachmentNames =
+        map['secondary_attachment_names'] as String?;
+    final secondaryPaths = _decodeStringList(rawSecondaryAttachmentPaths);
+    final secondaryNames = _normalizeSecondaryAttachmentNames(
+      paths: secondaryPaths,
+      rawNames: _decodeStringList(rawSecondaryAttachmentNames),
+    );
 
     return PurchaseItem(
       id: map['id'] as int?,
@@ -61,8 +74,57 @@ abstract class PurchaseItem with _$PurchaseItem {
       isDeductible: (map['deductible'] as int? ?? 0) == 1,
       notes: map['notes'] as String? ?? '',
       attachmentPath: (map['attachment_path'] as String?)?.trim(),
+      secondaryAttachmentPaths: secondaryPaths,
+      secondaryAttachmentNames: secondaryNames,
       subItems: _decodeSubItems(rawSubItems),
     );
+  }
+
+  static List<String> _decodeStringList(String? rawList) {
+    if (rawList == null || rawList.trim().isEmpty) {
+      return const [];
+    }
+
+    try {
+      final decoded = jsonDecode(rawList);
+      if (decoded is! List) {
+        return const [];
+      }
+      return decoded
+          .whereType<String>()
+          .map((entry) => entry.trim())
+          .where((entry) => entry.isNotEmpty)
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  static List<String> _normalizeSecondaryAttachmentNames({
+    required List<String> paths,
+    required List<String> rawNames,
+  }) {
+    if (paths.isEmpty) {
+      return const [];
+    }
+
+    final names = <String>[];
+    for (var i = 0; i < paths.length; i++) {
+      final candidate = i < rawNames.length ? rawNames[i].trim() : '';
+      names.add(candidate.isEmpty ? _filenameForPath(paths[i]) : candidate);
+    }
+    return names;
+  }
+
+  static String _filenameForPath(String path) {
+    final normalized = path.replaceAll('\\', '/');
+    final segments = normalized
+        .split('/')
+        .where((segment) => segment.isNotEmpty);
+    if (segments.isEmpty) {
+      return 'Bild';
+    }
+    return segments.last;
   }
 
   static List<ExpenseSubItem> _decodeSubItems(String? rawSubItems) {
