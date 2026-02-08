@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../gen/app_localizations.dart';
 import '../models/purchase_item.dart';
+import '../services/pdf_exporter.dart';
 import '../widgets/info_chip.dart';
 
 enum PurchaseDetailAction { edit, delete }
@@ -37,6 +38,24 @@ class PurchaseDetailPage extends StatelessWidget {
     ], sharePositionOrigin: Rect.fromLTWH(0, 0, 1, 1));
   }
 
+  Future<void> _exportExpensePdf(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await PdfExporter().exportPurchases(
+        account: item.accountType,
+        items: [item],
+        localizations: l10n,
+      );
+    } catch (_) {
+      if (!context.mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.exportSingleExpensePdfErrorMessage)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -53,6 +72,11 @@ class PurchaseDetailPage extends StatelessWidget {
             onPressed: () {
               Navigator.pop(context, PurchaseDetailAction.edit);
             },
+          ),
+          IconButton(
+            tooltip: l10n.exportSingleExpensePdfTooltip,
+            icon: const Icon(Icons.picture_as_pdf_outlined),
+            onPressed: () => _exportExpensePdf(context),
           ),
           IconButton(
             tooltip: l10n.deletePurchaseAction,

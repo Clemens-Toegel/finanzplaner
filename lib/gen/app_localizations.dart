@@ -116,6 +116,18 @@ abstract class AppLocalizations {
   /// **'PDF exportieren'**
   String get exportPdfTooltip;
 
+  /// No description provided for @exportSingleExpensePdfTooltip.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Ausgabe als PDF exportieren'**
+  String get exportSingleExpensePdfTooltip;
+
+  /// No description provided for @exportSingleExpensePdfErrorMessage.
+  ///
+  /// In de, this message translates to:
+  /// **'Diese Ausgabe konnte nicht als PDF exportiert werden.'**
+  String get exportSingleExpensePdfErrorMessage;
+
   /// No description provided for @expenseAccountLabel.
   ///
   /// In de, this message translates to:

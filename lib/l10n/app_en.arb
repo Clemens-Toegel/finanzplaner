@@ -3,6 +3,8 @@
   "appTitle": "Pilo",
   "taxRefundPurchasesTitle": "Pilo",
   "exportPdfTooltip": "Export PDF",
+  "exportSingleExpensePdfTooltip": "Export this expense as PDF",
+  "exportSingleExpensePdfErrorMessage": "Could not export this expense as PDF.",
   "expenseAccountLabel": "Expense account",
   "accountSettingsTitle": "Account settings",
   "accountDisplayNameLabel": "Account display name",
