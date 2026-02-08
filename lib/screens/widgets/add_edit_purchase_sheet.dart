@@ -23,6 +23,8 @@ class AddEditPurchaseSheet extends StatelessWidget {
     required this.dateFormat,
     required this.currencyFormat,
     this.item,
+    this.initialScanMode,
+    this.initialScanSource = BillImageSource.camera,
   });
 
   final ExpenseAccountType selectedAccount;
@@ -30,6 +32,8 @@ class AddEditPurchaseSheet extends StatelessWidget {
   final OfflineBillOcrService ocrService;
   final DateFormat dateFormat;
   final NumberFormat currencyFormat;
+  final BillScanMode? initialScanMode;
+  final BillImageSource initialScanSource;
 
   @override
   Widget build(BuildContext context) {
@@ -49,26 +53,73 @@ class AddEditPurchaseSheet extends StatelessWidget {
         ocrService: ocrService,
         dateFormat: dateFormat,
         currencyFormat: currencyFormat,
+        initialScanMode: initialScanMode,
+        initialScanSource: initialScanSource,
       ),
     );
   }
 }
 
-class _AddEditPurchaseSheetContent extends StatelessWidget {
-  _AddEditPurchaseSheetContent({
+class _AddEditPurchaseSheetContent extends StatefulWidget {
+  const _AddEditPurchaseSheetContent({
     required this.selectedAccount,
     required this.item,
     required this.ocrService,
     required this.dateFormat,
     required this.currencyFormat,
+    required this.initialScanMode,
+    required this.initialScanSource,
   });
 
-  final _formKey = GlobalKey<FormState>();
   final ExpenseAccountType selectedAccount;
   final PurchaseItem? item;
   final OfflineBillOcrService ocrService;
   final DateFormat dateFormat;
   final NumberFormat currencyFormat;
+  final BillScanMode? initialScanMode;
+  final BillImageSource initialScanSource;
+
+  @override
+  State<_AddEditPurchaseSheetContent> createState() =>
+      _AddEditPurchaseSheetContentState();
+}
+
+class _AddEditPurchaseSheetContentState
+    extends State<_AddEditPurchaseSheetContent> {
+  final _formKey = GlobalKey<FormState>();
+  bool _didRunInitialScan = false;
+
+  ExpenseAccountType get selectedAccount => widget.selectedAccount;
+
+  PurchaseItem? get item => widget.item;
+
+  OfflineBillOcrService get ocrService => widget.ocrService;
+
+  DateFormat get dateFormat => widget.dateFormat;
+
+  NumberFormat get currencyFormat => widget.currencyFormat;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didRunInitialScan || widget.initialScanMode == null) {
+      return;
+    }
+
+    _didRunInitialScan = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      final controller = context.read<AddEditPurchaseController>();
+      _scanBill(
+        context,
+        controller,
+        widget.initialScanMode!,
+        source: widget.initialScanSource,
+      );
+    });
+  }
 
   Color _accountColor() {
     return selectedAccount == ExpenseAccountType.business
@@ -151,7 +202,7 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
 
       if (data.rawText.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.ocrNoTextFound} – Beleg angehängt.')),
+          SnackBar(content: Text(l10n.ocrNoTextFoundWithAttachment)),
         );
         return;
       }
@@ -173,12 +224,9 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
     }
   }
 
-  Future<void> _scanA4Bill(
-    BuildContext context,
-    AddEditPurchaseController controller,
-  ) async {
+  Future<BillImageSource?> _pickImageSource(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final source = await showModalBottomSheet<BillImageSource>(
+    return showModalBottomSheet<BillImageSource>(
       context: context,
       builder: (context) {
         return SafeArea(
@@ -200,12 +248,150 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _scanA4Bill(
+    BuildContext context,
+    AddEditPurchaseController controller,
+  ) async {
+    final source = await _pickImageSource(context);
 
     if (source == null || !context.mounted) {
       return;
     }
 
     await _scanBill(context, controller, BillScanMode.a4Bill, source: source);
+  }
+
+  Future<void> _addSecondaryImage(
+    BuildContext context,
+    AddEditPurchaseController controller,
+  ) async {
+    final source = await _pickImageSource(context);
+    if (source == null || !context.mounted) {
+      return;
+    }
+
+    final sourcePath = await ocrService.pickBillImage(source: source);
+    if (sourcePath == null || !context.mounted) {
+      return;
+    }
+
+    final storedPath = await ocrService.persistAttachment(sourcePath);
+    if (!context.mounted) {
+      return;
+    }
+    if (storedPath == null) {
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.imageSaveFailedMessage)));
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context)!;
+    controller.addSecondaryAttachmentPath(storedPath);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.secondaryImageAddedMessage)));
+  }
+
+  Future<void> _removeSecondaryImage(
+    BuildContext context,
+    AddEditPurchaseController controller,
+    int index,
+  ) async {
+    if (index < 0 || index >= controller.secondaryAttachmentPaths.length) {
+      return;
+    }
+
+    final path = controller.secondaryAttachmentPaths[index];
+    final initialPaths = item?.secondaryAttachmentPaths ?? const <String>[];
+    controller.removeSecondaryAttachmentAt(index);
+
+    if (!initialPaths.contains(path)) {
+      await ocrService.deleteStoredAttachment(path);
+    }
+  }
+
+  ({String name, String extension}) _splitNameAndExtension(String filename) {
+    final trimmed = filename.trim();
+    if (trimmed.isEmpty) {
+      return (name: '', extension: '');
+    }
+
+    final dotIndex = trimmed.lastIndexOf('.');
+    if (dotIndex <= 0 || dotIndex == trimmed.length - 1) {
+      return (name: trimmed, extension: '');
+    }
+
+    return (
+      name: trimmed.substring(0, dotIndex),
+      extension: trimmed.substring(dotIndex),
+    );
+  }
+
+  Future<void> _renameSecondaryImage(
+    BuildContext context,
+    AddEditPurchaseController controller,
+    int index,
+  ) async {
+    if (index < 0 || index >= controller.secondaryAttachmentNames.length) {
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context)!;
+    final currentName = controller.secondaryAttachmentNames[index];
+    final splitName = _splitNameAndExtension(currentName);
+
+    final nameController = TextEditingController(text: splitName.name);
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.renameImageTitle),
+        content: TextField(
+          controller: nameController,
+          decoration: InputDecoration(
+            labelText: l10n.nameLabel,
+            suffixText: splitName.extension.isEmpty
+                ? null
+                : splitName.extension,
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.cancelAction),
+          ),
+          FilledButton(
+            onPressed: () {
+              final baseName = nameController.text.trim();
+              if (baseName.isEmpty) {
+                Navigator.pop(dialogContext, '');
+                return;
+              }
+              Navigator.pop(dialogContext, '$baseName${splitName.extension}');
+            },
+            child: Text(l10n.savePurchaseAction),
+          ),
+        ],
+      ),
+    );
+
+    if (newName == null) {
+      return;
+    }
+
+    controller.renameSecondaryAttachment(index, newName);
+  }
+
+  void _moveSecondaryImage(
+    AddEditPurchaseController controller,
+    int oldIndex,
+    int newIndex,
+  ) {
+    controller.moveSecondaryAttachment(oldIndex, newIndex);
   }
 
   Future<void> _addOrEditSubItem(
@@ -402,6 +588,26 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
                               controller,
                               index: index,
                             ),
+                            onAddSecondaryImage: () =>
+                                _addSecondaryImage(sheetContext, controller),
+                            onRemoveSecondaryImage: (index) =>
+                                _removeSecondaryImage(
+                                  sheetContext,
+                                  controller,
+                                  index,
+                                ),
+                            onMoveSecondaryImage: (oldIndex, newIndex) =>
+                                _moveSecondaryImage(
+                                  controller,
+                                  oldIndex,
+                                  newIndex,
+                                ),
+                            onRenameSecondaryImage: (index) =>
+                                _renameSecondaryImage(
+                                  sheetContext,
+                                  controller,
+                                  index,
+                                ),
                           ),
                           const AddEditPurchaseNotesStep(),
                         ],
@@ -462,6 +668,20 @@ class _AddEditPurchaseSheetContent extends StatelessWidget {
           return;
         }
       }
+
+      final initialSecondary =
+          item?.secondaryAttachmentPaths ?? const <String>[];
+      final currentSecondary = controller.secondaryAttachmentPaths;
+      final newlyAddedSecondary = currentSecondary
+          .where((path) => !initialSecondary.contains(path))
+          .toList();
+      for (final path in newlyAddedSecondary) {
+        await ocrService.deleteStoredAttachment(path);
+      }
+      if (!context.mounted) {
+        return;
+      }
+
       Navigator.of(context).pop();
     }
   }

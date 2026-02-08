@@ -48,6 +48,20 @@ class OfflineBillOcrService {
     return _extractData(rawText, mode: mode, sourceFilePath: image.path);
   }
 
+  Future<String?> pickBillImage({
+    BillImageSource source = BillImageSource.camera,
+  }) async {
+    final image = await _picker.pickImage(
+      source: source == BillImageSource.camera
+          ? ImageSource.camera
+          : ImageSource.gallery,
+      imageQuality: 92,
+      maxWidth: 2600,
+    );
+
+    return image?.path;
+  }
+
   OcrBillData _extractData(
     String rawText, {
     required BillScanMode mode,

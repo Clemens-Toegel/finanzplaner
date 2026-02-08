@@ -53,6 +53,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportInProgressMessage => 'Export in progress…';
 
   @override
+  String get exportDateRangeTitle => 'Select export period';
+
+  @override
+  String get confirmDateRangeAction => 'Use range';
+
+  @override
+  String get noItemsInDateRangeMessage =>
+      'No expenses found in the selected date range.';
+
+  @override
   String get discardChangesTitle => 'Discard changes?';
 
   @override
@@ -60,6 +70,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discardChangesAction => 'Discard';
+
+  @override
+  String selectionCountLabel(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get deleteSelectionTooltip => 'Delete selection';
+
+  @override
+  String get clearSelectionTooltip => 'End selection';
+
+  @override
+  String get deleteSelectedExpensesTitle => 'Delete selected expenses?';
+
+  @override
+  String deleteSelectedExpensesMessage(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# entries will be deleted.',
+      one: '# entry will be deleted.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get subItemsExceedTotalValidation =>
@@ -217,16 +252,80 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ocrNoTextFound => 'No readable text found on the bill.';
 
   @override
+  String get ocrNoTextFoundWithAttachment =>
+      'No readable text found on the bill. The receipt image was attached.';
+
+  @override
   String get ocrAppliedMessage => 'Bill data was inserted into the form.';
 
   @override
   String get ocrErrorMessage => 'Bill scan failed. Please try again.';
 
   @override
+  String get imageSaveFailedMessage => 'Image could not be saved.';
+
+  @override
+  String get secondaryImageAddedMessage => 'Additional image added.';
+
+  @override
+  String get renameImageTitle => 'Rename image';
+
+  @override
+  String get nameLabel => 'Name';
+
+  @override
   String get scanFromCameraAction => 'Take photo';
 
   @override
   String get scanFromGalleryAction => 'Choose from photos';
+
+  @override
+  String get receiptAttachedLabel => 'Receipt attached';
+
+  @override
+  String scanningReceiptProgress(Object dots) {
+    return 'Pilo is scanning your receipt$dots';
+  }
+
+  @override
+  String get receiptFileNotFoundMessage =>
+      'The receipt file could not be found.';
+
+  @override
+  String get receiptSectionTitle => 'Receipt';
+
+  @override
+  String get downloadReceiptAction => 'Download receipt';
+
+  @override
+  String get additionalImagesSectionTitle => 'Additional images';
+
+  @override
+  String get additionalImagesAddAction => 'Add additional images';
+
+  @override
+  String additionalImagesCountAction(int count) {
+    return 'Additional images ($count)';
+  }
+
+  @override
+  String get renameImageTooltip => 'Rename';
+
+  @override
+  String get moveUpTooltip => 'Move up';
+
+  @override
+  String get moveDownTooltip => 'Move down';
+
+  @override
+  String imageNumberLabel(int index) {
+    return 'Image $index';
+  }
+
+  @override
+  String downloadNamedImageAction(Object name) {
+    return 'Download $name';
+  }
 
   @override
   String get stepExpenseDetailsTitle => 'Expense details';
@@ -268,6 +367,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String secondaryAttachmentsCountLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# additional images',
+      one: '# additional image',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get applySubItemsTotalAction =>
       'Use sub-items total as expense amount';
 
@@ -277,14 +387,106 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String minimumAmountFromSubItemsHint(Object amount) {
+    return 'Minimum amount based on sub-items: $amount';
+  }
+
+  @override
   String pdfTitle(Object account) {
-    return '$account – deductible expenses';
+    return '$account';
   }
 
   @override
   String pdfGeneratedAt(Object date) {
     return 'Generated on $date';
   }
+
+  @override
+  String get pdfMetaReportIdLabel => 'Report ID';
+
+  @override
+  String get pdfMetaAccountLabel => 'Account';
+
+  @override
+  String get pdfMetaAccountNameLabel => 'Account name';
+
+  @override
+  String get pdfMetaPeriodLabel => 'Period';
+
+  @override
+  String get pdfMetaCurrencyLabel => 'Currency';
+
+  @override
+  String get pdfMetaGeneratedAtUtcLabel => 'Generated at UTC (ISO-8601)';
+
+  @override
+  String get pdfMetaSchemaLabel => 'Schema';
+
+  @override
+  String get pdfHeaderId => 'ID';
+
+  @override
+  String get pdfUnknownId => 'N/A';
+
+  @override
+  String get pdfSubItemCategory => 'Sub-item';
+
+  @override
+  String get excelSheetExpensesName => 'Expenses';
+
+  @override
+  String get excelSheetSummaryName => 'Summary';
+
+  @override
+  String get excelHeaderExpenseId => 'Expense ID';
+
+  @override
+  String get excelHeaderDate => 'Date';
+
+  @override
+  String get excelHeaderCompanyRegisterNumber => 'Company Register Number';
+
+  @override
+  String get excelHeaderVendor => 'Vendor';
+
+  @override
+  String get excelHeaderDescription => 'Description';
+
+  @override
+  String get excelHeaderCategory => 'Category';
+
+  @override
+  String get excelHeaderAmountEur => 'Amount EUR';
+
+  @override
+  String get excelHeaderDeductible => 'Deductible';
+
+  @override
+  String get excelHeaderNotes => 'Notes';
+
+  @override
+  String get excelHeaderSubItemDescription => 'Sub-item Description';
+
+  @override
+  String get excelHeaderSubItemAmountEur => 'Sub-item Amount EUR';
+
+  @override
+  String get excelSummaryHeaderAccount => 'Account';
+
+  @override
+  String get excelSummaryHeaderEntries => 'Entries';
+
+  @override
+  String get excelSummaryHeaderTotalEur => 'Total EUR';
+
+  @override
+  String get excelSummaryHeaderDeductibleEur => 'Deductible EUR';
+
+  @override
+  String get excelSummaryHeaderNonDeductibleEur => 'Non-deductible EUR';
+
+  @override
+  String get excelFileNamePrefix => 'expenses_tax_consultant';
 
   @override
   String get pdfHeaderDate => 'Date';

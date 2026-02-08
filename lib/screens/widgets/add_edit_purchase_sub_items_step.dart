@@ -11,10 +11,18 @@ class AddEditPurchaseSubItemsStep extends StatelessWidget {
     super.key,
     required this.currencyFormat,
     required this.onAddOrEditSubItem,
+    required this.onAddSecondaryImage,
+    required this.onRemoveSecondaryImage,
+    required this.onMoveSecondaryImage,
+    required this.onRenameSecondaryImage,
   });
 
   final NumberFormat currencyFormat;
   final Future<void> Function({int? index}) onAddOrEditSubItem;
+  final Future<void> Function() onAddSecondaryImage;
+  final Future<void> Function(int index) onRemoveSecondaryImage;
+  final void Function(int oldIndex, int newIndex) onMoveSecondaryImage;
+  final Future<void> Function(int index) onRenameSecondaryImage;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +37,8 @@ class AddEditPurchaseSubItemsStep extends StatelessWidget {
             bool canAddSubItem,
             bool subItemsOverAllocated,
             List<ExpenseSubItem> subItems,
+            List<String> secondaryAttachmentPaths,
+            List<String> secondaryAttachmentNames,
           })
         >(
           (c) => (
@@ -37,6 +47,8 @@ class AddEditPurchaseSubItemsStep extends StatelessWidget {
             canAddSubItem: c.canAddSubItem,
             subItemsOverAllocated: c.subItemsOverAllocated,
             subItems: c.subItems,
+            secondaryAttachmentPaths: c.secondaryAttachmentPaths,
+            secondaryAttachmentNames: c.secondaryAttachmentNames,
           ),
         );
 
@@ -92,6 +104,73 @@ class AddEditPurchaseSubItemsStep extends StatelessWidget {
             label: Text(l10n.addSubItemAction),
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: OutlinedButton.icon(
+            onPressed: onAddSecondaryImage,
+            icon: const Icon(Icons.add_photo_alternate_outlined),
+            label: Text(
+              vm.secondaryAttachmentPaths.isEmpty
+                  ? l10n.additionalImagesAddAction
+                  : l10n.additionalImagesCountAction(
+                      vm.secondaryAttachmentPaths.length,
+                    ),
+            ),
+          ),
+        ),
+        if (vm.secondaryAttachmentPaths.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Column(
+              spacing: 8,
+              children: vm.secondaryAttachmentPaths.asMap().entries.map((
+                entry,
+              ) {
+                final index = entry.key;
+                return Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.image_outlined),
+                    title: Text(vm.secondaryAttachmentNames[index]),
+                    subtitle: Text(
+                      entry.value.split('/').last,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: Wrap(
+                      spacing: 0,
+                      children: [
+                        IconButton(
+                          tooltip: l10n.renameImageTooltip,
+                          onPressed: () => onRenameSecondaryImage(index),
+                          icon: const Icon(Icons.drive_file_rename_outline),
+                        ),
+                        IconButton(
+                          tooltip: l10n.moveUpTooltip,
+                          onPressed: index == 0
+                              ? null
+                              : () => onMoveSecondaryImage(index, index - 1),
+                          icon: const Icon(Icons.keyboard_arrow_up),
+                        ),
+                        IconButton(
+                          tooltip: l10n.moveDownTooltip,
+                          onPressed:
+                              index == vm.secondaryAttachmentPaths.length - 1
+                              ? null
+                              : () => onMoveSecondaryImage(index, index + 1),
+                          icon: const Icon(Icons.keyboard_arrow_down),
+                        ),
+                        IconButton(
+                          tooltip: l10n.deletePurchaseAction,
+                          onPressed: () => onRemoveSecondaryImage(index),
+                          icon: const Icon(Icons.delete_outline),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
         if (vm.subItemsOverAllocated)
           Padding(
             padding: const EdgeInsets.only(top: 10),

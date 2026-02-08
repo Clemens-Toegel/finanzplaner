@@ -14,9 +14,31 @@
   "exportExcelForTaxConsultantAction": "Excel für die Steuerberatung exportieren",
   "exportExcelSuccessMessage": "Excel-Datei ist zum Teilen bereit.",
   "exportInProgressMessage": "Export läuft…",
+  "exportDateRangeTitle": "Exportzeitraum auswählen",
+  "confirmDateRangeAction": "Zeitraum verwenden",
+  "noItemsInDateRangeMessage": "Im ausgewählten Zeitraum wurden keine Ausgaben gefunden.",
   "discardChangesTitle": "Änderungen verwerfen?",
   "discardChangesMessage": "Du hast ungespeicherte Änderungen in diesem Formular.",
   "discardChangesAction": "Verwerfen",
+  "selectionCountLabel": "{count} ausgewählt",
+  "@selectionCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteSelectionTooltip": "Auswahl löschen",
+  "clearSelectionTooltip": "Auswahl beenden",
+  "deleteSelectedExpensesTitle": "Ausgewählte Ausgaben löschen?",
+  "deleteSelectedExpensesMessage": "{count, plural, one{# Eintrag wird gelöscht.} other{# Einträge werden gelöscht.}}",
+  "@deleteSelectedExpensesMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "subItemsExceedTotalValidation": "Unterpositionen dürfen nicht höher als der Ausgabenbetrag sein.",
   "subItemAmountExceedsTotalValidation": "Diese Unterposition ist höher als der Ausgabenbetrag.",
   "remainingForSubItemsLabel": "Verbleibend für Unterpositionen",
@@ -76,10 +98,52 @@
   "scanReceiptAction": "Kassenbon scannen",
   "scanDocumentAction": "A4-Rechnung scannen",
   "ocrNoTextFound": "Kein lesbarer Text auf dem Beleg gefunden.",
+  "ocrNoTextFoundWithAttachment": "Kein lesbarer Text auf dem Beleg gefunden. Das Belegfoto wurde angehängt.",
   "ocrAppliedMessage": "Belegdaten wurden in das Formular übernommen.",
   "ocrErrorMessage": "Belegscan fehlgeschlagen. Bitte erneut versuchen.",
+  "imageSaveFailedMessage": "Bild konnte nicht gespeichert werden.",
+  "secondaryImageAddedMessage": "Zusätzliches Bild hinzugefügt.",
+  "renameImageTitle": "Bildname ändern",
+  "nameLabel": "Name",
   "scanFromCameraAction": "Foto aufnehmen",
   "scanFromGalleryAction": "Aus Fotos auswählen",
+  "receiptAttachedLabel": "Beleg angehängt",
+  "scanningReceiptProgress": "Pilo scannt deinen Beleg{dots}",
+  "@scanningReceiptProgress": {
+    "placeholders": {
+      "dots": {}
+    }
+  },
+  "receiptFileNotFoundMessage": "Die Belegdatei wurde nicht gefunden.",
+  "receiptSectionTitle": "Beleg",
+  "downloadReceiptAction": "Beleg herunterladen",
+  "additionalImagesSectionTitle": "Zusätzliche Bilder",
+  "additionalImagesAddAction": "Zusätzliche Bilder hinzufügen",
+  "additionalImagesCountAction": "Zusätzliche Bilder ({count})",
+  "@additionalImagesCountAction": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "renameImageTooltip": "Namen ändern",
+  "moveUpTooltip": "Nach oben",
+  "moveDownTooltip": "Nach unten",
+  "imageNumberLabel": "Bild {index}",
+  "@imageNumberLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadNamedImageAction": "{name} herunterladen",
+  "@downloadNamedImageAction": {
+    "placeholders": {
+      "name": {}
+    }
+  },
   "stepExpenseDetailsTitle": "Ausgabendetails",
   "stepSubItemsTitle": "Unterpositionen",
   "stepNextAction": "Weiter",
@@ -97,6 +161,14 @@
       }
     }
   },
+  "secondaryAttachmentsCountLabel": "{count, plural, one{# Zusatzbild} other{# Zusatzbilder}}",
+  "@secondaryAttachmentsCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "applySubItemsTotalAction": "Summe der Unterpositionen als Ausgabenbetrag verwenden",
   "subItemsSumHint": "Summe Unterpositionen: {amount}",
   "@subItemsSumHint": {
@@ -104,13 +176,48 @@
       "amount": {}
     }
   },
-  "pdfTitle": "{account} – absetzbare Ausgaben",
+  "minimumAmountFromSubItemsHint": "Mindestbetrag basierend auf Unterpositionen: {amount}",
+  "@minimumAmountFromSubItemsHint": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "pdfTitle": "{account}",
   "@pdfTitle": {
     "placeholders": {
       "account": {}
     }
   },
   "pdfGeneratedAt": "Erstellt am {date}",
+  "pdfMetaReportIdLabel": "Report-ID",
+  "pdfMetaAccountLabel": "Konto",
+  "pdfMetaAccountNameLabel": "Kontobezeichnung",
+  "pdfMetaPeriodLabel": "Zeitraum",
+  "pdfMetaCurrencyLabel": "Währung",
+  "pdfMetaGeneratedAtUtcLabel": "Erstellt um UTC (ISO-8601)",
+  "pdfMetaSchemaLabel": "Schema",
+  "pdfHeaderId": "ID",
+  "pdfUnknownId": "N/V",
+  "pdfSubItemCategory": "Unterposition",
+  "excelSheetExpensesName": "Ausgaben",
+  "excelSheetSummaryName": "Zusammenfassung",
+  "excelHeaderExpenseId": "Ausgaben-ID",
+  "excelHeaderDate": "Datum",
+  "excelHeaderCompanyRegisterNumber": "Firmenbuchnummer",
+  "excelHeaderVendor": "Anbieter",
+  "excelHeaderDescription": "Beschreibung",
+  "excelHeaderCategory": "Kategorie",
+  "excelHeaderAmountEur": "Betrag EUR",
+  "excelHeaderDeductible": "Absetzbar",
+  "excelHeaderNotes": "Notizen",
+  "excelHeaderSubItemDescription": "Unterpositionsbeschreibung",
+  "excelHeaderSubItemAmountEur": "Unterpositionsbetrag EUR",
+  "excelSummaryHeaderAccount": "Konto",
+  "excelSummaryHeaderEntries": "Einträge",
+  "excelSummaryHeaderTotalEur": "Gesamt EUR",
+  "excelSummaryHeaderDeductibleEur": "Absetzbar EUR",
+  "excelSummaryHeaderNonDeductibleEur": "Nicht absetzbar EUR",
+  "excelFileNamePrefix": "ausgaben_steuerberatung",
   "@pdfGeneratedAt": {
     "placeholders": {
       "date": {}

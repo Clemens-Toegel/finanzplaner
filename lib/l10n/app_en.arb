@@ -14,9 +14,31 @@
   "exportExcelForTaxConsultantAction": "Export Excel for tax consultant",
   "exportExcelSuccessMessage": "Excel file is ready to share.",
   "exportInProgressMessage": "Export in progress…",
+  "exportDateRangeTitle": "Select export period",
+  "confirmDateRangeAction": "Use range",
+  "noItemsInDateRangeMessage": "No expenses found in the selected date range.",
   "discardChangesTitle": "Discard changes?",
   "discardChangesMessage": "You have unsaved changes in this form.",
   "discardChangesAction": "Discard",
+  "selectionCountLabel": "{count} selected",
+  "@selectionCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteSelectionTooltip": "Delete selection",
+  "clearSelectionTooltip": "End selection",
+  "deleteSelectedExpensesTitle": "Delete selected expenses?",
+  "deleteSelectedExpensesMessage": "{count, plural, one{# entry will be deleted.} other{# entries will be deleted.}}",
+  "@deleteSelectedExpensesMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "subItemsExceedTotalValidation": "Sub-items cannot be higher than the expense total.",
   "subItemAmountExceedsTotalValidation": "This sub-item is higher than the expense total.",
   "remainingForSubItemsLabel": "Remaining for sub-items",
@@ -76,10 +98,52 @@
   "scanReceiptAction": "Scan receipt",
   "scanDocumentAction": "Scan A4 bill",
   "ocrNoTextFound": "No readable text found on the bill.",
+  "ocrNoTextFoundWithAttachment": "No readable text found on the bill. The receipt image was attached.",
   "ocrAppliedMessage": "Bill data was inserted into the form.",
   "ocrErrorMessage": "Bill scan failed. Please try again.",
+  "imageSaveFailedMessage": "Image could not be saved.",
+  "secondaryImageAddedMessage": "Additional image added.",
+  "renameImageTitle": "Rename image",
+  "nameLabel": "Name",
   "scanFromCameraAction": "Take photo",
   "scanFromGalleryAction": "Choose from photos",
+  "receiptAttachedLabel": "Receipt attached",
+  "scanningReceiptProgress": "Pilo is scanning your receipt{dots}",
+  "@scanningReceiptProgress": {
+    "placeholders": {
+      "dots": {}
+    }
+  },
+  "receiptFileNotFoundMessage": "The receipt file could not be found.",
+  "receiptSectionTitle": "Receipt",
+  "downloadReceiptAction": "Download receipt",
+  "additionalImagesSectionTitle": "Additional images",
+  "additionalImagesAddAction": "Add additional images",
+  "additionalImagesCountAction": "Additional images ({count})",
+  "@additionalImagesCountAction": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "renameImageTooltip": "Rename",
+  "moveUpTooltip": "Move up",
+  "moveDownTooltip": "Move down",
+  "imageNumberLabel": "Image {index}",
+  "@imageNumberLabel": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadNamedImageAction": "Download {name}",
+  "@downloadNamedImageAction": {
+    "placeholders": {
+      "name": {}
+    }
+  },
   "stepExpenseDetailsTitle": "Expense details",
   "stepSubItemsTitle": "Sub-items",
   "stepNextAction": "Next",
@@ -97,6 +161,14 @@
       }
     }
   },
+  "secondaryAttachmentsCountLabel": "{count, plural, one{# additional image} other{# additional images}}",
+  "@secondaryAttachmentsCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "applySubItemsTotalAction": "Use sub-items total as expense amount",
   "subItemsSumHint": "Sub-items sum: {amount}",
   "@subItemsSumHint": {
@@ -104,13 +176,48 @@
       "amount": {}
     }
   },
-  "pdfTitle": "{account} – deductible expenses",
+  "minimumAmountFromSubItemsHint": "Minimum amount based on sub-items: {amount}",
+  "@minimumAmountFromSubItemsHint": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "pdfTitle": "{account}",
   "@pdfTitle": {
     "placeholders": {
       "account": {}
     }
   },
   "pdfGeneratedAt": "Generated on {date}",
+  "pdfMetaReportIdLabel": "Report ID",
+  "pdfMetaAccountLabel": "Account",
+  "pdfMetaAccountNameLabel": "Account name",
+  "pdfMetaPeriodLabel": "Period",
+  "pdfMetaCurrencyLabel": "Currency",
+  "pdfMetaGeneratedAtUtcLabel": "Generated at UTC (ISO-8601)",
+  "pdfMetaSchemaLabel": "Schema",
+  "pdfHeaderId": "ID",
+  "pdfUnknownId": "N/A",
+  "pdfSubItemCategory": "Sub-item",
+  "excelSheetExpensesName": "Expenses",
+  "excelSheetSummaryName": "Summary",
+  "excelHeaderExpenseId": "Expense ID",
+  "excelHeaderDate": "Date",
+  "excelHeaderCompanyRegisterNumber": "Company Register Number",
+  "excelHeaderVendor": "Vendor",
+  "excelHeaderDescription": "Description",
+  "excelHeaderCategory": "Category",
+  "excelHeaderAmountEur": "Amount EUR",
+  "excelHeaderDeductible": "Deductible",
+  "excelHeaderNotes": "Notes",
+  "excelHeaderSubItemDescription": "Sub-item Description",
+  "excelHeaderSubItemAmountEur": "Sub-item Amount EUR",
+  "excelSummaryHeaderAccount": "Account",
+  "excelSummaryHeaderEntries": "Entries",
+  "excelSummaryHeaderTotalEur": "Total EUR",
+  "excelSummaryHeaderDeductibleEur": "Deductible EUR",
+  "excelSummaryHeaderNonDeductibleEur": "Non-deductible EUR",
+  "excelFileNamePrefix": "expenses_tax_consultant",
   "@pdfGeneratedAt": {
     "placeholders": {
       "date": {}

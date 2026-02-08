@@ -21,6 +21,16 @@ _PurchaseItem _$PurchaseItemFromJson(Map<String, dynamic> json) =>
       isDeductible: json['isDeductible'] as bool,
       notes: json['notes'] as String,
       attachmentPath: json['attachmentPath'] as String?,
+      secondaryAttachmentPaths:
+          (json['secondaryAttachmentPaths'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const <String>[],
+      secondaryAttachmentNames:
+          (json['secondaryAttachmentNames'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const <String>[],
       subItems:
           (json['subItems'] as List<dynamic>?)
               ?.map((e) => ExpenseSubItem.fromJson(e as Map<String, dynamic>))
@@ -40,6 +50,8 @@ Map<String, dynamic> _$PurchaseItemToJson(_PurchaseItem instance) =>
       'isDeductible': instance.isDeductible,
       'notes': instance.notes,
       'attachmentPath': instance.attachmentPath,
+      'secondaryAttachmentPaths': instance.secondaryAttachmentPaths,
+      'secondaryAttachmentNames': instance.secondaryAttachmentNames,
       'subItems': instance.subItems,
     };
 
