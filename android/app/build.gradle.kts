@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.finanzplaner"
+    namespace = "at.toegel.pilo"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

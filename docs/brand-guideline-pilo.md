@@ -1,15 +1,15 @@
-# BelegPilot Brand Guideline (v1)
+# Pilo Brand Guideline (v1)
 
 ## 1) Brand foundation
 
 ### Brand name
-**BelegPilot**
+**Pilo**
 
 ### Mascot
 **Pilo the Owl** (smart, calm tax co-pilot)
 
 ### Brand promise
-BelegPilot helps people capture receipts quickly, organize expenses clearly, and export data with confidence.
+Pilo helps people capture receipts quickly, organize expenses clearly, and export data with confidence.
 
 ### Positioning
 A trustworthy, modern, privacy-aware expense and tax documentation app for freelancers, entrepreneurs, and private users.
@@ -42,10 +42,10 @@ A trustworthy, modern, privacy-aware expense and tax documentation app for freel
 ## 3) Logo system
 
 ### Primary logo
-**Compass + receipt mark + wordmark “BelegPilot”**
+**Compass + receipt mark + wordmark “Pilo”**
 
 ### Secondary logo
-Wordmark only (“BelegPilot”).
+Wordmark only (“Pilo”).
 
 ### Mascot lockup
 Pilo icon + wordmark for onboarding/marketing assets.
@@ -206,7 +206,7 @@ Friendly assistant for onboarding, guidance, and positive feedback.
 ## 11) App store metadata starter
 
 ### App title
-**BelegPilot**
+**Pilo**
 
 ### Subtitle (DE)
 **Belege scannen. Ausgaben ordnen. Alles im Blick.**
@@ -230,5 +230,5 @@ Friendly assistant for onboarding, guidance, and positive feedback.
 
 ## 13) Versioning
 
-This document is **Brand Guideline v1** for BelegPilot + Pilo.
+This document is **Brand Guideline v1** for Pilo + Pilo.
 Update when visual system, naming, or tone changes materially.
