@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../gen/app_localizations.dart';
@@ -153,6 +153,9 @@ class PurchaseHomeController extends ChangeNotifier {
     for (final item in selectedItems) {
       await _service.deletePurchase(item);
       await _offlineBillOcrService.deleteStoredAttachment(item.attachmentPath);
+      for (final path in item.secondaryAttachmentPaths) {
+        await _offlineBillOcrService.deleteStoredAttachment(path);
+      }
     }
 
     items = items.where((item) {
@@ -163,9 +166,17 @@ class PurchaseHomeController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> exportPdf(AppLocalizations localizations) async {
+  Future<bool> exportPdf(
+    AppLocalizations localizations, {
+    required DateTimeRange dateRange,
+  }) async {
     if (isExporting) {
-      return;
+      return false;
+    }
+
+    final filteredItems = _filterItemsByDateRange(items, dateRange);
+    if (filteredItems.isEmpty) {
+      return false;
     }
 
     isExporting = true;
@@ -173,10 +184,11 @@ class PurchaseHomeController extends ChangeNotifier {
     try {
       await _service.exportPdf(
         account: selectedAccount,
-        items: items,
+        items: filteredItems,
         localizations: localizations,
         accountSettings: accountSettings[selectedAccount],
       );
+      return true;
     } finally {
       isExporting = false;
       notifyListeners();
@@ -184,8 +196,9 @@ class PurchaseHomeController extends ChangeNotifier {
   }
 
   Future<bool> exportExcelForTaxConsultant(
-    AppLocalizations localizations,
-  ) async {
+    AppLocalizations localizations, {
+    required DateTimeRange dateRange,
+  }) async {
     if (isExporting) {
       return false;
     }
@@ -194,13 +207,14 @@ class PurchaseHomeController extends ChangeNotifier {
     notifyListeners();
     try {
       final accountItems = await _service.fetchPurchases(selectedAccount);
-      if (accountItems.isEmpty) {
+      final filteredItems = _filterItemsByDateRange(accountItems, dateRange);
+      if (filteredItems.isEmpty) {
         return false;
       }
 
       await _excelExporter.exportForTaxConsultant(
         account: selectedAccount,
-        items: accountItems,
+        items: filteredItems,
         accountSettings: accountSettings[selectedAccount],
         localizations: localizations,
       );
@@ -238,6 +252,15 @@ class PurchaseHomeController extends ChangeNotifier {
       await _offlineBillOcrService.deleteStoredAttachment(previousAttachment);
     }
 
+    final previousSecondary = previous?.secondaryAttachmentPaths ?? const [];
+    final nextSecondary = draft.secondaryAttachmentPaths;
+    final removedSecondary = previousSecondary
+        .where((path) => !nextSecondary.contains(path))
+        .toList();
+    for (final path in removedSecondary) {
+      await _offlineBillOcrService.deleteStoredAttachment(path);
+    }
+
     if (index != -1) {
       items = _sortItemsByDate(List.from(items)..[index] = draft);
       notifyListeners();
@@ -247,6 +270,9 @@ class PurchaseHomeController extends ChangeNotifier {
   Future<void> deletePurchase(PurchaseItem item) async {
     await _service.deletePurchase(item);
     await _offlineBillOcrService.deleteStoredAttachment(item.attachmentPath);
+    for (final path in item.secondaryAttachmentPaths) {
+      await _offlineBillOcrService.deleteStoredAttachment(path);
+    }
     final id = item.id;
     if (id == null) {
       return;
@@ -266,6 +292,30 @@ class PurchaseHomeController extends ChangeNotifier {
         return (b.id ?? 0).compareTo(a.id ?? 0);
       });
     return sorted;
+  }
+
+  List<PurchaseItem> _filterItemsByDateRange(
+    List<PurchaseItem> source,
+    DateTimeRange dateRange,
+  ) {
+    final start = DateTime(
+      dateRange.start.year,
+      dateRange.start.month,
+      dateRange.start.day,
+    );
+    final end = DateTime(
+      dateRange.end.year,
+      dateRange.end.month,
+      dateRange.end.day,
+      23,
+      59,
+      59,
+      999,
+    );
+
+    return source
+        .where((item) => !item.date.isBefore(start) && !item.date.isAfter(end))
+        .toList();
   }
 
   @override

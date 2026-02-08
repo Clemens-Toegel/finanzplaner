@@ -26,21 +26,21 @@ class ExcelExporter {
     final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
 
     final excel = Excel.createExcel();
-    final expensesSheet = excel['Expenses'];
-    final summarySheet = excel['Summary'];
+    final expensesSheet = excel[localizations.excelSheetExpensesName];
+    final summarySheet = excel[localizations.excelSheetSummaryName];
 
     expensesSheet.appendRow([
-      TextCellValue('Expense ID'),
-      TextCellValue('Date'),
-      TextCellValue('Company Register Number'),
-      TextCellValue('Vendor'),
-      TextCellValue('Description'),
-      TextCellValue('Category'),
-      TextCellValue('Amount EUR'),
-      TextCellValue('Deductible'),
-      TextCellValue('Notes'),
-      TextCellValue('Sub-item Description'),
-      TextCellValue('Sub-item Amount EUR'),
+      TextCellValue(localizations.excelHeaderExpenseId),
+      TextCellValue(localizations.excelHeaderDate),
+      TextCellValue(localizations.excelHeaderCompanyRegisterNumber),
+      TextCellValue(localizations.excelHeaderVendor),
+      TextCellValue(localizations.excelHeaderDescription),
+      TextCellValue(localizations.excelHeaderCategory),
+      TextCellValue(localizations.excelHeaderAmountEur),
+      TextCellValue(localizations.excelHeaderDeductible),
+      TextCellValue(localizations.excelHeaderNotes),
+      TextCellValue(localizations.excelHeaderSubItemDescription),
+      TextCellValue(localizations.excelHeaderSubItemAmountEur),
     ]);
 
     final sorted = List<PurchaseItem>.from(items)
@@ -64,7 +64,9 @@ class ExcelExporter {
           TextCellValue(item.description),
           TextCellValue(item.category),
           TextCellValue(item.amount.toStringAsFixed(2)),
-          TextCellValue(item.isDeductible ? 'Yes' : 'No'),
+          TextCellValue(
+            item.isDeductible ? localizations.yesLabel : localizations.noLabel,
+          ),
           TextCellValue(item.notes),
           TextCellValue(''),
           TextCellValue(''),
@@ -81,7 +83,9 @@ class ExcelExporter {
           TextCellValue(item.description),
           TextCellValue(item.category),
           TextCellValue(item.amount.toStringAsFixed(2)),
-          TextCellValue(item.isDeductible ? 'Yes' : 'No'),
+          TextCellValue(
+            item.isDeductible ? localizations.yesLabel : localizations.noLabel,
+          ),
           TextCellValue(item.notes),
           TextCellValue(subItem.description),
           TextCellValue(subItem.amount.toStringAsFixed(2)),
@@ -97,18 +101,16 @@ class ExcelExporter {
         .fold(0, (total, item) => total + item.amount);
 
     summarySheet.appendRow([
-      TextCellValue('Account'),
-      TextCellValue('Entries'),
-      TextCellValue('Total EUR'),
-      TextCellValue('Deductible EUR'),
-      TextCellValue('Non-deductible EUR'),
+      TextCellValue(localizations.excelSummaryHeaderEntries),
+      TextCellValue(localizations.excelSummaryHeaderTotalEur),
+      TextCellValue(localizations.excelSummaryHeaderDeductibleEur),
+      TextCellValue(localizations.excelSummaryHeaderNonDeductibleEur),
     ]);
 
     final total = totalFor(sorted);
     final deductible = deductibleFor(sorted);
 
     summarySheet.appendRow([
-      TextCellValue(account.storageValue),
       TextCellValue(sorted.length.toString()),
       TextCellValue(total.toStringAsFixed(2)),
       TextCellValue(deductible.toStringAsFixed(2)),
@@ -122,7 +124,7 @@ class ExcelExporter {
       return;
     }
 
-    final filename = 'expenses_tax_consultant_$timestamp.xlsx';
+    final filename = '${localizations.excelFileNamePrefix}_$timestamp.xlsx';
     await Share.shareXFiles(
       [
         XFile.fromData(

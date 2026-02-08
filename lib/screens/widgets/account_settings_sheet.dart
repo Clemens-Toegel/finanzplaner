@@ -22,8 +22,8 @@ class AccountSettingsSheet extends StatelessWidget {
   final ExpenseAccountType selectedAccount;
   final Future<void> Function(Map<ExpenseAccountType, AccountSettings> settings)
   onSave;
-  final Future<void> Function() onExportExcel;
-  final Future<void> Function() onExportPdf;
+  final Future<void> Function(DateTimeRange dateRange) onExportExcel;
+  final Future<void> Function(DateTimeRange dateRange) onExportPdf;
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +51,29 @@ class _AccountSettingsSheetContent extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final Future<void> Function(Map<ExpenseAccountType, AccountSettings> settings)
   onSave;
-  final Future<void> Function() onExportExcel;
-  final Future<void> Function() onExportPdf;
+  final Future<void> Function(DateTimeRange dateRange) onExportExcel;
+  final Future<void> Function(DateTimeRange dateRange) onExportPdf;
+
+  Future<DateTimeRange?> _pickExportDateRange(BuildContext context) {
+    final now = DateTime.now();
+    final l10n = AppLocalizations.of(context)!;
+    return showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2015),
+      lastDate: now,
+      initialDateRange: DateTimeRange(
+        start: DateTime(
+          now.year,
+          now.month,
+          now.day,
+        ).subtract(const Duration(days: 30)),
+        end: DateTime(now.year, now.month, now.day),
+      ),
+      helpText: l10n.exportDateRangeTitle,
+      saveText: l10n.confirmDateRangeAction,
+      cancelText: l10n.cancelAction,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,9 +162,15 @@ class _AccountSettingsSheetContent extends StatelessWidget {
                     onPressed: controller.isExporting
                         ? null
                         : () async {
+                            final dateRange = await _pickExportDateRange(
+                              context,
+                            );
+                            if (dateRange == null) {
+                              return;
+                            }
                             controller.setExporting(true);
                             try {
-                              await onExportExcel();
+                              await onExportExcel(dateRange);
                             } finally {
                               if (context.mounted) {
                                 controller.setExporting(false);
@@ -159,9 +186,15 @@ class _AccountSettingsSheetContent extends StatelessWidget {
                     onPressed: controller.isExporting
                         ? null
                         : () async {
+                            final dateRange = await _pickExportDateRange(
+                              context,
+                            );
+                            if (dateRange == null) {
+                              return;
+                            }
                             controller.setExporting(true);
                             try {
-                              await onExportPdf();
+                              await onExportPdf(dateRange);
                             } finally {
                               if (context.mounted) {
                                 controller.setExporting(false);

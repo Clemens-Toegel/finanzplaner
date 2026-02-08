@@ -5,6 +5,7 @@ import '../gen/app_localizations.dart';
 import '../localization/app_localizations_ext.dart';
 import '../models/expense_account_type.dart';
 import '../models/purchase_item.dart';
+import '../services/offline_bill_ocr_service.dart';
 import '../state/purchase_home_controller.dart';
 import '../widgets/pilo_logo.dart';
 import 'purchase_detail_page.dart';
@@ -53,8 +54,11 @@ class _PurchaseHomeView extends StatelessWidget {
           initialSettings: controller.accountSettings,
           selectedAccount: controller.selectedAccount,
           onSave: controller.saveAccountSettings,
-          onExportExcel: () async {
-            final success = await controller.exportExcelForTaxConsultant(l10n);
+          onExportExcel: (dateRange) async {
+            final success = await controller.exportExcelForTaxConsultant(
+              l10n,
+              dateRange: dateRange,
+            );
             if (!context.mounted) {
               return;
             }
@@ -63,13 +67,19 @@ class _PurchaseHomeView extends StatelessWidget {
                 content: Text(
                   success
                       ? l10n.exportExcelSuccessMessage
-                      : l10n.addBeforeExport,
+                      : l10n.noItemsInDateRangeMessage,
                 ),
               ),
             );
           },
-          onExportPdf: () async {
-            await _exportPdf(context, l10n, controller, controller.items);
+          onExportPdf: (dateRange) async {
+            await _exportPdf(
+              context,
+              l10n,
+              controller,
+              controller.items,
+              dateRange: dateRange,
+            );
           },
         );
       },
@@ -86,6 +96,8 @@ class _PurchaseHomeView extends StatelessWidget {
     BuildContext context,
     PurchaseHomeController controller, {
     PurchaseItem? item,
+    BillScanMode? initialScanMode,
+    BillImageSource initialScanSource = BillImageSource.camera,
   }) async {
     final draft = await showModalBottomSheet<PurchaseItem>(
       context: context,
@@ -107,6 +119,8 @@ class _PurchaseHomeView extends StatelessWidget {
           ocrService: controller.offlineBillOcrService,
           dateFormat: controller.dateFormat,
           currencyFormat: controller.currencyFormat,
+          initialScanMode: initialScanMode,
+          initialScanSource: initialScanSource,
         );
       },
     );
@@ -120,8 +134,9 @@ class _PurchaseHomeView extends StatelessWidget {
     BuildContext context,
     AppLocalizations l10n,
     PurchaseHomeController controller,
-    List<PurchaseItem> items,
-  ) async {
+    List<PurchaseItem> items, {
+    required DateTimeRange dateRange,
+  }) async {
     if (items.isEmpty) {
       ScaffoldMessenger.of(
         context,
@@ -129,7 +144,14 @@ class _PurchaseHomeView extends StatelessWidget {
       return;
     }
 
-    await controller.exportPdf(l10n);
+    final success = await controller.exportPdf(l10n, dateRange: dateRange);
+    if (!context.mounted || success) {
+      return;
+    }
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.noItemsInDateRangeMessage)));
   }
 
   Future<void> _confirmDeleteSelected(
@@ -141,19 +163,20 @@ class _PurchaseHomeView extends StatelessWidget {
       return;
     }
 
+    final l10n = AppLocalizations.of(context)!;
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ausgewählte Ausgaben löschen?'),
-        content: Text('$selectedCount Einträge werden gelöscht.'),
+        title: Text(l10n.deleteSelectedExpensesTitle),
+        content: Text(l10n.deleteSelectedExpensesMessage(selectedCount)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Abbrechen'),
+            child: Text(l10n.cancelAction),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Löschen'),
+            child: Text(l10n.confirmDeleteAction),
           ),
         ],
       ),
@@ -239,7 +262,7 @@ class _PurchaseHomeView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: isSelectionMode
-            ? Text('$selectedCount ausgewählt')
+            ? Text(l10n.selectionCountLabel(selectedCount))
             : Row(
                 children: [
                   const PiloLogo(size: 24, showWordmark: false),
@@ -257,14 +280,14 @@ class _PurchaseHomeView extends StatelessWidget {
         actions: isSelectionMode
             ? [
                 IconButton(
-                  tooltip: 'Auswahl löschen',
+                  tooltip: l10n.deleteSelectionTooltip,
                   onPressed: selectedCount == 0
                       ? null
                       : () => _confirmDeleteSelected(context, controller),
                   icon: const Icon(Icons.delete_outline),
                 ),
                 IconButton(
-                  tooltip: 'Auswahl beenden',
+                  tooltip: l10n.clearSelectionTooltip,
                   onPressed: controller.clearSelection,
                   icon: const Icon(Icons.close),
                 ),
@@ -415,14 +438,36 @@ class _PurchaseHomeView extends StatelessWidget {
       ),
       floatingActionButton: isSelectionMode
           ? null
-          : FloatingActionButton.extended(
-              onPressed: isExporting
-                  ? null
-                  : () => _openAddItemSheet(context, controller),
-              backgroundColor: accountColor,
-              foregroundColor: Colors.white,
-              icon: const Icon(Icons.add),
-              label: Text(l10n.addPurchase),
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                FloatingActionButton(
+                  heroTag: 'quick_scan_receipt',
+                  tooltip: l10n.scanReceiptAction,
+                  onPressed: isExporting
+                      ? null
+                      : () => _openAddItemSheet(
+                          context,
+                          controller,
+                          initialScanMode: BillScanMode.shopReceipt,
+                        ),
+                  backgroundColor: accountColor,
+                  foregroundColor: Colors.white,
+                  child: const Icon(Icons.camera_alt_outlined),
+                ),
+                const SizedBox(height: 12),
+                FloatingActionButton.extended(
+                  heroTag: 'add_purchase',
+                  onPressed: isExporting
+                      ? null
+                      : () => _openAddItemSheet(context, controller),
+                  backgroundColor: accountColor,
+                  foregroundColor: Colors.white,
+                  icon: const Icon(Icons.add),
+                  label: Text(l10n.addPurchase),
+                ),
+              ],
             ),
     );
   }

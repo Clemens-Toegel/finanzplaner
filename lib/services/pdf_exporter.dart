@@ -48,8 +48,6 @@ class PdfExporter {
       localeName,
     ).format(DateTime.now());
     final generatedAtIsoUtc = DateTime.now().toUtc().toIso8601String();
-    final reportId =
-        'EXP-${account.storageValue.toUpperCase()}-${DateTime.now().millisecondsSinceEpoch}';
 
     final regularFont = await PdfGoogleFonts.notoSansRegular();
     final boldFont = await PdfGoogleFonts.notoSansBold();
@@ -68,8 +66,6 @@ class PdfExporter {
           pw.Text(localizations.pdfGeneratedAt(generatedAt)),
           pw.SizedBox(height: 10),
           _buildReportMeta(
-            reportId: reportId,
-            account: account,
             accountSettings: accountSettings,
             periodStart: periodStart,
             periodEnd: periodEnd,
@@ -114,8 +110,6 @@ class PdfExporter {
   }
 
   pw.Widget _buildReportMeta({
-    required String reportId,
-    required ExpenseAccountType account,
     required AccountSettings? accountSettings,
     required DateTime periodStart,
     required DateTime periodEnd,
@@ -132,24 +126,22 @@ class PdfExporter {
       child: pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text('Report-ID: $reportId'),
-          pw.Text('Konto/Account: ${localizations.accountLabel(account)}'),
           if (accountSettings != null && accountSettings.displayName.isNotEmpty)
             pw.Text(
-              'Kontobezeichnung/Account name: ${accountSettings.displayName}',
+              '${localizations.pdfMetaAccountNameLabel}: ${accountSettings.displayName}',
             ),
-          if (account == ExpenseAccountType.business &&
-              accountSettings != null &&
+          if (accountSettings != null &&
               accountSettings.companyRegisterNumber.isNotEmpty)
             pw.Text(
-              'Firmenbuchnummer: ${accountSettings.companyRegisterNumber}',
+              '${localizations.firmenbuchnummerLabel}: ${accountSettings.companyRegisterNumber}',
             ),
           pw.Text(
-            'Zeitraum/Period: ${dateFormat.format(periodStart)} - ${dateFormat.format(periodEnd)}',
+            '${localizations.pdfMetaPeriodLabel}: ${dateFormat.format(periodStart)} - ${dateFormat.format(periodEnd)}',
           ),
-          pw.Text('Währung/Currency: EUR'),
-          pw.Text('Generated-At-UTC (ISO-8601): $generatedAtIsoUtc'),
-          pw.Text('Schema: expense_report_v1'),
+          pw.Text('${localizations.pdfMetaCurrencyLabel}: EUR'),
+          pw.Text(
+            '${localizations.pdfMetaGeneratedAtUtcLabel}: $generatedAtIsoUtc',
+          ),
         ],
       ),
     );
@@ -172,7 +164,7 @@ class PdfExporter {
     NumberFormat currencyFormat,
     AppLocalizations localizations,
   ) {
-    final expenseId = item.id?.toString() ?? 'N/A';
+    final expenseId = item.id?.toString() ?? localizations.pdfUnknownId;
     final rows = <List<String>>[
       [
         expenseId,
@@ -193,7 +185,7 @@ class PdfExporter {
         '',
         '• ${subItem.description}',
         '',
-        'Sub-item',
+        localizations.pdfSubItemCategory,
         currencyFormat.format(subItem.amount),
         '',
         '',
@@ -228,7 +220,7 @@ class PdfExporter {
         ..add(
           pw.TableHelper.fromTextArray(
             headers: [
-              'ID',
+              localizations.pdfHeaderId,
               localizations.pdfHeaderDate,
               localizations.pdfHeaderDescription,
               localizations.pdfHeaderVendor,
