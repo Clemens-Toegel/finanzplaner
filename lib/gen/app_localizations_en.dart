@@ -18,6 +18,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportPdfTooltip => 'Export PDF';
 
   @override
+  String get exportSingleExpensePdfTooltip => 'Export this expense as PDF';
+
+  @override
+  String get exportSingleExpensePdfErrorMessage =>
+      'Could not export this expense as PDF.';
+
+  @override
   String get expenseAccountLabel => 'Expense account';
 
   @override
