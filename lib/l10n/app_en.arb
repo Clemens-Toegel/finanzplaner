@@ -1,7 +1,7 @@
 {
   "@@locale": "en",
-  "appTitle": "BelegPilot",
-  "taxRefundPurchasesTitle": "BelegPilot",
+  "appTitle": "Pilo",
+  "taxRefundPurchasesTitle": "Pilo",
   "exportPdfTooltip": "Export PDF",
   "expenseAccountLabel": "Expense account",
   "accountSettingsTitle": "Account settings",

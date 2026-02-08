@@ -1,6 +1,6 @@
-# BelegPilot
+# Pilo
 
-BelegPilot is a Flutter app to capture, organize, and review expenses with fast on-device OCR and clean export options.
+Pilo is a Flutter app to capture, organize, and review expenses with fast on-device OCR and clean export options.
 
 ## What it does
 

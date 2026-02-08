@@ -9,10 +9,10 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
-  String get appTitle => 'BelegPilot';
+  String get appTitle => 'Pilo';
 
   @override
-  String get taxRefundPurchasesTitle => 'BelegPilot';
+  String get taxRefundPurchasesTitle => 'Pilo';
 
   @override
   String get exportPdfTooltip => 'PDF exportieren';
