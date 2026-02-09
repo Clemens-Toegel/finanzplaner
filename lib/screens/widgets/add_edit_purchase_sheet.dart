@@ -551,77 +551,81 @@ class _AddEditPurchaseSheetContentState
       useSafeArea: true,
       showDragHandle: true,
       builder: (sheetContext) {
-        return ChangeNotifierProvider.value(
-          value: controller,
-          child: DefaultTabController(
-            length: 2,
-            child: Padding(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 12,
-                bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 16,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: TabBar(
-                      isScrollable: true,
-                      tabAlignment: TabAlignment.start,
-                      tabs: [
-                        Tab(text: l10n.stepSubItemsTitle),
-                        Tab(text: l10n.notesLabel),
-                      ],
-                    ),
-                  ),
-                  Flexible(
-                    child: Padding(
+        return SafeArea(
+          top: false,
+          child: ChangeNotifierProvider.value(
+            value: controller,
+            child: DefaultTabController(
+              length: 2,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: 12,
+                  bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 16,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: TabBarView(
-                        children: [
-                          AddEditPurchaseSubItemsStep(
-                            currencyFormat: currencyFormat,
-                            onAddOrEditSubItem: ({index}) => _addOrEditSubItem(
-                              sheetContext,
-                              controller,
-                              index: index,
-                            ),
-                            onAddSecondaryImage: () =>
-                                _addSecondaryImage(sheetContext, controller),
-                            onRemoveSecondaryImage: (index) =>
-                                _removeSecondaryImage(
-                                  sheetContext,
-                                  controller,
-                                  index,
-                                ),
-                            onMoveSecondaryImage: (oldIndex, newIndex) =>
-                                _moveSecondaryImage(
-                                  controller,
-                                  oldIndex,
-                                  newIndex,
-                                ),
-                            onRenameSecondaryImage: (index) =>
-                                _renameSecondaryImage(
-                                  sheetContext,
-                                  controller,
-                                  index,
-                                ),
-                          ),
-                          const AddEditPurchaseNotesStep(),
+                      child: TabBar(
+                        isScrollable: true,
+                        tabAlignment: TabAlignment.start,
+                        tabs: [
+                          Tab(text: l10n.stepSubItemsTitle),
+                          Tab(text: l10n.notesLabel),
                         ],
                       ),
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: FilledButton(
-                      onPressed: () => Navigator.pop(sheetContext),
-                      child: Text(l10n.savePurchaseAction),
+                    Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: TabBarView(
+                          children: [
+                            AddEditPurchaseSubItemsStep(
+                              currencyFormat: currencyFormat,
+                              onAddOrEditSubItem: ({index}) =>
+                                  _addOrEditSubItem(
+                                    sheetContext,
+                                    controller,
+                                    index: index,
+                                  ),
+                              onAddSecondaryImage: () =>
+                                  _addSecondaryImage(sheetContext, controller),
+                              onRemoveSecondaryImage: (index) =>
+                                  _removeSecondaryImage(
+                                    sheetContext,
+                                    controller,
+                                    index,
+                                  ),
+                              onMoveSecondaryImage: (oldIndex, newIndex) =>
+                                  _moveSecondaryImage(
+                                    controller,
+                                    oldIndex,
+                                    newIndex,
+                                  ),
+                              onRenameSecondaryImage: (index) =>
+                                  _renameSecondaryImage(
+                                    sheetContext,
+                                    controller,
+                                    index,
+                                  ),
+                            ),
+                            const AddEditPurchaseNotesStep(),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: FilledButton(
+                        onPressed: () => Navigator.pop(sheetContext),
+                        child: Text(l10n.savePurchaseAction),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
