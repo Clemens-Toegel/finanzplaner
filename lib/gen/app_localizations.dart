@@ -104,11 +104,11 @@ abstract class AppLocalizations {
   /// **'Pilo'**
   String get appTitle;
 
-  /// No description provided for @taxRefundPurchasesTitle.
+  /// No description provided for @taxRefundExpensesTitle.
   ///
   /// In de, this message translates to:
   /// **'Pilo'**
-  String get taxRefundPurchasesTitle;
+  String get taxRefundExpensesTitle;
 
   /// No description provided for @exportPdfTooltip.
   ///
@@ -302,53 +302,53 @@ abstract class AppLocalizations {
   /// **'betriebliche Ausgaben'**
   String get accountLabelInSentenceBusiness;
 
-  /// No description provided for @addPurchase.
+  /// No description provided for @addExpense.
   ///
   /// In de, this message translates to:
   /// **'Ausgabe hinzufügen'**
-  String get addPurchase;
+  String get addExpense;
 
-  /// No description provided for @addPurchaseTitle.
+  /// No description provided for @addExpenseTitle.
   ///
   /// In de, this message translates to:
   /// **'Ausgabe hinzufügen'**
-  String get addPurchaseTitle;
+  String get addExpenseTitle;
 
-  /// No description provided for @editPurchaseTitle.
+  /// No description provided for @editExpenseTitle.
   ///
   /// In de, this message translates to:
   /// **'Ausgabe bearbeiten'**
-  String get editPurchaseTitle;
+  String get editExpenseTitle;
 
-  /// No description provided for @editPurchaseAction.
+  /// No description provided for @editExpenseAction.
   ///
   /// In de, this message translates to:
   /// **'Bearbeiten'**
-  String get editPurchaseAction;
+  String get editExpenseAction;
 
-  /// No description provided for @savePurchaseAction.
+  /// No description provided for @saveExpenseAction.
   ///
   /// In de, this message translates to:
   /// **'Speichern'**
-  String get savePurchaseAction;
+  String get saveExpenseAction;
 
-  /// No description provided for @deletePurchaseAction.
+  /// No description provided for @deleteExpenseAction.
   ///
   /// In de, this message translates to:
   /// **'Löschen'**
-  String get deletePurchaseAction;
+  String get deleteExpenseAction;
 
-  /// No description provided for @deletePurchaseTitle.
+  /// No description provided for @deleteExpenseTitle.
   ///
   /// In de, this message translates to:
   /// **'Ausgabe löschen?'**
-  String get deletePurchaseTitle;
+  String get deleteExpenseTitle;
 
-  /// No description provided for @deletePurchaseMessage.
+  /// No description provided for @deleteExpenseMessage.
   ///
   /// In de, this message translates to:
   /// **'Möchtest du diese Ausgabe wirklich löschen?'**
-  String get deletePurchaseMessage;
+  String get deleteExpenseMessage;
 
   /// No description provided for @cancelAction.
   ///
@@ -362,11 +362,11 @@ abstract class AppLocalizations {
   /// **'Löschen'**
   String get confirmDeleteAction;
 
-  /// No description provided for @purchaseDetailsTitle.
+  /// No description provided for @expenseDetailsTitle.
   ///
   /// In de, this message translates to:
   /// **'Ausgabedetails'**
-  String get purchaseDetailsTitle;
+  String get expenseDetailsTitle;
 
   /// No description provided for @descriptionLabel.
   ///
@@ -410,11 +410,11 @@ abstract class AppLocalizations {
   /// **'Kategorie'**
   String get categoryLabel;
 
-  /// No description provided for @dateOfPurchaseLabel.
+  /// No description provided for @dateOfExpenseLabel.
   ///
   /// In de, this message translates to:
   /// **'Kaufdatum'**
-  String get dateOfPurchaseLabel;
+  String get dateOfExpenseLabel;
 
   /// No description provided for @pickDate.
   ///

@@ -3,11 +3,11 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../gen/app_localizations.dart';
-import '../../state/add_edit_purchase_controller.dart';
+import '../../state/add_edit_expense_controller.dart';
 import '../../widgets/pilo_scanning_logo.dart';
 
-class AddEditPurchaseDetailsStep extends StatelessWidget {
-  const AddEditPurchaseDetailsStep({
+class AddEditExpenseDetailsStep extends StatelessWidget {
+  const AddEditExpenseDetailsStep({
     super.key,
     required this.dateFormat,
     required this.currencyFormat,
@@ -23,10 +23,10 @@ class AddEditPurchaseDetailsStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final controller = context.read<AddEditPurchaseController>();
+    final controller = context.read<AddEditExpenseController>();
     final vm = context
         .select<
-          AddEditPurchaseController,
+          AddEditExpenseController,
           ({
             bool isScanning,
             String selectedCategory,
@@ -169,7 +169,7 @@ class AddEditPurchaseDetailsStep extends StatelessWidget {
         ),
         ListTile(
           contentPadding: EdgeInsets.zero,
-          title: Text(l10n.dateOfPurchaseLabel),
+          title: Text(l10n.dateOfExpenseLabel),
           subtitle: Text(dateFormat.format(vm.selectedDate)),
           trailing: TextButton.icon(
             onPressed: () async {

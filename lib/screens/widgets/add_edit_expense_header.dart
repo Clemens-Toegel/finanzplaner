@@ -4,8 +4,8 @@ import '../../gen/app_localizations.dart';
 import '../../localization/app_localizations_ext.dart';
 import '../../models/expense_account_type.dart';
 
-class AddEditPurchaseHeader extends StatelessWidget {
-  const AddEditPurchaseHeader({
+class AddEditExpenseHeader extends StatelessWidget {
+  const AddEditExpenseHeader({
     super.key,
     required this.selectedAccount,
     required this.isEdit,
@@ -55,7 +55,7 @@ class AddEditPurchaseHeader extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 8, bottom: 4),
             child: Text(
-              isEdit ? l10n.editPurchaseTitle : l10n.addPurchaseTitle,
+              isEdit ? l10n.editExpenseTitle : l10n.addExpenseTitle,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),

@@ -3,14 +3,14 @@ import 'package:sqflite/sqflite.dart';
 
 import '../models/account_settings.dart';
 import '../models/expense_account_type.dart';
-import '../models/purchase_item.dart';
+import '../models/expense_item.dart';
 
-class PurchaseRepository {
-  static final PurchaseRepository _instance = PurchaseRepository._internal();
+class ExpenseRepository {
+  static final ExpenseRepository _instance = ExpenseRepository._internal();
 
-  PurchaseRepository._internal();
+  ExpenseRepository._internal();
 
-  factory PurchaseRepository() => _instance;
+  factory ExpenseRepository() => _instance;
 
   Database? _database;
 
@@ -20,14 +20,14 @@ class PurchaseRepository {
     }
 
     final dbPath = await getDatabasesPath();
-    final filePath = path.join(dbPath, 'purchase_tracker.db');
+    final filePath = path.join(dbPath, 'pilo.db');
 
     _database = await openDatabase(
       filePath,
       version: 1,
       onCreate: (db, version) async {
         await db.execute('''
-          CREATE TABLE purchases(
+          CREATE TABLE expenses(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             account TEXT NOT NULL,
             description TEXT NOT NULL,
@@ -66,30 +66,30 @@ class PurchaseRepository {
     return _database!;
   }
 
-  Future<List<PurchaseItem>> fetchPurchases(ExpenseAccountType account) async {
+  Future<List<ExpenseItem>> fetchExpenses(ExpenseAccountType account) async {
     final db = await _openDatabase();
     final maps = await db.query(
-      'purchases',
+      'expenses',
       where: 'account = ?',
       whereArgs: [account.storageValue],
       orderBy: 'date DESC, id DESC',
     );
-    return maps.map(PurchaseItem.fromMap).toList();
+    return maps.map(ExpenseItem.fromMap).toList();
   }
 
-  Future<PurchaseItem> insertPurchase(PurchaseItem item) async {
+  Future<ExpenseItem> insertExpense(ExpenseItem item) async {
     final db = await _openDatabase();
-    final id = await db.insert('purchases', item.toMap());
+    final id = await db.insert('expenses', item.toMap());
     return item.copyWith(id: id);
   }
 
-  Future<PurchaseItem> updatePurchase(PurchaseItem item) async {
+  Future<ExpenseItem> updateExpense(ExpenseItem item) async {
     if (item.id == null) {
       return item;
     }
     final db = await _openDatabase();
     await db.update(
-      'purchases',
+      'expenses',
       item.toMap(),
       where: 'id = ?',
       whereArgs: [item.id],
@@ -97,9 +97,9 @@ class PurchaseRepository {
     return item;
   }
 
-  Future<void> deletePurchase(int id) async {
+  Future<void> deleteExpenses(int id) async {
     final db = await _openDatabase();
-    await db.delete('purchases', where: 'id = ?', whereArgs: [id]);
+    await db.delete('expenses', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<Map<ExpenseAccountType, AccountSettings>>

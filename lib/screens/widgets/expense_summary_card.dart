@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../gen/app_localizations.dart';
 
-class PurchaseSummaryCard extends StatelessWidget {
-  const PurchaseSummaryCard({
+class ExpenseSummaryCard extends StatelessWidget {
+  const ExpenseSummaryCard({
     super.key,
     required this.localizations,
     required this.itemCount,

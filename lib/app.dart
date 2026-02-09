@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'gen/app_localizations.dart';
-import 'screens/purchase_home_page.dart';
+import 'screens/expense_home_page.dart';
 import 'theme/app_theme.dart';
 
-class PurchaseTrackerApp extends StatelessWidget {
-  const PurchaseTrackerApp({super.key});
+class PiloApp extends StatelessWidget {
+  const PiloApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class PurchaseTrackerApp extends StatelessWidget {
       darkTheme: AppTheme.buildDarkTheme(),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
-      home: const PurchaseHomePage(),
+      home: const PiloHomePage(),
     );
   }
 }

@@ -5,12 +5,12 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'expense_account_type.dart';
 import 'expense_sub_item.dart';
 
-part 'purchase_item.freezed.dart';
-part 'purchase_item.g.dart';
+part 'expense_item.freezed.dart';
+part 'expense_item.g.dart';
 
 @freezed
-abstract class PurchaseItem with _$PurchaseItem {
-  const factory PurchaseItem({
+abstract class ExpenseItem with _$ExpenseItem {
+  const factory ExpenseItem({
     int? id,
     required ExpenseAccountType accountType,
     required String description,
@@ -24,12 +24,12 @@ abstract class PurchaseItem with _$PurchaseItem {
     @Default(<String>[]) List<String> secondaryAttachmentPaths,
     @Default(<String>[]) List<String> secondaryAttachmentNames,
     @Default(<ExpenseSubItem>[]) List<ExpenseSubItem> subItems,
-  }) = _PurchaseItem;
+  }) = _ExpenseItem;
 
-  factory PurchaseItem.fromJson(Map<String, dynamic> json) =>
-      _$PurchaseItemFromJson(json);
+  factory ExpenseItem.fromJson(Map<String, dynamic> json) =>
+      _$ExpenseItemFromJson(json);
 
-  const PurchaseItem._();
+  const ExpenseItem._();
 
   Map<String, Object?> toMap() {
     return {
@@ -49,7 +49,7 @@ abstract class PurchaseItem with _$PurchaseItem {
     };
   }
 
-  factory PurchaseItem.fromMap(Map<String, Object?> map) {
+  factory ExpenseItem.fromMap(Map<String, Object?> map) {
     final rawSubItems = map['sub_items'] as String?;
     final rawSecondaryAttachmentPaths =
         map['secondary_attachment_paths'] as String?;
@@ -61,7 +61,7 @@ abstract class PurchaseItem with _$PurchaseItem {
       rawNames: _decodeStringList(rawSecondaryAttachmentNames),
     );
 
-    return PurchaseItem(
+    return ExpenseItem(
       id: map['id'] as int?,
       accountType: ExpenseAccountTypeStorage.fromStorage(
         map['account'] as String? ?? 'personal',

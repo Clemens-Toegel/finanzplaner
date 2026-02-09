@@ -6,17 +6,17 @@ import '../../gen/app_localizations.dart';
 import '../../localization/app_localizations_ext.dart';
 import '../../models/expense_account_type.dart';
 import '../../models/expense_sub_item.dart';
-import '../../models/purchase_item.dart';
+import '../../models/expense_item.dart';
 import '../../services/offline_bill_ocr_service.dart';
-import '../../state/add_edit_purchase_controller.dart';
-import 'add_edit_purchase_details_step.dart';
-import 'add_edit_purchase_footer.dart';
-import 'add_edit_purchase_header.dart';
-import 'add_edit_purchase_notes_step.dart';
-import 'add_edit_purchase_sub_items_step.dart';
+import '../../state/add_edit_expense_controller.dart';
+import 'add_edit_expense_details_step.dart';
+import 'add_edit_expense_footer.dart';
+import 'add_edit_expense_header.dart';
+import 'add_edit_expense_notes_step.dart';
+import 'add_edit_expense_sub_items_step.dart';
 
-class AddEditPurchaseSheet extends StatelessWidget {
-  const AddEditPurchaseSheet({
+class AddEditExpenseSheet extends StatelessWidget {
+  const AddEditExpenseSheet({
     super.key,
     required this.selectedAccount,
     required this.ocrService,
@@ -28,7 +28,7 @@ class AddEditPurchaseSheet extends StatelessWidget {
   });
 
   final ExpenseAccountType selectedAccount;
-  final PurchaseItem? item;
+  final ExpenseItem? item;
   final OfflineBillOcrService ocrService;
   final DateFormat dateFormat;
   final NumberFormat currencyFormat;
@@ -42,12 +42,12 @@ class AddEditPurchaseSheet extends StatelessWidget {
     )!.categoriesForAccount(selectedAccount);
 
     return ChangeNotifierProvider(
-      create: (_) => AddEditPurchaseController(
+      create: (_) => AddEditExpenseController(
         selectedAccount: selectedAccount,
         categories: categories,
         item: item,
       ),
-      child: _AddEditPurchaseSheetContent(
+      child: _AddEditExpenseSheetContent(
         selectedAccount: selectedAccount,
         item: item,
         ocrService: ocrService,
@@ -60,8 +60,8 @@ class AddEditPurchaseSheet extends StatelessWidget {
   }
 }
 
-class _AddEditPurchaseSheetContent extends StatefulWidget {
-  const _AddEditPurchaseSheetContent({
+class _AddEditExpenseSheetContent extends StatefulWidget {
+  const _AddEditExpenseSheetContent({
     required this.selectedAccount,
     required this.item,
     required this.ocrService,
@@ -72,7 +72,7 @@ class _AddEditPurchaseSheetContent extends StatefulWidget {
   });
 
   final ExpenseAccountType selectedAccount;
-  final PurchaseItem? item;
+  final ExpenseItem? item;
   final OfflineBillOcrService ocrService;
   final DateFormat dateFormat;
   final NumberFormat currencyFormat;
@@ -80,18 +80,18 @@ class _AddEditPurchaseSheetContent extends StatefulWidget {
   final BillImageSource initialScanSource;
 
   @override
-  State<_AddEditPurchaseSheetContent> createState() =>
-      _AddEditPurchaseSheetContentState();
+  State<_AddEditExpenseSheetContent> createState() =>
+      _AddEditExpenseSheetContentState();
 }
 
-class _AddEditPurchaseSheetContentState
-    extends State<_AddEditPurchaseSheetContent> {
+class _AddEditExpenseSheetContentState
+    extends State<_AddEditExpenseSheetContent> {
   final _formKey = GlobalKey<FormState>();
   bool _didRunInitialScan = false;
 
   ExpenseAccountType get selectedAccount => widget.selectedAccount;
 
-  PurchaseItem? get item => widget.item;
+  ExpenseItem? get item => widget.item;
 
   OfflineBillOcrService get ocrService => widget.ocrService;
 
@@ -111,7 +111,7 @@ class _AddEditPurchaseSheetContentState
       if (!mounted) {
         return;
       }
-      final controller = context.read<AddEditPurchaseController>();
+      final controller = context.read<AddEditExpenseController>();
       _scanBill(
         context,
         controller,
@@ -129,7 +129,7 @@ class _AddEditPurchaseSheetContentState
 
   Future<void> _submitForm(
     BuildContext context,
-    AddEditPurchaseController controller,
+    AddEditExpenseController controller,
   ) async {
     final l10n = AppLocalizations.of(context)!;
     controller.ensureAmountFromSubItemsIfMissing();
@@ -181,7 +181,7 @@ class _AddEditPurchaseSheetContentState
 
   Future<void> _scanBill(
     BuildContext context,
-    AddEditPurchaseController controller,
+    AddEditExpenseController controller,
     BillScanMode mode, {
     BillImageSource source = BillImageSource.camera,
   }) async {
@@ -252,7 +252,7 @@ class _AddEditPurchaseSheetContentState
 
   Future<void> _scanA4Bill(
     BuildContext context,
-    AddEditPurchaseController controller,
+    AddEditExpenseController controller,
   ) async {
     final source = await _pickImageSource(context);
 
@@ -265,7 +265,7 @@ class _AddEditPurchaseSheetContentState
 
   Future<void> _addSecondaryImage(
     BuildContext context,
-    AddEditPurchaseController controller,
+    AddEditExpenseController controller,
   ) async {
     final source = await _pickImageSource(context);
     if (source == null || !context.mounted) {
@@ -298,7 +298,7 @@ class _AddEditPurchaseSheetContentState
 
   Future<void> _removeSecondaryImage(
     BuildContext context,
-    AddEditPurchaseController controller,
+    AddEditExpenseController controller,
     int index,
   ) async {
     if (index < 0 || index >= controller.secondaryAttachmentPaths.length) {
@@ -333,7 +333,7 @@ class _AddEditPurchaseSheetContentState
 
   Future<void> _renameSecondaryImage(
     BuildContext context,
-    AddEditPurchaseController controller,
+    AddEditExpenseController controller,
     int index,
   ) async {
     if (index < 0 || index >= controller.secondaryAttachmentNames.length) {
@@ -373,7 +373,7 @@ class _AddEditPurchaseSheetContentState
               }
               Navigator.pop(dialogContext, '$baseName${splitName.extension}');
             },
-            child: Text(l10n.savePurchaseAction),
+            child: Text(l10n.saveExpenseAction),
           ),
         ],
       ),
@@ -387,7 +387,7 @@ class _AddEditPurchaseSheetContentState
   }
 
   void _moveSecondaryImage(
-    AddEditPurchaseController controller,
+    AddEditExpenseController controller,
     int oldIndex,
     int newIndex,
   ) {
@@ -396,7 +396,7 @@ class _AddEditPurchaseSheetContentState
 
   Future<void> _addOrEditSubItem(
     BuildContext context,
-    AddEditPurchaseController controller, {
+    AddEditExpenseController controller, {
     int? index,
   }) async {
     final l10n = AppLocalizations.of(context)!;
@@ -501,7 +501,7 @@ class _AddEditPurchaseSheetContentState
                   ),
                 );
               },
-              child: Text(l10n.savePurchaseAction),
+              child: Text(l10n.saveExpenseAction),
             ),
           ],
         );
@@ -541,7 +541,7 @@ class _AddEditPurchaseSheetContentState
 
   Future<void> _openExtraDetailsSheet(
     BuildContext context,
-    AddEditPurchaseController controller,
+    AddEditExpenseController controller,
   ) async {
     final l10n = AppLocalizations.of(context)!;
 
@@ -583,7 +583,7 @@ class _AddEditPurchaseSheetContentState
                         padding: const EdgeInsets.only(bottom: 12),
                         child: TabBarView(
                           children: [
-                            AddEditPurchaseSubItemsStep(
+                            AddEditExpenseSubItemsStep(
                               currencyFormat: currencyFormat,
                               onAddOrEditSubItem: ({index}) =>
                                   _addOrEditSubItem(
@@ -612,7 +612,7 @@ class _AddEditPurchaseSheetContentState
                                     index,
                                   ),
                             ),
-                            const AddEditPurchaseNotesStep(),
+                            const AddEditExpenseNotesStep(),
                           ],
                         ),
                       ),
@@ -621,7 +621,7 @@ class _AddEditPurchaseSheetContentState
                       alignment: Alignment.centerRight,
                       child: FilledButton(
                         onPressed: () => Navigator.pop(sheetContext),
-                        child: Text(l10n.savePurchaseAction),
+                        child: Text(l10n.saveExpenseAction),
                       ),
                     ),
                   ],
@@ -636,7 +636,7 @@ class _AddEditPurchaseSheetContentState
 
   Future<void> _requestClose(
     BuildContext context,
-    AddEditPurchaseController controller,
+    AddEditExpenseController controller,
   ) async {
     if (!controller.hasUnsavedChanges()) {
       Navigator.of(context).pop();
@@ -692,7 +692,7 @@ class _AddEditPurchaseSheetContentState
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.read<AddEditPurchaseController>();
+    final controller = context.read<AddEditExpenseController>();
 
     return AnimatedPadding(
       padding: EdgeInsets.only(
@@ -715,13 +715,13 @@ class _AddEditPurchaseSheetContentState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AddEditPurchaseHeader(
+              AddEditExpenseHeader(
                 selectedAccount: selectedAccount,
                 isEdit: item != null,
                 accountColor: _accountColor(),
               ),
               Expanded(
-                child: AddEditPurchaseDetailsStep(
+                child: AddEditExpenseDetailsStep(
                   dateFormat: dateFormat,
                   currencyFormat: currencyFormat,
                   onScanReceipt: () =>
@@ -729,7 +729,7 @@ class _AddEditPurchaseSheetContentState
                   onScanDocument: () => _scanA4Bill(context, controller),
                 ),
               ),
-              AddEditPurchaseFooter(
+              AddEditExpenseFooter(
                 isEdit: item != null,
                 onCancel: () => _requestClose(context, controller),
                 onSubmit: () => _submitForm(context, controller),

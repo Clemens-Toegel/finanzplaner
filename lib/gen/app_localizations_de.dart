@@ -12,7 +12,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get appTitle => 'Pilo';
 
   @override
-  String get taxRefundPurchasesTitle => 'Pilo';
+  String get taxRefundExpensesTitle => 'Pilo';
 
   @override
   String get exportPdfTooltip => 'PDF exportieren';
@@ -129,28 +129,28 @@ class AppLocalizationsDe extends AppLocalizations {
   String get accountLabelInSentenceBusiness => 'betriebliche Ausgaben';
 
   @override
-  String get addPurchase => 'Ausgabe hinzufügen';
+  String get addExpense => 'Ausgabe hinzufügen';
 
   @override
-  String get addPurchaseTitle => 'Ausgabe hinzufügen';
+  String get addExpenseTitle => 'Ausgabe hinzufügen';
 
   @override
-  String get editPurchaseTitle => 'Ausgabe bearbeiten';
+  String get editExpenseTitle => 'Ausgabe bearbeiten';
 
   @override
-  String get editPurchaseAction => 'Bearbeiten';
+  String get editExpenseAction => 'Bearbeiten';
 
   @override
-  String get savePurchaseAction => 'Speichern';
+  String get saveExpenseAction => 'Speichern';
 
   @override
-  String get deletePurchaseAction => 'Löschen';
+  String get deleteExpenseAction => 'Löschen';
 
   @override
-  String get deletePurchaseTitle => 'Ausgabe löschen?';
+  String get deleteExpenseTitle => 'Ausgabe löschen?';
 
   @override
-  String get deletePurchaseMessage =>
+  String get deleteExpenseMessage =>
       'Möchtest du diese Ausgabe wirklich löschen?';
 
   @override
@@ -160,7 +160,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get confirmDeleteAction => 'Löschen';
 
   @override
-  String get purchaseDetailsTitle => 'Ausgabedetails';
+  String get expenseDetailsTitle => 'Ausgabedetails';
 
   @override
   String get descriptionLabel => 'Beschreibung';
@@ -184,7 +184,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get categoryLabel => 'Kategorie';
 
   @override
-  String get dateOfPurchaseLabel => 'Kaufdatum';
+  String get dateOfExpenseLabel => 'Kaufdatum';
 
   @override
   String get pickDate => 'Auswählen';

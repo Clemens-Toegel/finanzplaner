@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import '../models/expense_account_type.dart';
 import '../models/expense_sub_item.dart';
 import '../models/ocr_bill_data.dart';
-import '../models/purchase_item.dart';
+import '../models/expense_item.dart';
 
-class AddEditPurchaseController extends ChangeNotifier {
-  AddEditPurchaseController({
+class AddEditExpenseController extends ChangeNotifier {
+  AddEditExpenseController({
     required this.selectedAccount,
     required this.categories,
     this.item,
@@ -56,7 +56,7 @@ class AddEditPurchaseController extends ChangeNotifier {
 
   final ExpenseAccountType selectedAccount;
   final List<String> categories;
-  final PurchaseItem? item;
+  final ExpenseItem? item;
 
   late final TextEditingController descriptionController;
   late final TextEditingController vendorController;
@@ -398,7 +398,7 @@ class AddEditPurchaseController extends ChangeNotifier {
     return false;
   }
 
-  PurchaseItem? tryBuildDraft() {
+  ExpenseItem? tryBuildDraft() {
     final parsedAmount = double.tryParse(
       amountController.text.replaceAll(',', '.'),
     );
@@ -406,7 +406,7 @@ class AddEditPurchaseController extends ChangeNotifier {
       return null;
     }
 
-    return PurchaseItem(
+    return ExpenseItem(
       id: item?.id,
       accountType: selectedAccount,
       description: descriptionController.text.trim(),

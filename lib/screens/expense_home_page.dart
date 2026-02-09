@@ -4,33 +4,33 @@ import 'package:provider/provider.dart';
 import '../gen/app_localizations.dart';
 import '../localization/app_localizations_ext.dart';
 import '../models/expense_account_type.dart';
-import '../models/purchase_item.dart';
+import '../models/expense_item.dart';
 import '../services/offline_bill_ocr_service.dart';
-import '../state/purchase_home_controller.dart';
+import '../state/pilo_home_controller.dart';
 import '../widgets/pilo_logo.dart';
-import 'purchase_detail_page.dart';
+import 'expense_detail_page.dart';
 import 'widgets/account_settings_sheet.dart';
-import 'widgets/add_edit_purchase_sheet.dart';
-import 'widgets/purchase_account_switcher.dart';
-import 'widgets/purchase_dashboard_tab.dart';
-import 'widgets/purchase_empty_state.dart';
-import 'widgets/purchase_expense_card.dart';
-import 'widgets/purchase_expenses_tab.dart';
+import 'widgets/add_edit_expense_sheet.dart';
+import 'widgets/expense_account_switcher.dart';
+import 'widgets/expense_dashboard_tab.dart';
+import 'widgets/expense_empty_state.dart';
+import 'widgets/expense_expense_card.dart';
+import 'widgets/expense_expenses_tab.dart';
 
-class PurchaseHomePage extends StatelessWidget {
-  const PurchaseHomePage({super.key});
+class PiloHomePage extends StatelessWidget {
+  const PiloHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => PurchaseHomeController()..initialize(),
-      child: const _PurchaseHomeView(),
+      create: (_) => PiloHomeController()..initialize(),
+      child: const _PiloHomeView(),
     );
   }
 }
 
-class _PurchaseHomeView extends StatelessWidget {
-  const _PurchaseHomeView();
+class _PiloHomeView extends StatelessWidget {
+  const _PiloHomeView();
 
   Color _accountColor(ExpenseAccountType selectedAccount) {
     return selectedAccount == ExpenseAccountType.business
@@ -40,7 +40,7 @@ class _PurchaseHomeView extends StatelessWidget {
 
   Future<void> _openAccountSettingsSheet(
     BuildContext context,
-    PurchaseHomeController controller,
+    PiloHomeController controller,
   ) async {
     final l10n = AppLocalizations.of(context)!;
 
@@ -94,12 +94,12 @@ class _PurchaseHomeView extends StatelessWidget {
 
   Future<void> _openAddItemSheet(
     BuildContext context,
-    PurchaseHomeController controller, {
-    PurchaseItem? item,
+    PiloHomeController controller, {
+    ExpenseItem? item,
     BillScanMode? initialScanMode,
     BillImageSource initialScanSource = BillImageSource.camera,
   }) async {
-    final draft = await showModalBottomSheet<PurchaseItem>(
+    final draft = await showModalBottomSheet<ExpenseItem>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -113,7 +113,7 @@ class _PurchaseHomeView extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       elevation: 8,
       builder: (context) {
-        return AddEditPurchaseSheet(
+        return AddEditExpenseSheet(
           selectedAccount: controller.selectedAccount,
           item: item,
           ocrService: controller.offlineBillOcrService,
@@ -126,15 +126,15 @@ class _PurchaseHomeView extends StatelessWidget {
     );
 
     if (draft != null) {
-      await controller.savePurchaseDraft(draft);
+      await controller.saveExpenseDraft(draft);
     }
   }
 
   Future<void> _exportPdf(
     BuildContext context,
     AppLocalizations l10n,
-    PurchaseHomeController controller,
-    List<PurchaseItem> items, {
+    PiloHomeController controller,
+    List<ExpenseItem> items, {
     required DateTimeRange dateRange,
   }) async {
     if (items.isEmpty) {
@@ -156,9 +156,9 @@ class _PurchaseHomeView extends StatelessWidget {
 
   Future<void> _confirmDeleteSelected(
     BuildContext context,
-    PurchaseHomeController controller,
+    PiloHomeController controller,
   ) async {
-    final selectedCount = controller.selectedPurchaseIds.length;
+    final selectedCount = controller.selectedExpenseIds.length;
     if (selectedCount == 0) {
       return;
     }
@@ -183,47 +183,47 @@ class _PurchaseHomeView extends StatelessWidget {
     );
 
     if (shouldDelete == true && context.mounted) {
-      await controller.deleteSelectedPurchases();
+      await controller.deleteSelectedExpenses();
     }
   }
 
   Widget _buildExpenseCard(
     BuildContext context,
-    PurchaseHomeController controller,
-    PurchaseItem item,
+    PiloHomeController controller,
+    ExpenseItem item,
     AppLocalizations l10n,
     bool isSelectionMode,
   ) {
-    final isSelected = controller.isPurchaseSelected(item);
+    final isSelected = controller.isExpenseSelected(item);
 
-    return PurchaseExpenseCard(
+    return ExpenseExpenseCard(
       item: item,
       localizations: l10n,
       dateFormat: controller.dateFormat,
       currencyFormat: controller.currencyFormat,
       isSelectionMode: isSelectionMode,
       isSelected: isSelected,
-      onLongPress: () => controller.togglePurchaseSelection(item),
+      onLongPress: () => controller.toggleExpenseSelection(item),
       onTap: () async {
         if (isSelectionMode) {
-          controller.togglePurchaseSelection(item);
+          controller.toggleExpenseSelection(item);
           return;
         }
 
-        final action = await Navigator.push<PurchaseDetailAction>(
+        final action = await Navigator.push<ExpenseDetailAction>(
           context,
           MaterialPageRoute(
-            builder: (context) => PurchaseDetailPage(item: item),
+            builder: (context) => ExpenseDetailPage(item: item),
           ),
         );
         if (!context.mounted) {
           return;
         }
-        if (action == PurchaseDetailAction.edit) {
+        if (action == ExpenseDetailAction.edit) {
           await _openAddItemSheet(context, controller, item: item);
         }
-        if (action == PurchaseDetailAction.delete && item.id != null) {
-          await controller.deletePurchase(item);
+        if (action == ExpenseDetailAction.delete && item.id != null) {
+          await controller.deleteExpense(item);
         }
       },
     );
@@ -232,29 +232,29 @@ class _PurchaseHomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final controller = context.read<PurchaseHomeController>();
+    final controller = context.read<PiloHomeController>();
 
     final selectedAccount = context
-        .select<PurchaseHomeController, ExpenseAccountType>(
+        .select<PiloHomeController, ExpenseAccountType>(
           (c) => c.selectedAccount,
         );
-    final selectedTabIndex = context.select<PurchaseHomeController, int>(
+    final selectedTabIndex = context.select<PiloHomeController, int>(
       (c) => c.selectedTabIndex,
     );
-    final isLoading = context.select<PurchaseHomeController, bool>(
+    final isLoading = context.select<PiloHomeController, bool>(
       (c) => c.isLoading,
     );
-    final isExporting = context.select<PurchaseHomeController, bool>(
+    final isExporting = context.select<PiloHomeController, bool>(
       (c) => c.isExporting,
     );
-    final items = context.select<PurchaseHomeController, List<PurchaseItem>>(
+    final items = context.select<PiloHomeController, List<ExpenseItem>>(
       (c) => c.items,
     );
-    final isSelectionMode = context.select<PurchaseHomeController, bool>(
+    final isSelectionMode = context.select<PiloHomeController, bool>(
       (c) => c.isSelectionMode,
     );
-    final selectedCount = context.select<PurchaseHomeController, int>(
-      (c) => c.selectedPurchaseIds.length,
+    final selectedCount = context.select<PiloHomeController, int>(
+      (c) => c.selectedExpenseIds.length,
     );
 
     final accountColor = _accountColor(selectedAccount);
@@ -270,7 +270,7 @@ class _PurchaseHomeView extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 8),
                       child: Text(
-                        l10n.taxRefundPurchasesTitle,
+                        l10n.taxRefundExpensesTitle,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -305,7 +305,7 @@ class _PurchaseHomeView extends StatelessWidget {
             ? null
             : PreferredSize(
                 preferredSize: const Size.fromHeight(88),
-                child: PurchaseAccountSwitcher(
+                child: ExpenseAccountSwitcher(
                   localizations: l10n,
                   selectedAccount: selectedAccount,
                   accountColor: accountColor,
@@ -323,14 +323,14 @@ class _PurchaseHomeView extends StatelessWidget {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : items.isEmpty
-                  ? PurchaseEmptyState(
+                  ? ExpenseEmptyState(
                       localizations: l10n,
                       accountLabelInSentence: l10n.accountLabelInSentence(
                         selectedAccount,
                       ),
                     )
                   : selectedTabIndex == 0
-                  ? PurchaseExpensesTab(
+                  ? ExpenseExpensesTab(
                       localizations: l10n,
                       items: items,
                       summaryDeductibleAmount: controller.currencyFormat.format(
@@ -344,7 +344,7 @@ class _PurchaseHomeView extends StatelessWidget {
                         isSelectionMode,
                       ),
                     )
-                  : PurchaseDashboardTab(
+                  : ExpenseDashboardTab(
                       localizations: l10n,
                       formattedTotalAmount: controller.currencyFormat.format(
                         controller.totalAmount,
@@ -458,14 +458,14 @@ class _PurchaseHomeView extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 FloatingActionButton.extended(
-                  heroTag: 'add_purchase',
+                  heroTag: 'add_expense',
                   onPressed: isExporting
                       ? null
                       : () => _openAddItemSheet(context, controller),
                   backgroundColor: accountColor,
                   foregroundColor: Colors.white,
                   icon: const Icon(Icons.add),
-                  label: Text(l10n.addPurchase),
+                  label: Text(l10n.addExpense),
                 ),
               ],
             ),

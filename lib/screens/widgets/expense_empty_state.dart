@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../gen/app_localizations.dart';
 import '../../widgets/pilo_logo.dart';
 
-class PurchaseEmptyState extends StatelessWidget {
-  const PurchaseEmptyState({
+class ExpenseEmptyState extends StatelessWidget {
+  const ExpenseEmptyState({
     super.key,
     required this.localizations,
     required this.accountLabelInSentence,

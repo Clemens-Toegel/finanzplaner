@@ -6,22 +6,22 @@ import 'package:intl/intl.dart';
 import '../gen/app_localizations.dart';
 import '../models/account_settings.dart';
 import '../models/expense_account_type.dart';
-import '../models/purchase_item.dart';
+import '../models/expense_item.dart';
 import '../services/excel_exporter.dart';
 import '../services/offline_bill_ocr_service.dart';
-import '../services/purchase_home_service.dart';
+import '../services/expense_home_service.dart';
 
-class PurchaseHomeController extends ChangeNotifier {
-  PurchaseHomeController({
-    PurchaseHomeService? service,
+class PiloHomeController extends ChangeNotifier {
+  PiloHomeController({
+    PiloHomeService? service,
     OfflineBillOcrService? offlineBillOcrService,
     ExcelExporter? excelExporter,
-  }) : _service = service ?? DefaultPurchaseHomeService(),
+  }) : _service = service ?? DefaultExpenseHomeService(),
        _offlineBillOcrService =
            offlineBillOcrService ?? OfflineBillOcrService(),
        _excelExporter = excelExporter ?? ExcelExporter();
 
-  final PurchaseHomeService _service;
+  final PiloHomeService _service;
   final OfflineBillOcrService _offlineBillOcrService;
   final ExcelExporter _excelExporter;
 
@@ -32,11 +32,11 @@ class PurchaseHomeController extends ChangeNotifier {
   );
 
   ExpenseAccountType selectedAccount = ExpenseAccountType.business;
-  List<PurchaseItem> items = [];
+  List<ExpenseItem> items = [];
   bool isLoading = true;
   bool isExporting = false;
   int selectedTabIndex = 0;
-  Set<int> selectedPurchaseIds = <int>{};
+  Set<int> selectedExpenseIds = <int>{};
   Map<ExpenseAccountType, AccountSettings> accountSettings = {
     ExpenseAccountType.personal: const AccountSettings(
       accountType: ExpenseAccountType.personal,
@@ -68,7 +68,7 @@ class PurchaseHomeController extends ChangeNotifier {
 
   OfflineBillOcrService get offlineBillOcrService => _offlineBillOcrService;
 
-  bool get isSelectionMode => selectedPurchaseIds.isNotEmpty;
+  bool get isSelectionMode => selectedExpenseIds.isNotEmpty;
 
   Future<void> initialize() async {
     await loadAccountSettings();
@@ -77,9 +77,9 @@ class PurchaseHomeController extends ChangeNotifier {
 
   Future<void> loadItems() async {
     isLoading = true;
-    selectedPurchaseIds.clear();
+    selectedExpenseIds.clear();
     notifyListeners();
-    final loadedItems = await _service.fetchPurchases(selectedAccount);
+    final loadedItems = await _service.fetchExpenses(selectedAccount);
     items = _sortItemsByDate(loadedItems);
     isLoading = false;
     notifyListeners();
@@ -105,42 +105,42 @@ class PurchaseHomeController extends ChangeNotifier {
     }
     selectedTabIndex = index;
     if (index != 0) {
-      selectedPurchaseIds.clear();
+      selectedExpenseIds.clear();
     }
     notifyListeners();
   }
 
-  void togglePurchaseSelection(PurchaseItem item) {
+  void toggleExpenseSelection(ExpenseItem item) {
     final id = item.id;
     if (id == null) {
       return;
     }
-    if (selectedPurchaseIds.contains(id)) {
-      selectedPurchaseIds.remove(id);
+    if (selectedExpenseIds.contains(id)) {
+      selectedExpenseIds.remove(id);
     } else {
-      selectedPurchaseIds.add(id);
+      selectedExpenseIds.add(id);
     }
     notifyListeners();
   }
 
-  bool isPurchaseSelected(PurchaseItem item) {
+  bool isExpenseSelected(ExpenseItem item) {
     final id = item.id;
     if (id == null) {
       return false;
     }
-    return selectedPurchaseIds.contains(id);
+    return selectedExpenseIds.contains(id);
   }
 
   void clearSelection() {
-    if (selectedPurchaseIds.isEmpty) {
+    if (selectedExpenseIds.isEmpty) {
       return;
     }
-    selectedPurchaseIds.clear();
+    selectedExpenseIds.clear();
     notifyListeners();
   }
 
-  Future<void> deleteSelectedPurchases() async {
-    final ids = Set<int>.from(selectedPurchaseIds);
+  Future<void> deleteSelectedExpenses() async {
+    final ids = Set<int>.from(selectedExpenseIds);
     if (ids.isEmpty) {
       return;
     }
@@ -151,7 +151,7 @@ class PurchaseHomeController extends ChangeNotifier {
     }).toList();
 
     for (final item in selectedItems) {
-      await _service.deletePurchase(item);
+      await _service.deleteExpense(item);
       await _offlineBillOcrService.deleteStoredAttachment(item.attachmentPath);
       for (final path in item.secondaryAttachmentPaths) {
         await _offlineBillOcrService.deleteStoredAttachment(path);
@@ -162,7 +162,7 @@ class PurchaseHomeController extends ChangeNotifier {
       final id = item.id;
       return id == null || !ids.contains(id);
     }).toList();
-    selectedPurchaseIds.clear();
+    selectedExpenseIds.clear();
     notifyListeners();
   }
 
@@ -206,7 +206,7 @@ class PurchaseHomeController extends ChangeNotifier {
     isExporting = true;
     notifyListeners();
     try {
-      final accountItems = await _service.fetchPurchases(selectedAccount);
+      final accountItems = await _service.fetchExpenses(selectedAccount);
       final filteredItems = _filterItemsByDateRange(accountItems, dateRange);
       if (filteredItems.isEmpty) {
         return false;
@@ -233,9 +233,9 @@ class PurchaseHomeController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> savePurchaseDraft(PurchaseItem draft) async {
+  Future<void> saveExpenseDraft(ExpenseItem draft) async {
     if (draft.id == null) {
-      final savedItem = await _service.insertPurchase(draft);
+      final savedItem = await _service.insertExpense(draft);
       items = _sortItemsByDate([savedItem, ...items]);
       notifyListeners();
       return;
@@ -244,7 +244,7 @@ class PurchaseHomeController extends ChangeNotifier {
     final index = items.indexWhere((existing) => existing.id == draft.id);
     final previous = index != -1 ? items[index] : null;
 
-    await _service.updatePurchase(draft);
+    await _service.updateExpense(draft);
 
     final previousAttachment = previous?.attachmentPath?.trim() ?? '';
     final nextAttachment = draft.attachmentPath?.trim() ?? '';
@@ -267,8 +267,8 @@ class PurchaseHomeController extends ChangeNotifier {
     }
   }
 
-  Future<void> deletePurchase(PurchaseItem item) async {
-    await _service.deletePurchase(item);
+  Future<void> deleteExpense(ExpenseItem item) async {
+    await _service.deleteExpense(item);
     await _offlineBillOcrService.deleteStoredAttachment(item.attachmentPath);
     for (final path in item.secondaryAttachmentPaths) {
       await _offlineBillOcrService.deleteStoredAttachment(path);
@@ -277,13 +277,13 @@ class PurchaseHomeController extends ChangeNotifier {
     if (id == null) {
       return;
     }
-    selectedPurchaseIds.remove(id);
+    selectedExpenseIds.remove(id);
     items = items.where((existing) => existing.id != id).toList();
     notifyListeners();
   }
 
-  List<PurchaseItem> _sortItemsByDate(List<PurchaseItem> unsorted) {
-    final sorted = List<PurchaseItem>.from(unsorted)
+  List<ExpenseItem> _sortItemsByDate(List<ExpenseItem> unsorted) {
+    final sorted = List<ExpenseItem>.from(unsorted)
       ..sort((a, b) {
         final byDate = b.date.compareTo(a.date);
         if (byDate != 0) {
@@ -294,8 +294,8 @@ class PurchaseHomeController extends ChangeNotifier {
     return sorted;
   }
 
-  List<PurchaseItem> _filterItemsByDateRange(
-    List<PurchaseItem> source,
+  List<ExpenseItem> _filterItemsByDateRange(
+    List<ExpenseItem> source,
     DateTimeRange dateRange,
   ) {
     final start = DateTime(

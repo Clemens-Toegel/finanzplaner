@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../gen/app_localizations.dart';
-import '../../state/add_edit_purchase_controller.dart';
+import '../../state/add_edit_expense_controller.dart';
 
-class AddEditPurchaseFooter extends StatelessWidget {
-  const AddEditPurchaseFooter({
+class AddEditExpenseFooter extends StatelessWidget {
+  const AddEditExpenseFooter({
     super.key,
     required this.isEdit,
     required this.onCancel,
@@ -21,7 +21,7 @@ class AddEditPurchaseFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final controller = context.read<AddEditPurchaseController>();
+    final controller = context.read<AddEditExpenseController>();
 
     return SafeArea(
       top: false,
@@ -56,7 +56,7 @@ class AddEditPurchaseFooter extends StatelessWidget {
                               : null,
                           icon: Icon(isEdit ? Icons.save : Icons.add),
                           label: Text(
-                            isEdit ? l10n.savePurchaseAction : l10n.addPurchase,
+                            isEdit ? l10n.saveExpenseAction : l10n.addExpense,
                           ),
                         );
                       },
