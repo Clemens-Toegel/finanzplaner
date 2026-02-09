@@ -3,12 +3,12 @@ import 'package:finanzplaner/gen/app_localizations.dart';
 import 'package:finanzplaner/gen/app_localizations_en.dart';
 import 'package:finanzplaner/models/account_settings.dart';
 import 'package:finanzplaner/models/expense_account_type.dart';
-import 'package:finanzplaner/models/purchase_item.dart';
-import 'package:finanzplaner/services/purchase_home_service.dart';
-import 'package:finanzplaner/state/purchase_home_controller.dart';
+import 'package:finanzplaner/models/expense_item.dart';
+import 'package:finanzplaner/services/expense_home_service.dart';
+import 'package:finanzplaner/state/expense_home_controller.dart';
 
-class _FakePurchaseHomeService implements PurchaseHomeService {
-  final Map<ExpenseAccountType, List<PurchaseItem>> store = {
+class _FakeExpenseHomeService implements ExpenseHomeService {
+  final Map<ExpenseAccountType, List<ExpenseItem>> store = {
     ExpenseAccountType.business: [],
     ExpenseAccountType.personal: [],
   };
@@ -27,7 +27,7 @@ class _FakePurchaseHomeService implements PurchaseHomeService {
   int _id = 1;
 
   @override
-  Future<void> deletePurchase(PurchaseItem item) async {
+  Future<void> deleteExpense(ExpenseItem item) async {
     final id = item.id;
     if (id == null) {
       return;
@@ -40,7 +40,7 @@ class _FakePurchaseHomeService implements PurchaseHomeService {
   @override
   Future<void> exportPdf({
     required ExpenseAccountType account,
-    required List<PurchaseItem> items,
+    required List<ExpenseItem> items,
     required AppLocalizations localizations,
     required AccountSettings? accountSettings,
   }) async {}
@@ -52,12 +52,12 @@ class _FakePurchaseHomeService implements PurchaseHomeService {
   }
 
   @override
-  Future<List<PurchaseItem>> fetchPurchases(ExpenseAccountType account) async {
-    return List<PurchaseItem>.from(store[account]!);
+  Future<List<ExpenseItem>> fetchExpenses(ExpenseAccountType account) async {
+    return List<ExpenseItem>.from(store[account]!);
   }
 
   @override
-  Future<PurchaseItem> insertPurchase(PurchaseItem item) async {
+  Future<ExpenseItem> insertExpense(ExpenseItem item) async {
     final saved = item.copyWith(id: _id++);
     store[item.accountType] = [saved, ...store[item.accountType]!];
     return saved;
@@ -71,7 +71,7 @@ class _FakePurchaseHomeService implements PurchaseHomeService {
   }
 
   @override
-  Future<PurchaseItem> updatePurchase(PurchaseItem item) async {
+  Future<ExpenseItem> updateExpense(ExpenseItem item) async {
     final list = store[item.accountType]!;
     final index = list.indexWhere((e) => e.id == item.id);
     if (index != -1) {
@@ -81,13 +81,13 @@ class _FakePurchaseHomeService implements PurchaseHomeService {
   }
 }
 
-PurchaseItem _item({
+ExpenseItem _item({
   int? id,
   required ExpenseAccountType account,
   required DateTime date,
   double amount = 10,
 }) {
-  return PurchaseItem(
+  return ExpenseItem(
     id: id,
     accountType: account,
     description: 'Item',
@@ -103,11 +103,11 @@ PurchaseItem _item({
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('PurchaseHomeController', () {
+  group('ExpenseHomeController', () {
     test(
-      'initialize loads settings and purchases sorted desc by date',
+      'initialize loads settings and expenses sorted desc by date',
       () async {
-        final service = _FakePurchaseHomeService();
+        final service = _FakeExpenseHomeService();
         service.store[ExpenseAccountType.business] = [
           _item(
             id: 1,
@@ -121,7 +121,7 @@ void main() {
           ),
         ];
 
-        final controller = PurchaseHomeController(service: service);
+        final controller = ExpenseHomeController(service: service);
         await controller.initialize();
 
         expect(controller.isLoading, isFalse);
@@ -134,11 +134,11 @@ void main() {
       },
     );
 
-    test('savePurchaseDraft inserts new item', () async {
-      final service = _FakePurchaseHomeService();
-      final controller = PurchaseHomeController(service: service);
+    test('saveExpenseDraft inserts new item', () async {
+      final service = _FakeExpenseHomeService();
+      final controller = ExpenseHomeController(service: service);
 
-      await controller.savePurchaseDraft(
+      await controller.saveExpenseDraft(
         _item(account: ExpenseAccountType.business, date: DateTime(2025, 1, 1)),
       );
 
@@ -148,7 +148,7 @@ void main() {
     });
 
     test('changeAccount reloads list for selected account', () async {
-      final service = _FakePurchaseHomeService();
+      final service = _FakeExpenseHomeService();
       service.store[ExpenseAccountType.business] = [
         _item(
           id: 1,
@@ -164,7 +164,7 @@ void main() {
         ),
       ];
 
-      final controller = PurchaseHomeController(service: service);
+      final controller = ExpenseHomeController(service: service);
       await controller.initialize();
       await controller.changeAccount(ExpenseAccountType.personal);
 
@@ -174,8 +174,8 @@ void main() {
     });
 
     test('exportPdf delegates without throwing', () async {
-      final controller = PurchaseHomeController(
-        service: _FakePurchaseHomeService(),
+      final controller = ExpenseHomeController(
+        service: _FakeExpenseHomeService(),
       );
       await controller.exportPdf(AppLocalizationsEn());
       controller.dispose();
@@ -184,8 +184,8 @@ void main() {
     test(
       'exportExcelForTaxConsultant returns false when there is no data',
       () async {
-        final controller = PurchaseHomeController(
-          service: _FakePurchaseHomeService(),
+        final controller = ExpenseHomeController(
+          service: _FakeExpenseHomeService(),
         );
 
         final result = await controller.exportExcelForTaxConsultant(

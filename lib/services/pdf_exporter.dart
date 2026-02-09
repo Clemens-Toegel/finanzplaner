@@ -7,12 +7,12 @@ import '../gen/app_localizations.dart';
 import '../localization/app_localizations_ext.dart';
 import '../models/account_settings.dart';
 import '../models/expense_account_type.dart';
-import '../models/purchase_item.dart';
+import '../models/expense_item.dart';
 
 class PdfExporter {
-  Future<void> exportPurchases({
+  Future<void> exportExpenses({
     required ExpenseAccountType account,
-    required List<PurchaseItem> items,
+    required List<ExpenseItem> items,
     required AppLocalizations localizations,
     AccountSettings? accountSettings,
   }) async {
@@ -29,7 +29,7 @@ class PdfExporter {
     );
 
     // Chronological order is easier for tax review.
-    final sortedItems = List<PurchaseItem>.from(items)
+    final sortedItems = List<ExpenseItem>.from(items)
       ..sort((a, b) => a.date.compareTo(b.date));
     final groupedItems = _groupItemsByMonth(sortedItems);
 
@@ -147,10 +147,10 @@ class PdfExporter {
     );
   }
 
-  Map<DateTime, List<PurchaseItem>> _groupItemsByMonth(
-    List<PurchaseItem> items,
+  Map<DateTime, List<ExpenseItem>> _groupItemsByMonth(
+    List<ExpenseItem> items,
   ) {
-    final groupedItems = <DateTime, List<PurchaseItem>>{};
+    final groupedItems = <DateTime, List<ExpenseItem>>{};
     for (final item in items) {
       final monthKey = DateTime(item.date.year, item.date.month);
       groupedItems.putIfAbsent(monthKey, () => []).add(item);
@@ -159,7 +159,7 @@ class PdfExporter {
   }
 
   List<List<String>> _rowsForItem(
-    PurchaseItem item,
+    ExpenseItem item,
     DateFormat dateFormat,
     NumberFormat currencyFormat,
     AppLocalizations localizations,
@@ -196,7 +196,7 @@ class PdfExporter {
   }
 
   List<pw.Widget> _buildMonthlySections({
-    required Map<DateTime, List<PurchaseItem>> groupedItems,
+    required Map<DateTime, List<ExpenseItem>> groupedItems,
     required DateFormat monthFormat,
     required DateFormat dateFormat,
     required NumberFormat currencyFormat,

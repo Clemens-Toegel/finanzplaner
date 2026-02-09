@@ -1,40 +1,46 @@
-import '../data/purchase_repository.dart';
+import '../data/expense_repository.dart';
 import '../gen/app_localizations.dart';
 import '../models/account_settings.dart';
 import '../models/expense_account_type.dart';
-import '../models/purchase_item.dart';
+import '../models/expense_item.dart';
 import 'pdf_exporter.dart';
 
-abstract class PurchaseHomeService {
-  Future<List<PurchaseItem>> fetchPurchases(ExpenseAccountType account);
+abstract class PiloHomeService {
+  Future<List<ExpenseItem>> fetchExpenses(ExpenseAccountType account);
+
   Future<Map<ExpenseAccountType, AccountSettings>> fetchAccountSettings();
+
   Future<void> saveAccountSettings(
     Map<ExpenseAccountType, AccountSettings> settings,
   );
-  Future<PurchaseItem> insertPurchase(PurchaseItem item);
-  Future<PurchaseItem> updatePurchase(PurchaseItem item);
-  Future<void> deletePurchase(PurchaseItem item);
+
+  Future<ExpenseItem> insertExpense(ExpenseItem item);
+
+  Future<ExpenseItem> updateExpense(ExpenseItem item);
+
+  Future<void> deleteExpense(ExpenseItem item);
+
   Future<void> exportPdf({
     required ExpenseAccountType account,
-    required List<PurchaseItem> items,
+    required List<ExpenseItem> items,
     required AppLocalizations localizations,
     required AccountSettings? accountSettings,
   });
 }
 
-class DefaultPurchaseHomeService implements PurchaseHomeService {
-  DefaultPurchaseHomeService({
-    PurchaseRepository? repository,
+class DefaultExpenseHomeService implements PiloHomeService {
+  DefaultExpenseHomeService({
+    ExpenseRepository? repository,
     PdfExporter? pdfExporter,
-  }) : _repository = repository ?? PurchaseRepository(),
+  }) : _repository = repository ?? ExpenseRepository(),
        _pdfExporter = pdfExporter ?? PdfExporter();
 
-  final PurchaseRepository _repository;
+  final ExpenseRepository _repository;
   final PdfExporter _pdfExporter;
 
   @override
-  Future<List<PurchaseItem>> fetchPurchases(ExpenseAccountType account) {
-    return _repository.fetchPurchases(account);
+  Future<List<ExpenseItem>> fetchExpenses(ExpenseAccountType account) {
+    return _repository.fetchExpenses(account);
   }
 
   @override
@@ -55,32 +61,32 @@ class DefaultPurchaseHomeService implements PurchaseHomeService {
   }
 
   @override
-  Future<PurchaseItem> insertPurchase(PurchaseItem item) {
-    return _repository.insertPurchase(item);
+  Future<ExpenseItem> insertExpense(ExpenseItem item) {
+    return _repository.insertExpense(item);
   }
 
   @override
-  Future<PurchaseItem> updatePurchase(PurchaseItem item) {
-    return _repository.updatePurchase(item);
+  Future<ExpenseItem> updateExpense(ExpenseItem item) {
+    return _repository.updateExpense(item);
   }
 
   @override
-  Future<void> deletePurchase(PurchaseItem item) {
+  Future<void> deleteExpense(ExpenseItem item) {
     final id = item.id;
     if (id == null) {
       return Future.value();
     }
-    return _repository.deletePurchase(id);
+    return _repository.deleteExpenses(id);
   }
 
   @override
   Future<void> exportPdf({
     required ExpenseAccountType account,
-    required List<PurchaseItem> items,
+    required List<ExpenseItem> items,
     required AppLocalizations localizations,
     required AccountSettings? accountSettings,
   }) {
-    return _pdfExporter.exportPurchases(
+    return _pdfExporter.exportExpenses(
       account: account,
       items: items,
       localizations: localizations,

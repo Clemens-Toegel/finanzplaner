@@ -4,8 +4,8 @@ import '../../gen/app_localizations.dart';
 import '../../widgets/pilo_logo.dart';
 import 'dashboard_metric_card.dart';
 
-class PurchaseDashboardTab extends StatelessWidget {
-  const PurchaseDashboardTab({
+class ExpenseDashboardTab extends StatelessWidget {
+  const ExpenseDashboardTab({
     super.key,
     required this.localizations,
     required this.formattedTotalAmount,

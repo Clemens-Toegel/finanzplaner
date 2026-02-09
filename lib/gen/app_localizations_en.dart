@@ -12,7 +12,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Pilo';
 
   @override
-  String get taxRefundPurchasesTitle => 'Pilo';
+  String get taxRefundExpensesTitle => 'Pilo';
 
   @override
   String get exportPdfTooltip => 'Export PDF';
@@ -127,28 +127,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountLabelInSentenceBusiness => 'business expenses';
 
   @override
-  String get addPurchase => 'Add expense';
+  String get addExpense => 'Add expense';
 
   @override
-  String get addPurchaseTitle => 'Add expense';
+  String get addExpenseTitle => 'Add expense';
 
   @override
-  String get editPurchaseTitle => 'Edit expense';
+  String get editExpenseTitle => 'Edit expense';
 
   @override
-  String get editPurchaseAction => 'Edit';
+  String get editExpenseAction => 'Edit';
 
   @override
-  String get savePurchaseAction => 'Save';
+  String get saveExpenseAction => 'Save';
 
   @override
-  String get deletePurchaseAction => 'Delete';
+  String get deleteExpenseAction => 'Delete';
 
   @override
-  String get deletePurchaseTitle => 'Delete expense?';
+  String get deleteExpenseTitle => 'Delete expense?';
 
   @override
-  String get deletePurchaseMessage =>
+  String get deleteExpenseMessage =>
       'Do you really want to delete this expense?';
 
   @override
@@ -158,7 +158,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmDeleteAction => 'Delete';
 
   @override
-  String get purchaseDetailsTitle => 'Expense details';
+  String get expenseDetailsTitle => 'Expense details';
 
   @override
   String get descriptionLabel => 'Description';
@@ -182,7 +182,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryLabel => 'Category';
 
   @override
-  String get dateOfPurchaseLabel => 'Purchase date';
+  String get dateOfExpenseLabel => 'Expense date';
 
   @override
   String get pickDate => 'Select';

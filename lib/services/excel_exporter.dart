@@ -8,12 +8,12 @@ import 'package:share_plus/share_plus.dart';
 import '../gen/app_localizations.dart';
 import '../models/account_settings.dart';
 import '../models/expense_account_type.dart';
-import '../models/purchase_item.dart';
+import '../models/expense_item.dart';
 
 class ExcelExporter {
   Future<void> exportForTaxConsultant({
     required ExpenseAccountType account,
-    required List<PurchaseItem> items,
+    required List<ExpenseItem> items,
     required AccountSettings? accountSettings,
     required AppLocalizations localizations,
   }) async {
@@ -43,7 +43,7 @@ class ExcelExporter {
       TextCellValue(localizations.excelHeaderSubItemAmountEur),
     ]);
 
-    final sorted = List<PurchaseItem>.from(items)
+    final sorted = List<ExpenseItem>.from(items)
       ..sort((a, b) {
         final byDate = a.date.compareTo(b.date);
         if (byDate != 0) {
@@ -93,10 +93,10 @@ class ExcelExporter {
       }
     }
 
-    double totalFor(List<PurchaseItem> list) =>
+    double totalFor(List<ExpenseItem> list) =>
         list.fold(0, (total, item) => total + item.amount);
 
-    double deductibleFor(List<PurchaseItem> list) => list
+    double deductibleFor(List<ExpenseItem> list) => list
         .where((item) => item.isDeductible)
         .fold(0, (total, item) => total + item.amount);
 

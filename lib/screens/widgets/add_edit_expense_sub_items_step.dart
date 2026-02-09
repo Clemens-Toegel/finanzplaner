@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 
 import '../../gen/app_localizations.dart';
 import '../../models/expense_sub_item.dart';
-import '../../state/add_edit_purchase_controller.dart';
+import '../../state/add_edit_expense_controller.dart';
 
-class AddEditPurchaseSubItemsStep extends StatelessWidget {
-  const AddEditPurchaseSubItemsStep({
+class AddEditExpenseSubItemsStep extends StatelessWidget {
+  const AddEditExpenseSubItemsStep({
     super.key,
     required this.currencyFormat,
     required this.onAddOrEditSubItem,
@@ -27,10 +27,10 @@ class AddEditPurchaseSubItemsStep extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final controller = context.read<AddEditPurchaseController>();
+    final controller = context.read<AddEditExpenseController>();
     final vm = context
         .select<
-          AddEditPurchaseController,
+          AddEditExpenseController,
           ({
             double subItemsTotal,
             double? remainingForSubItems,
@@ -160,7 +160,7 @@ class AddEditPurchaseSubItemsStep extends StatelessWidget {
                           icon: const Icon(Icons.keyboard_arrow_down),
                         ),
                         IconButton(
-                          tooltip: l10n.deletePurchaseAction,
+                          tooltip: l10n.deleteExpenseAction,
                           onPressed: () => onRemoveSecondaryImage(index),
                           icon: const Icon(Icons.delete_outline),
                         ),
@@ -205,7 +205,7 @@ class AddEditPurchaseSubItemsStep extends StatelessWidget {
                     icon: const Icon(Icons.edit_outlined),
                   ),
                   IconButton(
-                    tooltip: l10n.deletePurchaseAction,
+                    tooltip: l10n.deleteExpenseAction,
                     onPressed: () => controller.removeSubItemAt(index),
                     icon: const Icon(Icons.delete_outline),
                   ),

@@ -6,16 +6,16 @@ import 'package:path/path.dart' as p;
 import 'package:share_plus/share_plus.dart';
 
 import '../gen/app_localizations.dart';
-import '../models/purchase_item.dart';
+import '../models/expense_item.dart';
 import '../services/pdf_exporter.dart';
 import '../widgets/info_chip.dart';
 
-enum PurchaseDetailAction { edit, delete }
+enum ExpenseDetailAction { edit, delete }
 
-class PurchaseDetailPage extends StatelessWidget {
-  const PurchaseDetailPage({super.key, required this.item});
+class ExpenseDetailPage extends StatelessWidget {
+  const ExpenseDetailPage({super.key, required this.item});
 
-  final PurchaseItem item;
+  final ExpenseItem item;
 
   Future<void> _downloadAttachment(
     BuildContext context,
@@ -41,7 +41,7 @@ class PurchaseDetailPage extends StatelessWidget {
   Future<void> _exportExpensePdf(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     try {
-      await PdfExporter().exportPurchases(
+      await PdfExporter().exportExpenses(
         account: item.accountType,
         items: [item],
         localizations: l10n,
@@ -64,13 +64,13 @@ class PurchaseDetailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.purchaseDetailsTitle),
+        title: Text(l10n.expenseDetailsTitle),
         actions: [
           IconButton(
-            tooltip: l10n.editPurchaseAction,
+            tooltip: l10n.editExpenseAction,
             icon: const Icon(Icons.edit),
             onPressed: () {
-              Navigator.pop(context, PurchaseDetailAction.edit);
+              Navigator.pop(context, ExpenseDetailAction.edit);
             },
           ),
           IconButton(
@@ -79,14 +79,14 @@ class PurchaseDetailPage extends StatelessWidget {
             onPressed: () => _exportExpensePdf(context),
           ),
           IconButton(
-            tooltip: l10n.deletePurchaseAction,
+            tooltip: l10n.deleteExpenseAction,
             icon: const Icon(Icons.delete_outline),
             onPressed: () async {
               final shouldDelete = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: Text(l10n.deletePurchaseTitle),
-                  content: Text(l10n.deletePurchaseMessage),
+                  title: Text(l10n.deleteExpenseTitle),
+                  content: Text(l10n.deleteExpenseMessage),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
@@ -103,7 +103,7 @@ class PurchaseDetailPage extends StatelessWidget {
                 if (!context.mounted) {
                   return;
                 }
-                Navigator.pop(context, PurchaseDetailAction.delete);
+                Navigator.pop(context, ExpenseDetailAction.delete);
               }
             },
           ),
@@ -157,7 +157,7 @@ class PurchaseDetailPage extends StatelessWidget {
             ),
             _DetailTile(label: l10n.categoryLabel, value: item.category),
             _DetailTile(
-              label: l10n.dateOfPurchaseLabel,
+              label: l10n.dateOfExpenseLabel,
               value: dateFormat.format(item.date),
             ),
             _DetailTile(

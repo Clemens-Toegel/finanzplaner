@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:finanzplaner/models/expense_account_type.dart';
 import 'package:finanzplaner/models/expense_sub_item.dart';
-import 'package:finanzplaner/state/add_edit_purchase_controller.dart';
+import 'package:finanzplaner/state/add_edit_expense_controller.dart';
 
 void main() {
-  group('AddEditPurchaseController', () {
+  group('AddEditExpenseController', () {
     test('initializes with defaults and computes derived values', () {
-      final controller = AddEditPurchaseController(
+      final controller = AddEditExpenseController(
         selectedAccount: ExpenseAccountType.business,
         categories: const ['Office', 'Travel'],
       );
@@ -18,7 +18,7 @@ void main() {
     });
 
     test('applySubItemsTotalToAmount updates amount', () {
-      final controller = AddEditPurchaseController(
+      final controller = AddEditExpenseController(
         selectedAccount: ExpenseAccountType.business,
         categories: const ['Office'],
       );
@@ -35,7 +35,7 @@ void main() {
     });
 
     test('hasUnsavedChanges reflects form changes', () {
-      final controller = AddEditPurchaseController(
+      final controller = AddEditExpenseController(
         selectedAccount: ExpenseAccountType.business,
         categories: const ['Office'],
       );

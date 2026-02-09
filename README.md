@@ -38,7 +38,7 @@ lib/
   app.dart
   main.dart
   data/
-    purchase_repository.dart
+    expense_repository.dart
   models/
   screens/
   services/
@@ -69,6 +69,6 @@ Branding assets and guideline:
 
 ## Notes
 
-- Data is stored locally in SQLite (`purchase_tracker.db`)
+- Data is stored locally in SQLite (`expense_tracker.db`)
 - OCR runs on-device
 - iOS deployment target is 15.5+

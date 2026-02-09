@@ -4,8 +4,8 @@ import '../../gen/app_localizations.dart';
 import '../../localization/app_localizations_ext.dart';
 import '../../models/expense_account_type.dart';
 
-class PurchaseAccountSwitcher extends StatelessWidget {
-  const PurchaseAccountSwitcher({
+class ExpenseAccountSwitcher extends StatelessWidget {
+  const ExpenseAccountSwitcher({
     super.key,
     required this.localizations,
     required this.selectedAccount,

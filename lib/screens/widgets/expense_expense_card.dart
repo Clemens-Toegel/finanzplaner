@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../gen/app_localizations.dart';
-import '../../models/purchase_item.dart';
+import '../../models/expense_item.dart';
 import '../../widgets/info_chip.dart';
 
-class PurchaseExpenseCard extends StatelessWidget {
-  const PurchaseExpenseCard({
+class ExpenseExpenseCard extends StatelessWidget {
+  const ExpenseExpenseCard({
     super.key,
     required this.item,
     required this.localizations,
@@ -18,7 +18,7 @@ class PurchaseExpenseCard extends StatelessWidget {
     this.isSelected = false,
   });
 
-  final PurchaseItem item;
+  final ExpenseItem item;
   final AppLocalizations localizations;
   final DateFormat dateFormat;
   final NumberFormat currencyFormat;

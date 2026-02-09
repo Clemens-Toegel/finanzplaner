@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../gen/app_localizations.dart';
-import '../../models/purchase_item.dart';
+import '../../models/expense_item.dart';
 import 'month_header_delegate.dart';
-import 'purchase_summary_card.dart';
+import 'expense_summary_card.dart';
 
-class PurchaseExpensesTab extends StatelessWidget {
-  const PurchaseExpensesTab({
+class ExpenseExpensesTab extends StatelessWidget {
+  const ExpenseExpensesTab({
     super.key,
     required this.localizations,
     required this.items,
@@ -16,11 +16,11 @@ class PurchaseExpensesTab extends StatelessWidget {
   });
 
   final AppLocalizations localizations;
-  final List<PurchaseItem> items;
+  final List<ExpenseItem> items;
   final String summaryDeductibleAmount;
-  final Widget Function(PurchaseItem item) onBuildItem;
+  final Widget Function(ExpenseItem item) onBuildItem;
 
-  List<_MonthSection> _groupItemsByMonth(List<PurchaseItem> items) {
+  List<_MonthSection> _groupItemsByMonth(List<ExpenseItem> items) {
     final sections = <_MonthSection>[];
     for (final item in items) {
       if (sections.isEmpty ||
@@ -50,7 +50,7 @@ class PurchaseExpensesTab extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
-          child: PurchaseSummaryCard(
+          child: ExpenseSummaryCard(
             localizations: localizations,
             itemCount: items.length,
             formattedDeductibleAmount: summaryDeductibleAmount,
@@ -104,5 +104,5 @@ class _MonthSection {
   _MonthSection({required this.month, required this.items});
 
   final DateTime month;
-  final List<PurchaseItem> items;
+  final List<ExpenseItem> items;
 }
