@@ -1,0 +1,106 @@
+default_platform(:ios)
+
+PROJECT_ROOT = File.expand_path('..', __dir__)
+IOS_SCREENSHOT_DIR = File.join(PROJECT_ROOT, 'screenshots/app_store/ios')
+ANDROID_SCREENSHOT_DIR = File.join(PROJECT_ROOT, 'screenshots/app_store/android')
+
+def normalize_ios_screenshots(locale_dir)
+  Dir.glob(File.join(locale_dir, '*.png')).each do |file|
+    size = `sips -g pixelWidth -g pixelHeight "#{file}" 2>/dev/null`
+    width = size[/pixelWidth: (\d+)/, 1].to_i
+    height = size[/pixelHeight: (\d+)/, 1].to_i
+
+    allowed = [[1242, 2688], [2688, 1242], [1284, 2778], [2778, 1284]]
+    next if allowed.include?([width, height])
+
+    if height >= width
+      sh("sips -c 2778 1284 \"#{file}\" --out \"#{file}\"")
+    else
+      sh("sips -c 1284 2778 \"#{file}\" --out \"#{file}\"")
+    end
+  end
+end
+
+platform :ios do
+  desc 'Capture iOS App Store screenshots via snapshot (requires UI tests)'
+  lane :screenshots_ios do
+    snapshot(
+      workspace: 'ios/Runner.xcworkspace',
+      scheme: 'Runner',
+      output_directory: IOS_SCREENSHOT_DIR,
+      devices: [
+        'iPhone 16 Pro Max',
+        'iPad Pro 13-inch (M4)'
+      ],
+      languages: ['en-US', 'de-DE'],
+      clear_previous_screenshots: true,
+      override_status_bar: true,
+      reinstall_app: true,
+      stop_after_first_error: true,
+      number_of_retries: 1
+    )
+  end
+
+  desc 'Capture iOS screenshots via Flutter integration test flow (all locales)'
+  lane :screenshots_flutter_ios do
+    locales = ['en-US', 'de-DE']
+    device = ENV['IOS_SCREENSHOT_DEVICE'] || 'iPhone 16 Pro Max'
+
+    sh("xcrun simctl boot \"#{device}\" || true")
+    sh("xcrun simctl bootstatus \"#{device}\" -b")
+
+    locales.each do |locale|
+      locale_dir = File.join(IOS_SCREENSHOT_DIR, locale)
+      sh("mkdir -p \"#{locale_dir}\"")
+      sh("rm -f \"#{locale_dir}\"/*.png")
+
+      sh("xcrun simctl boot \"#{device}\" || true")
+      sh("xcrun simctl bootstatus \"#{device}\" -b")
+      sh("SCREENSHOT_PLATFORM=ios SCREENSHOT_BASE_DIR=#{IOS_SCREENSHOT_DIR} SCREENSHOT_OUTPUT_SUBDIR=#{locale} flutter drive --driver=test_driver/integration_test.dart --target=integration_test/store_screenshots_test.dart -d \"#{device}\" --dart-define=SCREENSHOT_LOCALE=#{locale}")
+      sh("xcrun simctl boot \"#{device}\" || true")
+      sh("xcrun simctl bootstatus \"#{device}\" -b")
+      sh("SCREENSHOT_PLATFORM=ios SCREENSHOT_BASE_DIR=#{IOS_SCREENSHOT_DIR} SCREENSHOT_OUTPUT_SUBDIR=#{locale} flutter drive --driver=test_driver/integration_test.dart --target=integration_test/store_screenshots_more_test.dart -d \"#{device}\" --dart-define=SCREENSHOT_LOCALE=#{locale}")
+
+      # Only use with iphone
+      normalize_ios_screenshots(locale_dir)
+    end
+  end
+end
+
+platform :android do
+  desc 'Capture Android Play Store screenshots via screengrab (requires instrumentation screenshot tests)'
+  lane :screenshots_android do
+    screengrab(
+      app_package_name: 'at.clemitdev.pilo',
+      output_directory: ANDROID_SCREENSHOT_DIR,
+      locales: ['en-US', 'de-DE'],
+      clear_previous_screenshots: true
+    )
+  end
+
+  desc 'Capture Android screenshots via Flutter integration test flow (all locales)'
+  lane :screenshots_flutter_android do
+    locales = ['en-US', 'de-DE']
+
+    sh('flutter emulators --launch Medium_Phone_API_36 || true')
+    sh('adb wait-for-device')
+
+    locales.each do |locale|
+      locale_dir = File.join(ANDROID_SCREENSHOT_DIR, locale)
+      sh("mkdir -p \"#{locale_dir}\"")
+      sh("rm -f \"#{locale_dir}\"/*.png")
+      sh("SCREENSHOT_PLATFORM=android SCREENSHOT_BASE_DIR=#{ANDROID_SCREENSHOT_DIR} SCREENSHOT_OUTPUT_SUBDIR=#{locale} flutter drive --driver=test_driver/integration_test.dart --target=integration_test/store_screenshots_test.dart -d emulator-5554 --dart-define=SCREENSHOT_LOCALE=#{locale}")
+      sh("SCREENSHOT_PLATFORM=android SCREENSHOT_BASE_DIR=#{ANDROID_SCREENSHOT_DIR} SCREENSHOT_OUTPUT_SUBDIR=#{locale} flutter drive --driver=test_driver/integration_test.dart --target=integration_test/store_screenshots_more_test.dart -d emulator-5554 --dart-define=SCREENSHOT_LOCALE=#{locale}")
+    end
+  end
+end
+
+lane :screenshots_all do
+  screenshots_ios
+  screenshots_android
+end
+
+lane :screenshots_flutter_all do
+  screenshots_flutter_ios
+  screenshots_flutter_android
+end

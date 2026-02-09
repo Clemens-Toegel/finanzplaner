@@ -1,0 +1,4 @@
+app_package_name "at.clemitdev.pilo"
+output_directory "screenshots/app_store/android"
+clear_previous_screenshots true
+locales(["en-US", "de-DE"])

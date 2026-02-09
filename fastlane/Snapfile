@@ -1,0 +1,16 @@
+workspace "ios/Runner.xcworkspace"
+scheme "Runner"
+output_directory "screenshots/app_store/ios"
+clear_previous_screenshots true
+override_status_bar true
+reinstall_app true
+stop_after_first_error true
+devices([
+  "iPhone 16 Pro Max",
+  "iPhone 16e",
+  "iPad Pro 13-inch (M4)"
+])
+languages([
+  "en-US",
+  "de-DE"
+])
