@@ -17,6 +17,7 @@ class PiloApp extends StatelessWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       home: const PiloHomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

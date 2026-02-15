@@ -30,7 +30,7 @@ class ExpenseDashboardTab extends StatelessWidget {
       children: [
         IgnorePointer(
           child: Align(
-            alignment: Alignment.topRight,
+            alignment: Alignment.center,
             child: Padding(
               padding: const EdgeInsets.only(top: 24, right: 12),
               child: Opacity(
